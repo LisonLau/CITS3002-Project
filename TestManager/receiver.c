@@ -27,18 +27,18 @@ int getQuestionFile() {
     // Clear the serv_addr struct
     memset((char *) &ser_addr, 0, sizeof(ser_addr));
 
-    // Attach socket to port
+    // Set socket options
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-        perror("[-] Error in attaching socket to port.");
+        perror("[-] Error in setting socket options.");
         exit(EXIT_FAILURE);
     }
-    printf("[+] Attaching socket to port successful.\n");
+    printf("[+] Set socket options successful.\n");
 
     ser_addr.sin_family      = AF_INET;
     ser_addr.sin_port        = htons(port);
     ser_addr.sin_addr.s_addr = INADDR_ANY;
 
-    // Bind socket to address and port
+    // Bind socket to port
     if (bind(sockfd, (struct sockaddr*)&ser_addr, sizeof(ser_addr)) < 0) {
         perror("[-] Error in binding.");
         exit(EXIT_FAILURE);
