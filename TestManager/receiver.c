@@ -7,7 +7,7 @@
 #define USERNAME    "user1"
 #define PASSWORD    "pass1"
 
-int main() {
+int getQuestionFile() {
     char *host  = "127.0.0.1";  // host
     int port    = 8080;         // port
     int opt = 1;
@@ -72,6 +72,11 @@ int main() {
     }
     printf("[+] File received successfully.\n");
     fclose(fp);     // Close the file
+}
+
+int main() {
+    getQuestionFile();
+    
 
     return EXIT_SUCCESS;
 }

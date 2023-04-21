@@ -41,11 +41,8 @@ def gradeMCQ(question, student_answer):
     return False
 
 def sendQuestionFile(student, password):
-    BUFFERSIZE = 1024
-    FORMAT = "utf-8"
     host = "127.0.0.1"  # host
     port = 8080         # port
-    filename = makeQuestionFile(student, password)
     
     # create the client socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
