@@ -19,6 +19,10 @@ typedef struct Student {
 Student     students[MAX_STUDENTS];
 int numStudents;
 
+int server_fd, new_socket, valread;
+struct sockaddr_in address;
+
 extern void storeRegistered();
 extern int authenticate(char *, char *);
 extern void getUserLogin();
+extern void handle_socket(int, int, int, struct sockaddr_in *, int, char *, char *, char *, char *);
