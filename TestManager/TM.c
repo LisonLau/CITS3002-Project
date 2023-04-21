@@ -29,7 +29,7 @@ void storeRegistered() {
 
     fp = fopen("students.csv", "r");
     if (fp == NULL) {
-        printf("Error opening file.\n");
+        perror("[-] Error opening file.\n");
     }
  
     while (fgets(line, sizeof(line), fp) != NULL) {
@@ -119,23 +119,27 @@ void getUserLogin() {
         char *form = strstr(buffer, "uname=");
         char response[BUFFERSIZE] = {0};
 
+        // Display login page
         if (strstr(buffer, "GET / HTTP/1.1") != NULL) {
-            // Display login page
             char *loginHTML = "<html><body><h1>Login</h1><form method=\"post\"><label for=\"uname\">Username : </label><input type=\"text\" name=\"uname\" value=\"\" required><br><br><label for=\"pword\">Password : </label><input type=\"text\" name=\"pword\" value=\"\" required><br><br><button type=\"submit\">Login</button></form></body></html>";
             sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(loginHTML), loginHTML);
             send(newsockfd, response, strlen(response), 0);
-        } else if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
-            // Extract the username and password from the form data
+        } 
+        // Extract the username and password from the form data
+        else if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
             char username[MAX_USERNAME_LENGTH] = {0};
             char password[MAX_PASSWORD_LENGTH] = {0};
             sscanf(form, "uname=%[^&]&pword=%s", username, password);
+            
+            // User successfully logged in, display question page
             if (authenticate(username, password)) {
-                // Display question page
+                // Loop for 10 Questions
                 char *questionHTML = createQuestionHTML();
                 sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(questionHTML), questionHTML);
                 send(newsockfd, response, strlen(response), 0);
-            } else {
-                // Ask for relogin
+            } 
+            // User failed to logged in, ask for login attempt
+            else {
                 char *loginFAILED  = "<html><body><h1>Login</h1><form method=\"post\"><label for=\"uname\">Username : </label><input type=\"text\" name=\"uname\" required><br><br><label for=\"pword\">Password : </label><input type=\"text\" name=\"pword\" required><br><p>Login failed. Try again.</p><br><button type=\"submit\">Login</button></form></body></html>";
                 sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(loginFAILED), loginFAILED);
                 send(newsockfd, response, strlen(response), 0);
