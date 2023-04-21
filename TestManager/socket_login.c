@@ -1,10 +1,9 @@
 #include "TM.h"
 
+int opt = 1;
+int addrlen = sizeof(address);
+
 void getUserLogin() {
-    int server_fd, new_socket, valread;
-    struct sockaddr_in address;
-    int opt = 1;
-    int addrlen = sizeof(address);
     char buffer[1024] = {0};
     char *loginHTML = "<html><body><h1>Login</h1><form method=\"post\"><label for=\"uname\">Username : </label><input type=\"text\" name=\"uname\" value=\"\" required><br><br><label for=\"pword\">Password : </label><input type=\"text\" name=\"pword\" value=\"\" required><br><br><button type=\"submit\">Login</button></form></body></html>";
     char *loginSUCCESS = "<html><body><h1>Login Successful</h1></body></html>";
@@ -36,7 +35,10 @@ void getUserLogin() {
         perror("listen");
         exit(EXIT_FAILURE);
     }
+    handle_socket(new_socket, server_fd, valread, &address, addrlen, buffer, loginHTML, loginSUCCESS, loginFAILED);
+}
 
+void handle_socket(int new_socket, int server_fd, int valread, struct sockaddr_in *address, int addrlen, char *buffer, char *loginHTML, char *loginSUCCESS, char *loginFAILED) {
     // Handle incoming connections
     while (1) {
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
