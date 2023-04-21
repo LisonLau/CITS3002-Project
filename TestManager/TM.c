@@ -7,11 +7,59 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <stdbool.h>
 
-#define PORT 8080
+#define PORT        8080
+#define LINE_SIZE   50
 
-int main(int argc, char const* argv[])
-{
+char *username = "user1";
+char *password = "pass1";
+
+bool checkLoginDetails() {
+    FILE *fin = fopen("students.csv", "r");
+    if (fin == NULL) {
+        printf("Cannot retrieve login details.");
+        exit(EXIT_FAILURE);
+    }
+    char line[LINE_SIZE];
+    int match = 0, authenticateUser = -1, authenticatePass = -50;
+    bool authenticated = false;
+    while (fgets(line, sizeof line, fin) != NULL && !authenticated) {
+        char *token = strtok(line, ",");
+        while (token != NULL && !authenticated) {
+            // cross check the user name and password
+            if (strcmp(username, token) == 0) {
+                authenticateUser = match;
+            }
+            if (strcmp(password, token) == 0) {
+                authenticatePass = match;
+            }
+            if (authenticatePass == authenticateUser) {
+                authenticated = true;
+                break;
+            }
+            token = strtok(NULL, "\n");
+        }
+        match++;
+    }
+    fclose(fin);
+    if (authenticated) {
+        return true;
+    }
+    return false;
+}
+
+int main(int argc, char const* argv[]) {   
+    if (argc > 1) {
+		printf("Usage: ./tm\n");
+		exit(EXIT_FAILURE);
+    }
+    // bool ans = checkLoginDetails();
+    // if (ans) {
+    //     printf("Found user \n");
+    // } else {
+    //     printf("Didn't find user \n");
+    // }
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
     int opt = 1;
@@ -57,4 +105,4 @@ int main(int argc, char const* argv[])
     // closing the listening socket
     shutdown(server_fd, SHUT_RDWR);
     return 0;
-}
+} 
