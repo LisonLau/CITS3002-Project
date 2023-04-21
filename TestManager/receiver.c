@@ -53,25 +53,27 @@ int getQuestionFile() {
     printf("[+] Listening...\n");
 
     // Accept incoming connections
-    addr_size = sizeof(cli_addr);
-    if ((newsockfd = accept(sockfd, (struct sockaddr*)&cli_addr, &addr_size)) < 0) {
-        perror("[-] Error in accepting.");
-        exit(EXIT_FAILURE);
-    }
+    while (1) {
+        addr_size = sizeof(cli_addr);
+        if ((newsockfd = accept(sockfd, (struct sockaddr*)&cli_addr, &addr_size)) < 0) {
+            perror("[-] Error in accepting.");
+            exit(EXIT_FAILURE);
+        }
 
-    // Create custom filename
-    char filename[100] = "";
-    strcat(filename, USERNAME);
-    strcat(filename, PASSWORD);
-    strcat(filename, ".csv");
+        // Create custom filename
+        char filename[100] = "";
+        strcat(filename, USERNAME);
+        strcat(filename, PASSWORD);
+        strcat(filename, ".csv");
 
-    // Receive file contents and store into file
-    FILE *fp = fopen(filename, "wb");
-    while ((n = recv(newsockfd, buffer, BUFFERSIZE, 0)) > 0) {
-        fwrite(buffer, sizeof(char), n, fp);
+        // Receive file contents and store into file
+        FILE *fp = fopen(filename, "wb");
+        while ((n = recv(newsockfd, buffer, BUFFERSIZE, 0)) > 0) {
+            fwrite(buffer, sizeof(char), n, fp);
+        }
+        printf("[+] File received successfully.\n");
+        fclose(fp);      // Close the file
     }
-    printf("[+] File received successfully.\n");
-    fclose(fp);     // Close the file
 }
 
 int main() {

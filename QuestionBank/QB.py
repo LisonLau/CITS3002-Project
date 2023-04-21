@@ -19,7 +19,8 @@ def getPCQ():
     return PCquestions
 
 def getRandom():
-    allQuestions = getMCQ() + getPCQ()
+    # Not including the answers for MCQ
+    allQuestions = [x[:-1] for x in getMCQ()] + getPCQ()
     random.shuffle(allQuestions)
     randomQuestions = allQuestions[:10]
     return randomQuestions
@@ -43,23 +44,26 @@ def gradeMCQ(question, student_answer):
 def sendQuestionFile(student, password):
     host = "127.0.0.1"  # host
     port = 8080         # port
+    try:
+        # create the client socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print(f"[+] Connecting to {host}:{port}.")
+        s.connect((host, port))
+        print("[+] Connected.")
+        
+        # open and read file to be transferred
+        filename = makeQuestionFile(student, password)
+        with open(filename, "rb") as f:
+            data = f.read()
+        
+        # send file data
+        s.sendall(data)
+        print("[+] File sent successfully.")
+        
+        s.close()    # close the socket
+    except Exception as e:
+        print("[-] Error occurred.")
     
-    # create the client socket
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print(f"[+] Connecting to {host}:{port}")
-    s.connect((host, port))
-    print("[+] Connected.")
-    
-    # open and read file to be transferred
-    filename = makeQuestionFile(student, password)
-    with open(filename, "rb") as f:
-        data = f.read()
-    
-    # send file data
-    s.sendall(data)
-    print("[+] File sent successfully.")
-    
-    s.close()    # close the socket
 
 sendQuestionFile("user1", "pass1")
 
