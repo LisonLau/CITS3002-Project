@@ -1,6 +1,6 @@
 #include "TM.h"
 
-void storeRegistered() {
+void storeUsers() {
     FILE *fp;
     char line[100];
     char *token;
@@ -30,3 +30,13 @@ void storeRegistered() {
     fclose(fp);
     numStudents = count;
 }
+
+int authenticateUsers(char *username, char *password) {
+    for (int i = 0; i < numStudents; i++) {
+        if (strcmp(username, students[i].username) == 0 && strcmp(password, students[i].password) == 0) {
+            return 1; 
+        }
+    }
+    return 0;
+}
+
