@@ -1,9 +1,8 @@
 import os
 
-from get_questions import *
-from questions_maker import *
-from grade import *
-from socket_transfer import *
+from get_questions      import *
+from grade              import *
+from socket_transfer    import *
 
 sendQuestionFile("user1", "pass1")
 

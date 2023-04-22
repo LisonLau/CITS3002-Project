@@ -1,7 +1,7 @@
 #include "TM.h"
 
 void getUserLogin() {
-    char *host  = "127.0.0.1";  // host
+    // char *host  = "127.0.0.1";  // host
     int port    = 8080;         // port
     int opt     = 1;
     int sockfd, newsockfd, valread;
@@ -51,6 +51,10 @@ void getUserLogin() {
         // Read HTTP request
         memset(buffer, 0, BUFFERSIZE);
         valread = read(newsockfd, buffer, BUFFERSIZE);
+        if (valread < 0) {
+            perror("[-] Error in reading HTTP request.");
+            exit(EXIT_FAILURE);
+        }
         printf("%s\n", buffer);
         char *form = strstr(buffer, "uname=");
         char response[BUFFERSIZE] = {0};
@@ -68,9 +72,9 @@ void getUserLogin() {
             sscanf(form, "uname=%[^&]&pword=%s", username, password);
             
             // User successfully logged in, display question page
-            if (authenticate(username, password)) {
+            if (authenticateUsers(username, password)) {
                 // Loop for 10 Questions
-                char *questionHTML = createQuestionHTML();
+                char *questionHTML = "";
                 sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(questionHTML), questionHTML);
                 send(newsockfd, response, strlen(response), 0);
             } 
