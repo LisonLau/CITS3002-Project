@@ -6,10 +6,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#define PORT 8080
+#define PORT                8080
 #define MAX_USERNAME_LENGTH 100
 #define MAX_PASSWORD_LENGTH 100
 #define MAX_STUDENTS        100
+#define BUFFERSIZE          1024
 
 typedef struct Student {
     char username[MAX_USERNAME_LENGTH];
@@ -17,7 +18,7 @@ typedef struct Student {
 } Student;
 
 Student     students[MAX_STUDENTS];
-int numStudents;
+int         numStudents;
 
 int server_fd, new_socket, valread;
 struct sockaddr_in address;

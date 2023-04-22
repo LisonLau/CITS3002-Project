@@ -17,7 +17,8 @@ def getPCQ():
     return PCquestions
 
 def getRandom():
-    allQuestions = getMCQ() + getPCQ()
+    # Not including the answers for MCQ
+    allQuestions = [x[:-1] for x in getMCQ()] + getPCQ()
     random.shuffle(allQuestions)
     randomQuestions = allQuestions[:10]
     return randomQuestions
