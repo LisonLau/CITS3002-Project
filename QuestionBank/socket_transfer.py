@@ -1,6 +1,6 @@
 import socket
 
-from questions_maker import *
+from get_questions import *
 
 def sendQuestionFile(student, password):
     host = "127.0.0.1"  # host
