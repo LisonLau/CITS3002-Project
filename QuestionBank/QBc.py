@@ -35,7 +35,8 @@ class QuestionBankC:
     # Grade C MCQ
     def gradeMCQ(self, question, student_answer):
         AllMCQ = self.getMCQ()
+        print(AllMCQ)
         for mcq in AllMCQ:
-            if mcq[0] == question and mcq[5] == student_answer:
+            if mcq[1] == question and mcq[6] == student_answer:
                 return True
         return False
