@@ -82,7 +82,6 @@ int getQuestionFile() {
                 max_sd = sd;
             }
         }
-        
         // Waiting for one of the sockets to do something, waits indefinitely
         activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
         if (activity < 0 && errno != EINTR){
@@ -115,30 +114,32 @@ int getQuestionFile() {
         
         for (int i = 0; i < max_clients; i++){
             sd = client_socket[i];
-            if ((value = read(sd, buffer, BUFFERSIZE)) == 0){
-                // One of the client's disconnected
-                getpeername(sd, (struct sockaddr*)&cli_addr, &addr_size);
-                printf("Client disconnected, ip: %s, port: %d\n",
-                        inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
-                close(sd);
-                client_socket[i] = 0;
-            }
-            // Incoming message
-            // TODO: 
-            else {
-                // Create custom filename
-                char filename[100] = "";
-                strcat(filename, USERNAME);
-                strcat(filename, PASSWORD);
-                strcat(filename, ".csv");
-
-                // Receive file contents and store into file
-                FILE *fp = fopen(filename, "wb");
-                while ((n = recv(newsockfd, buffer, BUFFERSIZE, 0)) > 0) {
-                    fwrite(buffer, sizeof(char), n, fp);
+            if (FD_ISSET(sd, &readfds)) {
+                if ((value = read(sd, buffer, BUFFERSIZE)) == 0){
+                    // One of the client's disconnected
+                    getpeername(sd, (struct sockaddr*)&cli_addr, &addr_size);
+                    printf("[-] Client disconnected, ip: %s, port: %d\n",
+                            inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
+                    close(sd);
+                    client_socket[i] = 0;
                 }
-                printf("[+] File received successfully.\n");
-                fclose(fp);      // Close the file
+                // Incoming message
+                // TODO: 
+                else {
+                    // Create custom filename
+                    char filename[100] = "";
+                    strcat(filename, USERNAME);
+                    strcat(filename, PASSWORD);
+                    strcat(filename, ".csv");
+
+                    // Receive file contents and store into file
+                    FILE *fp = fopen(filename, "wb");
+                    while ((n = recv(newsockfd, buffer, BUFFERSIZE, 0)) > 0) {
+                        fwrite(buffer, sizeof(char), n, fp);
+                    }
+                    printf("[+] File received successfully.\n");
+                    fclose(fp);      // Close the file
+                }
             }
         }
     }
