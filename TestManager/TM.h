@@ -29,4 +29,5 @@ struct sockaddr_in address;
 extern void storeUsers();
 extern int  authenticateUsers(char *, char *);
 extern void getUserLogin();
+extern void runTmServer();
 // extern void handle_socket(int, int, int, struct sockaddr_in *, int, char *, char *, char *, char *);
