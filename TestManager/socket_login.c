@@ -36,7 +36,7 @@ void getUserLogin() {
 
     ser_addr.sin_family      = AF_INET;
     ser_addr.sin_port        = htons(port);
-    ser_addr.sin_addr.s_addr = INADDR_ANY;
+    ser_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     // Bind socket to port
     if (bind(ser_sockfd, (struct sockaddr*)&ser_addr, sizeof(ser_addr)) < 0) {
@@ -73,20 +73,21 @@ void getUserLogin() {
         } 
 
         // Waiting for one of the sockets to do something, waits indefinitely
+        printf("[+] Waiting...\n");
         activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
         if (activity < 0 && errno != EINTR){
-            printf("[-] Socket connection error.");
+            printf("[-] Socket connection error.\n");
         }
 
         // When something happens on the master socket = incoming connection
         if (FD_ISSET(ser_sockfd, &readfds)){
             addrsize = sizeof(cli_addr);
             if ((newsockfd = accept(ser_sockfd, (struct sockaddr*)&cli_addr, &addrsize)) < 0) {
-                perror("[-] Error in accepting connection.");
+                perror("[-] Error in accepting connection: ");
                 exit(EXIT_FAILURE);
             }
             printf("[+] New connection, socket fd: %d, ip: %s, port: %d\n",
-            newsockfd, inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
+                    newsockfd, inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
 
             // Adds the new socket to array of sockets 
             for (int i = 0; i < max_clients; i++) {  
@@ -97,7 +98,7 @@ void getUserLogin() {
                     printf("[+] Adding to list of sockets as %d\n" , i); 
                     break;  
                 } 
-            } 
+            }
         }
 
         // TODO: This is where I/O happens....
@@ -111,19 +112,24 @@ void getUserLogin() {
                             inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
                     close(sd);
                     client_socket[i] = 0;
-                    client_verified[i] = 0;
+                    client_verified[i] = -1;
                 }
                 // Incoming message
                 else {
-                    // Loop for 10 Questions ???
-                    // If the client has not logged in succesfully...
+                    printf("[.] Reached else and client verfication.\n");
                     if (client_verified[i] == 0){
+                        // If the client has not logged in succesfully...
+                        printf("[.] Reached if.\n");
                         // Read HTTP request
                         memset(buffer, 0, BUFFERSIZE);
-                        if ((valread = read(sd, buffer, BUFFERSIZE))< 0) {
+                        printf("[.] Pending valread.\n");
+                        valread = read(sd, buffer, BUFFERSIZE);
+                        printf("[.] Passed valread.\n");
+                        if (valread  < 0) {
                             perror("[-] Error in reading HTTP request.");
                             exit(EXIT_FAILURE);
                         }
+                        printf("[.] Reached read\n");
                         printf("%s\n", buffer);
                         char *form = strstr(buffer, "uname=");
                         char response[BUFFERSIZE] = {0};
@@ -132,6 +138,7 @@ void getUserLogin() {
                             char *loginHTML = "<html><body><h1>Login</h1><form method=\"post\"><label for=\"uname\">Username : </label><input type=\"text\" name=\"uname\" value=\"\" required><br><br><label for=\"pword\">Password : </label><input type=\"text\" name=\"pword\" value=\"\" required><br><br><button type=\"submit\">Login</button></form></body></html>";
                             sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(loginHTML), loginHTML);
                             send(newsockfd, response, strlen(response), 0);
+                            printf("[.] Reached display\n");
                         }
                         // Extract the username and password from the form data
                         else if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
@@ -169,8 +176,10 @@ void getUserLogin() {
                             // Display 404 error page
                             char* errorHTML = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>404 Not Found</title>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n</body>\n</html>";
                             send(sd, errorHTML, strlen(errorHTML), 0);
-                            // close(sd); // ??
                         }
+                    } else if (client_verified[i] == 1) {
+                        // Client has succefully logged in...
+                        // loop through questions here...
                     }
                 }
             }
