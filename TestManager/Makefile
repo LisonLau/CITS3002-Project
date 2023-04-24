@@ -1,12 +1,12 @@
 PROJECT = TM
 HEADERS = $(PROJECT).h
-OBJ = TM.o user_login.o socket_login.o tm_server.o tm_client.o
+OBJECTS = TM.o user_login.o socket_login.o tm_server.o tm_client.o
 
 C11 = cc -std=c11
 CFLAGS = -Wall -Werror
 
-$(PROJECT) : $(OBJ)
-		$(C11) $(CFLAGS) -o $(PROJECT) $(OBJ)
+$(PROJECT) : $(OBJECTS)
+		$(C11) $(CFLAGS) -o $(PROJECT) $(OBJECTS)
 
 TM.o : TM.c $(HEADERS)
 		$(C11) $(CFLAGS) -c TM.c
@@ -22,3 +22,6 @@ tm_server.o : tm_server.c $(HEADERS)
 
 tm_client.o : tm_client.c $(HEADERS)
 		$(C11) $(CFLAGS) -c tm_client.c
+
+clean:
+	rm -f $(PROJECT) $(OBJECTS)

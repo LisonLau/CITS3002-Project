@@ -43,6 +43,7 @@ def runQbServer():
         connection.close()
     
     while True:
+        print('[+] Waiting...')
         client, address = server_socket.accept()
         # Connected client's information such as thread number and adddress given to it
         print('[+] Connected to: ' + address[0] + ':' + str(address[1]))
