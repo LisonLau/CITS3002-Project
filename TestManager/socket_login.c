@@ -59,7 +59,7 @@ void getUserLogin() {
 
         // Add master socket to set
         FD_SET(ser_sockfd, &readfds);
-        max_sd = ser_sockfd;
+        max_sd = ser_sockfd; // this is my server
 
         // Adding child sockets to the sets
         for (int i = 0; i < max_clients; i++){
@@ -114,7 +114,7 @@ void getUserLogin() {
                     client_socket[i] = 0;
                     client_verified[i] = -1;
                 }
-                // Incoming message
+                // Incoming message (client is still connected)
                 else {
                     printf("[.] Reached else and client verfication.\n");
                     if (client_verified[i] == 0){
@@ -123,6 +123,7 @@ void getUserLogin() {
                         // Read HTTP request
                         memset(buffer, 0, BUFFERSIZE);
                         printf("[.] Pending valread.\n");
+                        printf("[.] %i\n", sd);
                         valread = read(sd, buffer, BUFFERSIZE);
                         printf("[.] Passed valread.\n");
                         if (valread  < 0) {
