@@ -5,10 +5,10 @@ void runTmServer() {
     int port    = 8080;         // port
     int opt     = 1;
     int max_clients = 30;
-    int n, sd, max_sd, activity, valread;
+    int  sd, max_sd, activity, valread;
     int ser_sockfd, newsockfd, client_socket[30], client_verified[30];
     struct sockaddr_in address;
-    socklen_t addrsize;
+    socklen_t addrsize = sizeof(address);
     fd_set readfds;
     char buffer[BUFFERSIZE] = {0};
 
@@ -36,7 +36,7 @@ void runTmServer() {
 
     address.sin_family      = AF_INET;
     address.sin_port        = htons(port);
-    address.sin_addr.s_addr = htonl(INADDR_ANY);
+    address.sin_addr.s_addr = INADDR_ANY;
 
     // Bind socket to port
     if (bind(ser_sockfd, (struct sockaddr*)&address, sizeof(address)) < 0) {
@@ -63,7 +63,7 @@ void runTmServer() {
 
         // Adding child sockets to the sets
         for (int i = 0; i < max_clients; i++){
-            sd = client_socket [i];
+            sd = client_socket[i];
             if (sd > 0){
                 FD_SET(sd, &readfds);
             }
@@ -73,6 +73,7 @@ void runTmServer() {
         } 
 
         // Waiting for one of the sockets to do something, waits indefinitely
+        printf("[+] Current 0: %i, current 1: %i\n", client_socket[0], client_socket[1]);
         printf("[+] Waiting...\n");
         activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
         if (activity < 0 && errno != EINTR){
@@ -81,7 +82,6 @@ void runTmServer() {
 
         // When something happens on the server socket = incoming connection
         if (FD_ISSET(ser_sockfd, &readfds)){
-            addrsize = sizeof(address);
             if ((newsockfd = accept(ser_sockfd, (struct sockaddr*)&address, &addrsize)) < 0) {
                 perror("[-] Error in accepting connection: ");
                 exit(EXIT_FAILURE);
@@ -97,7 +97,7 @@ void runTmServer() {
                     client_verified[i] = 0;
                     printf("[+] Adding to list of sockets as %d\n" , i); 
                     break;  
-                } 
+                }
             }
         }
 
@@ -105,41 +105,33 @@ void runTmServer() {
         for (int i = 0; i < max_clients; i++){
             sd = client_socket[i];
             if (FD_ISSET(sd, &readfds)) {
-                if ((valread = read(sd, buffer, BUFFERSIZE)) == 0){
+                memset(buffer, 0, BUFFERSIZE);
+                valread = read(sd, buffer, BUFFERSIZE);
+                printf("[+] valread: %i\n", valread);
+                if (valread == 0){
                     // One of the client has disconnected
+                    client_socket[i] = 0;
+                    client_verified[i] = -1;
                     getpeername(sd, (struct sockaddr*)&address, &addrsize);
                     printf("[-] A client disconnected, ip: %s, port: %d\n",
                             inet_ntoa(address.sin_addr), ntohs(address.sin_port));
                     close(sd);
-                    client_socket[i] = 0;
-                    client_verified[i] = -1;
                 }
-                // Incoming message
+                // Incoming message (client is still connected)
                 else {
-                    printf("[.] Reached else and client verfication.\n");
                     if (client_verified[i] == 0){
                         // If the client has not logged in succesfully...
-                        printf("[.] Reached if.\n");
                         // Read HTTP request
-                        memset(buffer, 0, BUFFERSIZE);
-                        printf("[.] Pending valread.\n");
-                        valread = read(sd, buffer, BUFFERSIZE);
-                        printf("[.] Passed valread.\n");
-                        if (valread  < 0) {
-                            perror("[-] Error in reading HTTP request.");
-                            exit(EXIT_FAILURE);
-                        }
-                        printf("[.] Reached read\n");
-                        printf("%s\n", buffer);
+                        printf("[.]\n%s[.]\n", buffer);
                         char *form = strstr(buffer, "uname=");
                         char response[BUFFERSIZE] = {0};
+
                         // Display login page
                         if (strstr(buffer, "GET / HTTP/1.1") != NULL) {
                             char *loginHTML = "<html><body><h1>Login</h1><form method=\"post\"><label for=\"uname\">Username : </label><input type=\"text\" name=\"uname\" value=\"\" required><br><br><label for=\"pword\">Password : </label><input type=\"text\" name=\"pword\" value=\"\" required><br><br><button type=\"submit\">Login</button></form></body></html>";
                             sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(loginHTML), loginHTML);
-                            send(newsockfd, response, strlen(response), 0);
-                            printf("[.] Reached display\n");
-                        }
+                            send(sd, response, strlen(response), 0);
+                        } 
                         // Extract the username and password from the form data
                         else if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
                             char username[MAX_USERNAME_LENGTH] = {0};
@@ -148,18 +140,18 @@ void runTmServer() {
                             
                             // User successfully logged in, display question page
                             if (authenticateUsers(username, password)) {
-                                char filename[100] = "";
-                                strcat(filename, username);
-                                strcat(filename, password);
-                                strcat(filename, ".csv");
+                                // char filename[100] = "";
+                                // strcat(filename, username);
+                                // strcat(filename, password);
+                                // strcat(filename, ".csv");
 
-                                // Receive file contents and store into file
-                                FILE *fp = fopen(filename, "wb");
-                                while ((n = recv(client_socket[i], buffer, BUFFERSIZE, 0)) > 0) {
-                                    fwrite(buffer, sizeof(char), n, fp);
-                                }
-                                printf("[+] File received successfully.\n");
-                                fclose(fp);      // Close the file
+                                // // Receive file contents and store into file
+                                // FILE *fp = fopen(filename, "wb");
+                                // while ((n = recv(client_socket[i], buffer, BUFFERSIZE, 0)) > 0) {
+                                //     fwrite(buffer, sizeof(char), n, fp);
+                                // }
+                                // printf("[+] File received successfully.\n");
+                                // fclose(fp);      // Close the file
 
                                 client_verified[i] = 1;
                                 char *questionHTML = "<html><body><h1>IN</h1></body></html>";
@@ -180,6 +172,7 @@ void runTmServer() {
                     } else if (client_verified[i] == 1) {
                         // Client has succefully logged in...
                         // loop through questions here...
+                        printf("[+] User has been verified!\n");
                     }
                 }
             }
