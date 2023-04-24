@@ -5,7 +5,7 @@ void runTmServer() {
     int port    = 8080;         // port
     int opt     = 1;
     int max_clients = 30;
-    int  sd, max_sd, activity, valread;
+    int sd, max_sd, activity, valread;
     int ser_sockfd, newsockfd, client_socket[30], client_verified[30];
     struct sockaddr_in address;
     socklen_t addrsize = sizeof(address);
@@ -36,7 +36,7 @@ void runTmServer() {
 
     address.sin_family      = AF_INET;
     address.sin_port        = htons(port);
-    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr("127.0.0.1"); //INADDR_ANY;
 
     // Bind socket to port
     if (bind(ser_sockfd, (struct sockaddr*)&address, sizeof(address)) < 0) {
@@ -140,20 +140,15 @@ void runTmServer() {
                             
                             // User successfully logged in, display question page
                             if (authenticateUsers(username, password)) {
-                                // char filename[100] = "";
-                                // strcat(filename, username);
-                                // strcat(filename, password);
-                                // strcat(filename, ".csv");
-
-                                // // Receive file contents and store into file
-                                // FILE *fp = fopen(filename, "wb");
-                                // while ((n = recv(client_socket[i], buffer, BUFFERSIZE, 0)) > 0) {
-                                //     fwrite(buffer, sizeof(char), n, fp);
-                                // }
-                                // printf("[+] File received successfully.\n");
-                                // fclose(fp);      // Close the file
-
                                 client_verified[i] = 1;
+                                int passed = connectToQb(username, password);
+
+                                printf("[.] Exchange with QB: %i\n", passed);
+                                char filename[100] = "";
+                                strcat(filename, username);
+                                strcat(filename, password);
+                                strcat(filename, ".csv");
+
                                 char *questionHTML = "<html><body><h1>IN</h1></body></html>";
                                 sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(questionHTML), questionHTML);
                                 send(sd, response, strlen(response), 0);
@@ -169,7 +164,7 @@ void runTmServer() {
                             char* errorHTML = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>404 Not Found</title>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n</body>\n</html>";
                             send(sd, errorHTML, strlen(errorHTML), 0);
                         }
-                    } else if (client_verified[i] == 1) {
+                    }if (client_verified[i] == 1) {
                         // Client has succefully logged in...
                         // loop through questions here...
                         printf("[+] User has been verified!\n");

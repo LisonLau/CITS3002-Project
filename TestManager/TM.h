@@ -30,4 +30,5 @@ extern void storeUsers();
 extern int  authenticateUsers(char *, char *);
 extern void getUserLogin();
 extern void runTmServer();
+extern int connectToQb(char *, char *);
 // extern void handle_socket(int, int, int, struct sockaddr_in *, int, char *, char *, char *, char *);

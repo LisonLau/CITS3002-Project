@@ -1,6 +1,6 @@
 PROJECT = TM
 HEADERS = $(PROJECT).h
-OBJ = TM.o user_login.o socket_login.o tm_server.o
+OBJ = TM.o user_login.o socket_login.o tm_server.o tm_client.o
 
 C11 = cc -std=c11
 CFLAGS = -Wall -Werror
@@ -19,3 +19,6 @@ socket_login.o : socket_login.c $(HEADERS)
 
 tm_server.o : tm_server.c $(HEADERS)
 		$(C11) $(CFLAGS) -c tm_server.c
+
+tm_client.o : tm_client.c $(HEADERS)
+		$(C11) $(CFLAGS) -c tm_client.c

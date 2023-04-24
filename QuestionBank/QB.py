@@ -3,8 +3,10 @@ import os
 from get_questions      import *
 from grade              import *
 from socket_transfer    import *
+from qb_server          import *
 
-sendQuestionFile("user1", "pass1")
+runQbServer()
+# sendQuestionFile("user1", "pass1")
 
 # def gradePCQ(question, student_code):
 #     AllPCQ = getPCQ()
