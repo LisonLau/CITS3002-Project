@@ -72,8 +72,7 @@ void runTmServer() {
             }
         } 
 
-        // Waiting for one of the sockets to do something, waits indefinitely
-        printf("[+] Current 0: %i, current 1: %i\n", client_socket[0], client_socket[1]);
+        // Waiting for one of the sockets to do something, waits indefinitel
         printf("[+] Waiting...\n");
         activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
         if (activity < 0 && errno != EINTR){
@@ -164,7 +163,7 @@ void runTmServer() {
                             char* errorHTML = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>404 Not Found</title>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n</body>\n</html>";
                             send(sd, errorHTML, strlen(errorHTML), 0);
                         }
-                    }if (client_verified[i] == 1) {
+                    } if (client_verified[i] == 1) {
                         // Client has succefully logged in...
                         // loop through questions here...
                         printf("[+] User has been verified!\n");
