@@ -52,7 +52,7 @@ class QuestionBank:
             isCorrect = False
         return isCorrect
     
-    # Sending data via sockets
+    '''# Sending data via sockets
     def sendTM(self, QBsocket, filesent):
         HOST = "127.0.0.1"  # host
         PORT = 8080         # port
@@ -119,12 +119,11 @@ class QuestionBank:
         # If the user presses Ctrl+C, close the connection and the socket
         except KeyboardInterrupt:
             QBsocket.close()    # close QB socket
-            print("[-] Connection closed.")
+            print("[-] Connection closed.")'''
         
             
     
 QB = QuestionBank()
-QB.QBsocket("user1", "pass1")
 
 # # binding to TM to receive
 # print(f"[+] Binding to {HOST}:{PORT}.")
