@@ -55,10 +55,12 @@ class QuestionBank:
     
     def runQBserver(self):
         host = '127.0.0.1'
-        port = 8888
+        port = 8080
         thread_count = 0
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print('[+] Server socket created.')
+        
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         # # Connect is usually used by the client to reach to the server
         # server_socket.connect((host, port))
@@ -66,7 +68,7 @@ class QuestionBank:
 
         try:
             server_socket.bind((host, port))
-        except socket.error as e:
+        except socket.error as e:  
             print(f'[-] {str(e)}')
             return 0
         print('[+] Binding successful')
