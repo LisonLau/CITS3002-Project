@@ -6,6 +6,7 @@ void runTMforWeb() {
     struct sockaddr_in  ser_addr;
     socklen_t           ser_addrsize;
     char                buffer[BUFFERSIZE];
+    int                 isLoggedIn = 0;
 
     // Create socket file descriptor
     if ((sersockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -41,6 +42,8 @@ void runTMforWeb() {
     printf("[+] Listening...\n");
 
     // Accept incoming connections
+    char username[MAX_USERNAME_LENGTH] = {0};
+    char password[MAX_PASSWORD_LENGTH] = {0};
     while (1) {
         if ((newsockfd = accept(sersockfd, (struct sockaddr*)&ser_addr, (socklen_t*)&ser_addrsize)) < 0) {
             perror("[-] Error in accepting.");
@@ -55,12 +58,23 @@ void runTMforWeb() {
         }
 
         printf("%s\n", buffer);
-        handleUserLogin(newsockfd, buffer);
+
+        // Handle user login if user has not logged in
+        if (isLoggedIn == 0) {
+            isLoggedIn = handleUserLogin(newsockfd, buffer, username, password);
+        }
+
+        // Handle display questions after user has logged in
+        if (isLoggedIn) {
+            handleDisplayQuestion(newsockfd, buffer, username, password);
+        }
+
+
         close(newsockfd);
     }
 }
 
-void handleUserLogin(int socket, char *buffer) {
+int handleUserLogin(int socket, char *buffer, char *username, char *password) {
     char *form = strstr(buffer, "uname=");
     // Display login page
     if (strstr(buffer, "GET / HTTP/1.1") != NULL) {
@@ -74,12 +88,15 @@ void handleUserLogin(int socket, char *buffer) {
     } 
     // Extract the username and password from the form data
     else if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
-        char username[MAX_USERNAME_LENGTH] = {0};
-        char password[MAX_PASSWORD_LENGTH] = {0};
-        sscanf(form, "uname=%[^&]&pword=%s", username, password);
+        char uname[MAX_USERNAME_LENGTH] = {0};
+        char pword[MAX_PASSWORD_LENGTH] = {0};
+        sscanf(form, "uname=%[^&]&pword=%s", uname, pword);
         // User successfully logged in, display question page
-        if (authenticateUsers(username, password)) {
-            handleDisplayQuestion(socket, username, password);
+        if (authenticateUsers(uname, pword)) {
+            printf("[+] User has successfully logged in.\n");
+            strncpy(username, uname, MAX_USERNAME_LENGTH);
+            strncpy(password, pword, MAX_PASSWORD_LENGTH);
+            return 1;
         } 
         // User failed to logged in, ask for login attempt
         else {
@@ -96,8 +113,9 @@ void handleUserLogin(int socket, char *buffer) {
     // Display 404 error page
     else {
         char* errorHTML = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>404 Not Found</title>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n</body>\n</html>";
-        sendResponse(socket, errorHTML);
+        send(socket, errorHTML, strlen(errorHTML), 0);
     }
+    return 0;
 }
 
 void sendResponse(int socket, char *message) {

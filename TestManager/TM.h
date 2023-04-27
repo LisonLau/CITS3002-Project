@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
-#define PORT                8888
+#define PORT                8080
 #define MAX_USERNAME_LENGTH 100
 #define MAX_PASSWORD_LENGTH 100
 #define MAX_QUESTION_LENGTH 100
@@ -41,9 +41,10 @@ extern void storeUsers();
 extern int  authenticateUsers(char *, char *);
 // TM_web.c
 extern void runTMforWeb();
-extern void handleUserLogin();
-extern void sendResponse();
+int handleUserLogin(int, char *, char *, char *);
+void sendResponse(int, char *);
 // ques.c
-extern void handleDisplayQuestion();
-extern void storeQuestions();
-extern char* getQuestionHTML(int idx);
+extern void handleDisplayQuestion(int, char *, char *,  char *);
+extern void storeQuestions(char *);
+extern char* getQuestionHTML(int, char *);
+extern void handleAnswersToQB(char *);

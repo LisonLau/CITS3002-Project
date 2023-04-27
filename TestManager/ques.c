@@ -1,6 +1,6 @@
 #include "TM.h"
 
-void handleDisplayQuestion(int socket, char *username, char *password) {
+void handleDisplayQuestion(int socket, char *buffer, char *username, char *password) {
     // Create custom filename
     char filename[100] = "";
     strcat(filename, username);
@@ -11,10 +11,15 @@ void handleDisplayQuestion(int socket, char *username, char *password) {
     storeQuestions(filename);
 
     // Display questions
-    for (int i = 0; i < 1; i++) {
-        char *quesHTML = getQuestionHTML(i);
-        sendResponse(socket, quesHTML);
+    char *quesHTML = {0};
+    
+    quesHTML = getQuestionHTML(0, quesHTML);
+    sendResponse(socket, quesHTML);
+    if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
+        //todo
     }
+
+    free(quesHTML);
 }
 
 void storeQuestions(char *filename) {
@@ -58,17 +63,18 @@ void storeQuestions(char *filename) {
     fclose(fp);
 }
 
-char* getQuestionHTML(int idx) {
-    char* quesHTML = (char*) malloc(BUFFERSIZE);
+char* getQuestionHTML(int idx, char *quesHTML) {
+    quesHTML = (char*) realloc(quesHTML, BUFFERSIZE);
     if (questions[idx].isMCQ) { // MCQ
-        sprintf(quesHTML, "<html><body><h1>Question %d</h1><p>%s</p><form>\
-                        <input type=\"radio\" id=\"a\" name=\"mcq\"><label>%s</label><br>\
-                        <input type=\"radio\" id=\"b\" name=\"mcq\"><label>%s</label><br>\
-                        <input type=\"radio\" id=\"c\" name=\"mcq\"><label>%s</label><br>\
-                        <input type=\"radio\" id=\"d\" name=\"mcq\"><label>%s</label><br>\
+        sprintf(quesHTML, "<html><body><h1>Question %d</h1><p>%s</p><form method=\"post\">\
+                        <input type=\"radio\" id=\"a\" name=\"mcq\" value=\"%s\"><label>%s</label><br>\
+                        <input type=\"radio\" id=\"b\" name=\"mcq\" value=\"%s\"><label>%s</label><br>\
+                        <input type=\"radio\" id=\"c\" name=\"mcq\" value=\"%s\"><label>%s</label><br>\
+                        <input type=\"radio\" id=\"d\" name=\"mcq\" value=\"%s\"><label>%s</label><br><br>\
                         <button type=\"submit\">Submit</button>\
                         </form></body></html>", idx+1, questions[idx].question,\
-                        questions[idx].options[0], questions[idx].options[1], questions[idx].options[2], questions[idx].options[3]);
+                        questions[idx].options[0], questions[idx].options[0], questions[idx].options[1], questions[idx].options[1],\
+                        questions[idx].options[2], questions[idx].options[2], questions[idx].options[3], questions[idx].options[3]);
     } else {
         sprintf(quesHTML, "<html><body><h1>Question %d</h1><label for=\"pcq\">%s</label><form><br>\
                         <textarea name=\"pcq\" rows=\"20\" cols=\"60\"></textarea><br><br>\
@@ -76,4 +82,8 @@ char* getQuestionHTML(int idx) {
                         </form></body></html>", idx+1, questions[idx].question);
     }
     return quesHTML;
+}
+
+void handleAnswersToQB(char *buffer) {
+
 }
