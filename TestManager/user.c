@@ -2,7 +2,7 @@
 
 void storeUsers() {
     FILE *fp;
-    char line[100];
+    char line[BUFFERSIZE];
     char *token;
     int count = 0;
 

@@ -1,0 +1,10 @@
+mcqpy,What is the extension of a Python source code file?,.py,.java,.cpp,.html
+pcqpy,Write a Python function that takes a list of strings as input and returns the length of the longest string in the list.
+pcqpy,Write a Python function that takes a string as input and returns the length of the string.
+mcqc,What is the correct syntax to declare an array in C programming language?,array arr[10];,int arr = [10];,int arr[10];,None of the above
+mcqpy,What is the keyword used in Python to define a function?,module,function,class,def
+pcqpy,Write a Python function that takes two numbers as input and returns their sum.
+pcqc,Write a C function that takes an array of strings as input and returns the length of the longest string in the array.
+pcqc,Write a C function that takes a string as input and returns the reverse of that string.
+pcqpy,Write a Python function that takes a string as input and returns the reverse of that string.
+mcqc,What is the purpose of the 'scanf()' function in C programming?,To read input from the user,To print output to the console,To allocate memory dynamically,To compare two strings
