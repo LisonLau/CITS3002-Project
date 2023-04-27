@@ -44,6 +44,7 @@ void runTMforWeb() {
     // Accept incoming connections
     char username[MAX_USERNAME_LENGTH] = {0};
     char password[MAX_PASSWORD_LENGTH] = {0};
+    int quesIdx = 0;
     while (1) {
         if ((newsockfd = accept(sersockfd, (struct sockaddr*)&ser_addr, (socklen_t*)&ser_addrsize)) < 0) {
             perror("[-] Error in accepting.");
@@ -64,11 +65,16 @@ void runTMforWeb() {
             isLoggedIn = handleUserLogin(newsockfd, buffer, username, password);
         }
 
-        // Handle display questions after user has logged in
-        if (isLoggedIn) {
-            handleDisplayQuestion(newsockfd, buffer, username, password);
+        if (quesIdx == MAX_QUESTIONS) {
+            // Display done page
+            sendResponse(newsockfd, "");
         }
 
+        // Handle display questions after user has logged in
+        if (isLoggedIn) {
+            handleDisplayQuestion(newsockfd, quesIdx, buffer, username, password);
+            quesIdx++;
+        }
 
         close(newsockfd);
     }

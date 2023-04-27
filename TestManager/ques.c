@@ -1,6 +1,6 @@
 #include "TM.h"
 
-void handleDisplayQuestion(int socket, char *buffer, char *username, char *password) {
+void handleDisplayQuestion(int socket, int quesIdx, char *buffer, char *username, char *password) {
     // Create custom filename
     char filename[100] = "";
     strcat(filename, username);
@@ -12,13 +12,27 @@ void handleDisplayQuestion(int socket, char *buffer, char *username, char *passw
 
     // Display questions
     char *quesHTML = {0};
-    
-    quesHTML = getQuestionHTML(0, quesHTML);
+    quesHTML = getQuestionHTML(quesIdx, quesHTML);
     sendResponse(socket, quesHTML);
+    // Get the answer inputted by user
     if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
-        //todo
+        char encoded_ans[BUFFERSIZE];
+        char decoded_ans[BUFFERSIZE];
+        // If it is a MCQ
+        if (strstr(buffer, "mcq=") != NULL) {
+            sscanf(strstr(buffer, "mcq="), "mcq=%s", encoded_ans);
+            urlDecode(encoded_ans, decoded_ans); 
+            printf("%s\n", decoded_ans);
+            // TODO : send decoded_ans to QB for checking
+        }
+        // If it is a PCQ
+        if (strstr(buffer, "pcq=") != NULL) {
+            sscanf(strstr(buffer, "pcq="), "pcq=%s", encoded_ans);
+            urlDecode(encoded_ans, decoded_ans); 
+            printf("%s\n", decoded_ans);
+            // TODO : send decoded_ans to QB for checking
+        }
     }
-
     free(quesHTML);
 }
 
@@ -76,12 +90,29 @@ char* getQuestionHTML(int idx, char *quesHTML) {
                         questions[idx].options[0], questions[idx].options[0], questions[idx].options[1], questions[idx].options[1],\
                         questions[idx].options[2], questions[idx].options[2], questions[idx].options[3], questions[idx].options[3]);
     } else {
-        sprintf(quesHTML, "<html><body><h1>Question %d</h1><label for=\"pcq\">%s</label><form><br>\
+        sprintf(quesHTML, "<html><body><h1>Question %d</h1><label for=\"pcq\">%s</label><form method=\"post\"><br>\
                         <textarea name=\"pcq\" rows=\"20\" cols=\"60\"></textarea><br><br>\
                         <button type=\"submit\">Submit</button>\
                         </form></body></html>", idx+1, questions[idx].question);
     }
     return quesHTML;
+}
+
+void urlDecode(char *str, char *out) {
+    unsigned int c;
+    while (*str) {
+        if (*str == '%' && isxdigit(*(str + 1)) && isxdigit(*(str + 2))) {
+            sscanf(str + 1, "%2x", &c);
+            *out++ = (char) c;
+            str += 3;
+        } else if (*str == '+') {
+            *out++ = ' ';
+            str++;
+        } else {
+            *out++ = *str++;
+        }
+    }
+    *out = '\0';
 }
 
 void handleAnswersToQB(char *buffer) {
