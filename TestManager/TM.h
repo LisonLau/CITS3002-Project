@@ -25,7 +25,3 @@ int         numStudents;
 
 extern void storeUsers();
 extern int  authenticateUsers(char *, char *);
-extern void getUserLogin();
-extern void runTMserver();
-extern int connectToQB(char *, char *);
-// extern void handle_socket(int, int, int, struct sockaddr_in *, int, char *, char *, char *, char *);
