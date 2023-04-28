@@ -7,16 +7,17 @@ void runTmServer() {
     int max_clients = 30;
     int sd, max_sd, activity, valread;
     int ser_sockfd, newsockfd, client_socket[30], client_verified[30];
+    char buffer[BUFFERSIZE] = {0};
     struct sockaddr_in address;
     socklen_t addrsize = sizeof(address);
     fd_set readfds;
-    char buffer[BUFFERSIZE] = {0};
 
     // Initialise all clien_socket[] to 0, so we don't check
     for (int i = 0; i < max_clients; i++){
         client_socket[i] = 0;
         client_verified[i] = -1;
     }
+
     // Create socket file descriptor
     if ((ser_sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("[-] Error in socket.");
@@ -36,14 +37,16 @@ void runTmServer() {
 
     address.sin_family      = AF_INET;
     address.sin_port        = htons(port);
-    address.sin_addr.s_addr = inet_addr("127.0.0.1"); //INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr("192.168.68.106"); //INADDR_ANY;
 
     // Bind socket to port
-    if (bind(ser_sockfd, (struct sockaddr*)&address, sizeof(address)) < 0) {
+    if (bind(ser_sockfd, (struct sockaddr *)&address, sizeof(address)) < 0) {
         perror("[-] Error in binding.");
         exit(EXIT_FAILURE);
     }
     printf("[+] Binding successful.\n");
+    printf("[+] Server socket, fd: %d, ip: %s, port: %d\n",
+                    ser_sockfd, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
     // Listen for incoming connections
     if (listen(ser_sockfd, 10) < 0) {
