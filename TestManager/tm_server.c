@@ -118,12 +118,12 @@ void runTmServer() {
                 }
                 // Incoming message (client is still connected)
                 else {
+                    printf("[.]\n%s[.]\n", buffer);
+                    char *form = strstr(buffer, "uname=");
+                    char response[BUFFERSIZE] = {0};
                     if (client_verified[i] == 0){
                         // If the client has not logged in succesfully...
                         // Read HTTP request
-                        printf("[.]\n%s[.]\n", buffer);
-                        char *form = strstr(buffer, "uname=");
-                        char response[BUFFERSIZE] = {0};
 
                         // Display login page
                         if (strstr(buffer, "GET / HTTP/1.1") != NULL) {
@@ -147,10 +147,6 @@ void runTmServer() {
                                 strcat(filename, username);
                                 strcat(filename, password);
                                 strcat(filename, ".csv");
-
-                                char *questionHTML = "<html><body><h1>IN</h1></body></html>";
-                                sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(questionHTML), questionHTML);
-                                send(sd, response, strlen(response), 0);
                             } 
                             // User failed to logged in, ask for login attempt
                             else {
@@ -167,6 +163,9 @@ void runTmServer() {
                         // Client has succefully logged in...
                         // loop through questions here...
                         printf("[+] User has been verified!\n");
+                        char *questionHTML = "<html><body><h1>IN</h1></body></html>";
+                        sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(questionHTML), questionHTML);
+                        send(sd, response, strlen(response), 0);
                     }
                 }
             }
