@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
+#define HOST                "IP ADDRESS"
 #define PORT                8080
 #define MAX_USERNAME_LENGTH 100
 #define MAX_PASSWORD_LENGTH 100

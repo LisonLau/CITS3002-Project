@@ -24,7 +24,7 @@ void runTMforWeb() {
 
     ser_addr.sin_family      = AF_INET;
     ser_addr.sin_port        = htons(PORT);
-    ser_addr.sin_addr.s_addr = INADDR_ANY; //inet_addr("192.168.1.123");
+    ser_addr.sin_addr.s_addr = inet_addr(HOST); //INADDR_ANY;
 
     // Bind socket to port
     ser_addrsize = sizeof(ser_addr);
