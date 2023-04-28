@@ -21,21 +21,19 @@
 #define MAX_OPTION_LENGTH   100
 #define BUFFERSIZE          1024
 
-typedef struct Question {
+typedef struct Questions {
     char question[MAX_QUESTION_LENGTH];
     int isMCQ;  // 1 means MCQ, 0 means PCQ
     char options[MAX_OPTIONS][MAX_OPTION_LENGTH];
-} Question; 
+} Questions; 
 
-typedef struct Student {
+typedef struct Students {
     char username[MAX_USERNAME_LENGTH];
     char password[MAX_PASSWORD_LENGTH];
-    int grade;  // out of 10
-    // Question allocated[MAX_QUESTIONS];
-} Student;
+} Students;
 
-Question    questions[MAX_QUESTIONS];  
-Student     students[MAX_STUDENTS];
+Questions   questions[MAX_QUESTIONS];  
+Students    students[MAX_STUDENTS];
 int         numStudents;
 
 // user.c
@@ -43,11 +41,15 @@ extern void storeUsers();
 extern int  authenticateUsers(char *, char *);
 // TM_web.c
 extern void runTMforWeb();
-int handleUserLogin(int, char *, char *, char *);
-void sendResponse(int, char *);
+extern int handleUserLogin(int, char *, char *, char *);
+extern void sendResponse(int, char *);
 // ques.c
-extern void handleDisplayQuestion(int, int, char *, char *,  char *);
+extern int handleDisplayQuestion(int, int, char *, char *,  char *);
 extern void storeQuestions(char *);
 extern char* getQuestionHTML(int, char *);
 extern void handleAnswersToQB(char *);
 extern void urlDecode(char *, char *);
+// TM_QB.c
+extern char* getFinishHTML(int, char *, int, char *);
+extern int QBcheckMCQAnswer(char *);
+extern int QBcheckPCQAnswer(char *);

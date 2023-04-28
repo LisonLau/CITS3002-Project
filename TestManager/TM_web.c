@@ -24,7 +24,7 @@ void runTMforWeb() {
 
     ser_addr.sin_family      = AF_INET;
     ser_addr.sin_port        = htons(PORT);
-    ser_addr.sin_addr.s_addr = inet_addr(HOST); //INADDR_ANY;
+    ser_addr.sin_addr.s_addr = INADDR_ANY; //inet_addr(HOST);
 
     // Bind socket to port
     ser_addrsize = sizeof(ser_addr);
@@ -41,10 +41,13 @@ void runTMforWeb() {
     }
     printf("[+] Listening...\n");
 
-    // Accept incoming connections
+    // Current client information
     char username[MAX_USERNAME_LENGTH] = {0};
     char password[MAX_PASSWORD_LENGTH] = {0};
-    int quesIdx = 0;
+    int  grade = 0;
+    int  quesIdx = 0;
+
+    // Accept incoming connections
     while (1) {
         if ((newsockfd = accept(sersockfd, (struct sockaddr*)&ser_addr, (socklen_t*)&ser_addrsize)) < 0) {
             perror("[-] Error in accepting.");
@@ -65,15 +68,19 @@ void runTMforWeb() {
             isLoggedIn = handleUserLogin(newsockfd, buffer, username, password);
         }
 
+        // Handle display finish page after test is done
         if (quesIdx == MAX_QUESTIONS) {
-            // Display done page
-            sendResponse(newsockfd, "");
+            char *finishHTML = {0};
+            finishHTML = getFinishHTML(newsockfd, buffer, grade, finishHTML);
+            sendResponse(newsockfd, finishHTML);
+            free(finishHTML);
         }
 
         // Handle display questions after user has logged in
         if (isLoggedIn) {
-            handleDisplayQuestion(newsockfd, quesIdx, buffer, username, password);
+            int questionGrade = handleDisplayQuestion(newsockfd, quesIdx, buffer, username, password);
             quesIdx++;
+            grade = grade + questionGrade;
         }
 
         close(newsockfd);

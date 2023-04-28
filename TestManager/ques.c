@@ -1,6 +1,6 @@
 #include "TM.h"
 
-void handleDisplayQuestion(int socket, int quesIdx, char *buffer, char *username, char *password) {
+int handleDisplayQuestion(int socket, int quesIdx, char *buffer, char *username, char *password) {
     // Create custom filename
     char filename[100] = "";
     strcat(filename, username);
@@ -22,18 +22,23 @@ void handleDisplayQuestion(int socket, int quesIdx, char *buffer, char *username
         if (strstr(buffer, "mcq=") != NULL) {
             sscanf(strstr(buffer, "mcq="), "mcq=%s", encoded_ans);
             urlDecode(encoded_ans, decoded_ans); 
-            printf("%s\n", decoded_ans);
             // TODO : send decoded_ans to QB for checking
+            if (QBcheckMCQAnswer(decoded_ans)) {
+
+            }
         }
         // If it is a PCQ
         if (strstr(buffer, "pcq=") != NULL) {
             sscanf(strstr(buffer, "pcq="), "pcq=%s", encoded_ans);
             urlDecode(encoded_ans, decoded_ans); 
-            printf("%s\n", decoded_ans);
             // TODO : send decoded_ans to QB for checking
+            if (QBcheckPCQAnswer(decoded_ans)) {
+                
+            }
         }
     }
     free(quesHTML);
+    return 3;   // tbc
 }
 
 void storeQuestions(char *filename) {
