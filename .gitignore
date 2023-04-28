@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# compiled files
+/TestManager/receiver
+/TestManager/socket_login.o
+/TestManager/user_login.o
+/TestManager/TM.o
+/TestManager/TM
