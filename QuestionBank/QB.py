@@ -1,6 +1,7 @@
 import csv
 import random
 import socket
+from _thread import *
 
 from QBc  import *
 from QBpy import *
@@ -51,6 +52,66 @@ class QuestionBank:
         elif type == "pcqpy":   # PYTHON programming challenge question
             isCorrect = False
         return isCorrect
+    
+    def runQBserver(self):
+        host = '127.0.0.1'
+        port = 8080
+        thread_count = 0
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print('[+] Server socket created.')
+        
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        # # Connect is usually used by the client to reach to the server
+        # server_socket.connect((host, port))
+        # print("[+] Connected.")
+
+        try:
+            server_socket.bind((host, port))
+        except socket.error as e:  
+            print(f'[-] {str(e)}')
+            return 0
+        print('[+] Binding successful')
+
+        print('[+] Listening...')
+        server_socket.listen(5)
+        
+        # Connects every client to the server simultaneously
+        def multi_threaded_client(connection):
+            # connection.send(str.encode('Server is working:'))
+            while True:
+                # Seperately getting data from the clients and returning the server response
+                # data = connection.recv(2048) 
+                # response = '[+] Server message: ' + data.decode('utf-8')
+
+                data = self.sendQuestionFile("user1", "pass1")
+                # response = '[+] Server message: ' + data
+                # if not data:
+                #     break
+
+                # Send file data
+                # connection.sendall(str.encode(data))
+                connection.sendall(data)
+                break;
+            connection.close()
+            
+        try:
+            # Keep connection going
+            while True:
+                print('[+] Waiting...')
+                client, address = server_socket.accept()
+                # Connected client's information such as thread number and adddress given to it
+                print('[+] Connected to: ' + address[0] + ':' + str(address[1]))
+                start_new_thread(multi_threaded_client, (client, ))
+                thread_count += 1
+                print('[+] Thread Number: ' + str(thread_count))
+        # If the user presses Ctrl+C, close the connection and the socket
+        except KeyboardInterrupt:
+            server_socket.close()    # close QB socket
+            print("[-] Connection closed.")
+        
+
+    
     
     '''# Sending data via sockets
     def sendTM(self, QBsocket, filesent):
@@ -124,6 +185,7 @@ class QuestionBank:
             
     
 QB = QuestionBank()
+QB.runQBserver()
 
 # # binding to TM to receive
 # print(f"[+] Binding to {HOST}:{PORT}.")
