@@ -80,20 +80,20 @@ void storeQuestions(char *filename) {
 char* getQuestionHTML(int idx, char *quesHTML) {
     quesHTML = (char*) realloc(quesHTML, BUFFERSIZE);
     if (questions[idx].isMCQ) { // MCQ
-        sprintf(quesHTML, "<html><body><h1>Question %d</h1><p>%s</p><form method=\"post\">\
+        sprintf(quesHTML, "<html><body><h1>Question %d/%d</h1><p>%s</p><form method=\"post\">\
                         <input type=\"radio\" id=\"a\" name=\"mcq\" value=\"%s\"><label>%s</label><br>\
                         <input type=\"radio\" id=\"b\" name=\"mcq\" value=\"%s\"><label>%s</label><br>\
                         <input type=\"radio\" id=\"c\" name=\"mcq\" value=\"%s\"><label>%s</label><br>\
                         <input type=\"radio\" id=\"d\" name=\"mcq\" value=\"%s\"><label>%s</label><br><br>\
                         <button type=\"submit\">Submit</button>\
-                        </form></body></html>", idx+1, questions[idx].question,\
+                        </form></body></html>", idx+1, MAX_QUESTIONS, questions[idx].question,\
                         questions[idx].options[0], questions[idx].options[0], questions[idx].options[1], questions[idx].options[1],\
                         questions[idx].options[2], questions[idx].options[2], questions[idx].options[3], questions[idx].options[3]);
     } else {
-        sprintf(quesHTML, "<html><body><h1>Question %d</h1><label for=\"pcq\">%s</label><form method=\"post\"><br>\
+        sprintf(quesHTML, "<html><body><h1>Question %d/%d</h1><label for=\"pcq\">%s</label><form method=\"post\"><br>\
                         <textarea name=\"pcq\" rows=\"20\" cols=\"60\"></textarea><br><br>\
                         <button type=\"submit\">Submit</button>\
-                        </form></body></html>", idx+1, questions[idx].question);
+                        </form></body></html>", idx+1, MAX_QUESTIONS, questions[idx].question);
     }
     return quesHTML;
 }
