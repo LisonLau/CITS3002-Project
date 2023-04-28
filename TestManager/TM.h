@@ -51,8 +51,3 @@ extern void storeQuestions(char *);
 extern char* getQuestionHTML(int, char *);
 extern void handleAnswersToQB(char *);
 extern void urlDecode(char *, char *);
-
-extern void getUserLogin();
-extern void runTmServer();
-extern int connectToQb(char *, char *);
-// extern void handle_socket(int, int, int, struct sockaddr_in *, int, char *, char *, char *, char *);
