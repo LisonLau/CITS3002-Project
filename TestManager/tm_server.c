@@ -1,7 +1,7 @@
 #include "TM.h"
 
 void runTmServer() {
-    // char *host  = "127.0.0.1";  // host
+    char *host  = "192.168.68.106";  // host
     int port    = 8080;         // port
     int opt     = 1;
     int max_clients = 30;
@@ -37,7 +37,7 @@ void runTmServer() {
 
     address.sin_family      = AF_INET;
     address.sin_port        = htons(port);
-    address.sin_addr.s_addr = inet_addr("192.168.68.106"); //INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr(host); //INADDR_ANY;
 
     // Bind socket to port
     if (bind(ser_sockfd, (struct sockaddr *)&address, sizeof(address)) < 0) {
