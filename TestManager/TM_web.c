@@ -2,11 +2,25 @@
 
 void runTMforWeb() {
     int                 opt = 1;
-    int                 sersockfd, newsockfd, valread;
-    struct sockaddr_in  ser_addr;
-    socklen_t           ser_addrsize;
+    int                 max_sd, activity, sersockfd, newsockfd, sockfd, valread;
+    int                 client_socket[MAX_CLIENTS] = {0};
+    struct hostent      *hostInfo;
+    struct in_addr      **addr_list;
+    struct sockaddr_in  addr;
+    socklen_t           addrsize;
+    fd_set              readset;
     char                buffer[BUFFERSIZE];
+    char                hostname[255];
     int                 isLoggedIn = 0;
+
+    // Retrieving HOST IP address
+    gethostname(hostname, 255);
+    hostInfo = gethostbyname(hostname);
+    addr_list = (struct in_addr **)hostInfo->h_addr_list;
+    HOST = inet_ntoa(*addr_list[0]);
+    if (strcmp(HOST, "127.0.0.1") == 0) {
+        HOST = inet_ntoa(*addr_list[1]);
+    }
 
     // Create socket file descriptor
     if ((sersockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -22,72 +36,146 @@ void runTMforWeb() {
     }
     printf("[+] Set socket options successful.\n");
 
-    ser_addr.sin_family      = AF_INET;
-    ser_addr.sin_port        = htons(PORT);
-    ser_addr.sin_addr.s_addr = INADDR_ANY; //inet_addr(HOST);
+    addr.sin_family      = AF_INET;
+    addr.sin_port        = htons(SERVER_PORT);
+    addr.sin_addr.s_addr = inet_addr(HOST);
 
     // Bind socket to port
-    ser_addrsize = sizeof(ser_addr);
-    if (bind(sersockfd, (struct sockaddr*)&ser_addr, ser_addrsize) < 0) {
+    addrsize = sizeof(addr);
+    if (bind(sersockfd, (struct sockaddr*)&addr, addrsize) < 0) {
         perror("[-] Error in binding.");
         exit(EXIT_FAILURE);
     }
     printf("[+] Binding successful.\n");
+    printf("[+] Server socket, fd: %d\n", sersockfd);
 
     // Listen for incoming connections
     if (listen(sersockfd, 10) < 0) {
         perror("[-] Error in listening.");
         exit(EXIT_FAILURE);
     }
-    printf("[+] Listening...\n");
-
-    // Current client information
-    char username[MAX_USERNAME_LENGTH] = {0};
-    char password[MAX_PASSWORD_LENGTH] = {0};
-    int  grade = 0;
-    int  quesIdx = 0;
+    printf("[+] Listening as %s:%d\n", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
 
     // Accept incoming connections
     while (1) {
-        if ((newsockfd = accept(sersockfd, (struct sockaddr*)&ser_addr, (socklen_t*)&ser_addrsize)) < 0) {
-            perror("[-] Error in accepting.");
+        // Clear the socket set
+        FD_ZERO(&readset);
+
+        // Add master socket to set
+        FD_SET(sersockfd, &readset);
+        max_sd = sersockfd;
+
+        // Adding child sockets to the sets
+        for (int i = 0; i < MAX_CLIENTS; i++){
+            sockfd = client_socket[i];
+            if (sockfd > 0) {FD_SET(sockfd, &readset);}
+            if (sockfd > max_sd) {max_sd = sockfd;}
+        } 
+
+        // Waiting for one of the sockets to do something, waits indefinitely
+        printf("[+] Waiting...\n");
+        activity = select(max_sd + 1, &readset, NULL, NULL, NULL);
+        if (activity < 0 && errno != EINTR){
+            perror("[-] Socket connection error.\n");
             exit(EXIT_FAILURE);
         }
 
-        // Read HTTP request
-        memset(buffer, 0, BUFFERSIZE);
-        if ((valread = read(newsockfd, buffer, BUFFERSIZE)) < 0) {
-            perror("[-] Error in reading HTTP request.");
-            exit(EXIT_FAILURE);
+        // When something a client request comes into the server
+        if (FD_ISSET(sersockfd, &readset)) {
+            if ((newsockfd = accept(sersockfd, (struct sockaddr*)&addr, &addrsize)) < 0) {
+                perror("[-] Error in accepting.");
+                exit(EXIT_FAILURE);
+            }
+            printf("[+] New connection, socket fd: %d, ip: %s, port: %d\n",
+                    newsockfd, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+
+            // Adds the new socket to array of sockets 
+            for (int i = 0; i < MAX_STUDENTS; i++) {  
+                // If position is empty 
+                if (client_socket[i] == 0) {  
+                    client_socket[i] = newsockfd;  
+                    printf("[+] Adding to list of sockets as %d\n" , i); 
+                    break;  
+                }
+            }
         }
 
-        printf("%s\n", buffer);
+        // Going through the list of connected clients
+        for (int i = 0; i < MAX_CLIENTS; i++) {
+            sockfd = client_socket[i];
+            if (FD_ISSET(sockfd, &readset)) {
 
-        // Handle user login if user has not logged in
-        if (isLoggedIn == 0) {
-            isLoggedIn = handleUserLogin(newsockfd, buffer, username, password);
+                // Read HTTP request
+                memset(buffer, 0, BUFFERSIZE);
+                getpeername(sockfd, (struct sockaddr*)&addr, &addrsize);
+                if ((valread = read(sockfd, buffer, BUFFERSIZE))  == 0) {
+                    // This client has disconnected
+                    printf("[-] A client disconnected, ip: %s, port: %d\n",
+                            inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+                    client_socket[i] = 0;
+                    shutdown(sockfd, SHUT_RDWR);
+                    close(sockfd);
+                } 
+                else {
+                    printf("%s\n", buffer);
+
+                    // Handle user login if user has not logged in
+                    isLoggedIn = checkLoggedIn(inet_ntoa(addr.sin_addr), 0);
+                    printf("[!] %s isLoggedIn: %d\n",inet_ntoa(addr.sin_addr), isLoggedIn);
+
+                    if (isLoggedIn == -1) {
+                        isLoggedIn = handleUserLogin(sockfd, inet_ntoa(addr.sin_addr), buffer);
+                    }
+
+                    if (isLoggedIn) {
+                        // If a student is logged in, i need to find that student
+                        int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
+                        Students currStudent = students[index];
+                        int quesIdx = currStudent.quesIdx;
+                        printf("[.] Student is: %s, index:%i quesIdx:%i\n", currStudent.username, index, quesIdx);
+
+                        // Handle display finish page after test is done
+                        if (quesIdx == MAX_QUESTIONS) {
+                            char *finishHTML = {0};
+                            finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML);
+                            sendResponse(sockfd, finishHTML);
+                            free(finishHTML);
+                        }
+
+                        // Handle display question page of current question
+                        if (currStudent.allocated_ques[quesIdx].isCorrect) {
+                            // If student attempts 2nd time after correct, no change
+                            if (currStudent.allocated_ques[quesIdx].numAttempts == 2) {
+                                currStudent.grade -= 2;
+                            } else if (currStudent.allocated_ques[quesIdx].numAttempts == 3) {
+                                currStudent.grade -= 1;
+                            }
+                        }
+
+                        handleGetQuestion(&currStudent);
+
+                        int isCorrect = handleDisplayQuestion(sockfd, buffer, &currStudent);
+                        currStudent.grade += isCorrect;
+                        currStudent.allocated_ques[quesIdx].isCorrect = isCorrect;
+                        currStudent.allocated_ques[quesIdx].numAttempts++;
+
+                        if (currStudent.allocated_ques[quesIdx].isCorrect) {
+                            // If student gets the question right 1st attempt
+                            if (currStudent.allocated_ques[quesIdx].numAttempts == 1)
+                                currStudent.grade += 3;    
+                            else if (currStudent.allocated_ques[quesIdx].numAttempts == 2)
+                                currStudent.grade += 2;
+                            else if (currStudent.allocated_ques[quesIdx].numAttempts == 3)
+                                currStudent.grade += 1;
+                        }  
+                    }            
+                }
+            }
         }
-
-        // Handle display finish page after test is done
-        if (quesIdx == MAX_QUESTIONS) {
-            char *finishHTML = {0};
-            finishHTML = getFinishHTML(newsockfd, buffer, grade, finishHTML);
-            sendResponse(newsockfd, finishHTML);
-            free(finishHTML);
-        }
-
-        // Handle display questions after user has logged in
-        if (isLoggedIn) {
-            int questionGrade = handleDisplayQuestion(newsockfd, quesIdx, buffer, username, password);
-            quesIdx++;
-            grade = grade + questionGrade;
-        }
-
-        close(newsockfd);
     }
 }
 
-int handleUserLogin(int socket, char *buffer, char *username, char *password) {
+int handleUserLogin(int socket, char *ip, char *buffer) {
     char *form = strstr(buffer, "uname=");
     // Display login page
     if (strstr(buffer, "GET / HTTP/1.1") != NULL) {
@@ -107,8 +195,9 @@ int handleUserLogin(int socket, char *buffer, char *username, char *password) {
         // User successfully logged in, display question page
         if (authenticateUsers(uname, pword)) {
             printf("[+] User has successfully logged in.\n");
-            strncpy(username, uname, MAX_USERNAME_LENGTH);
-            strncpy(password, pword, MAX_PASSWORD_LENGTH);
+            int match = checkLoggedIn(uname, 1);
+            strcpy(students[match].ipAddress, ip);
+            students[match].loggedIn = 1;
             return 1;
         } 
         // User failed to logged in, ask for login attempt
@@ -129,6 +218,19 @@ int handleUserLogin(int socket, char *buffer, char *username, char *password) {
         send(socket, errorHTML, strlen(errorHTML), 0);
     }
     return 0;
+}
+
+int checkLoggedIn(char *var, int getIndex) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        // Checks if a student is associated with this IP and is logged in
+        if (getIndex && (strcmp(students[i].username, var) == 0 || strcmp(students[i].ipAddress, var) == 0)) {
+            return i; // returns index of the student
+        }
+        else if (!getIndex && strcmp(students[i].ipAddress, var) == 0 && students[i].loggedIn == 1) {
+            return 1; // returns 1 for true user is logged in
+        }
+    }
+    return -1; // not 0 because i need to differentiate between index 0 and false
 }
 
 void sendResponse(int socket, char *message) {

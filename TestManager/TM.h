@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 500
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -9,9 +11,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <netdb.h>
 
-#define HOST                "IP ADDRESS"
-#define PORT                8080
+#define SERVER_PORT         8080
+#define CLIENT_PORT         8888
 #define MAX_USERNAME_LENGTH 100
 #define MAX_PASSWORD_LENGTH 100
 #define MAX_QUESTION_LENGTH 500
@@ -19,37 +22,50 @@
 #define MAX_QUESTIONS       10
 #define MAX_OPTIONS         4
 #define MAX_OPTION_LENGTH   100
+#define MAX_CLIENTS         30
 #define BUFFERSIZE          1024
 
 typedef struct Questions {
+    char type[10];
     char question[MAX_QUESTION_LENGTH];
-    int isMCQ;  // 1 means MCQ, 0 means PCQ
+    int  isMCQ;  // 1 means MCQ, 0 means PCQ
     char options[MAX_OPTIONS][MAX_OPTION_LENGTH];
+    int  numAttempts;
+    int  isCorrect;
 } Questions; 
 
 typedef struct Students {
     char username[MAX_USERNAME_LENGTH];
     char password[MAX_PASSWORD_LENGTH];
+    char ipAddress[255];
+    int  loggedIn;
+    int  quesIdx;
+    int  grade;
+    Questions allocated_ques[MAX_QUESTIONS];
 } Students;
 
 Questions   questions[MAX_QUESTIONS];  
 Students    students[MAX_STUDENTS];
 int         numStudents;
+char        *HOST;
 
 // user.c
 extern void storeUsers();
 extern int  authenticateUsers(char *, char *);
 // TM_web.c
 extern void runTMforWeb();
-extern int handleUserLogin(int, char *, char *, char *);
+extern int checkLoggedIn(char *, int);
+extern int handleUserLogin(int, char *, char *);
 extern void sendResponse(int, char *);
 // ques.c
-extern int handleDisplayQuestion(int, int, char *, char *,  char *);
-extern void storeQuestions(char *);
-extern char* getQuestionHTML(int, char *);
-extern void handleAnswersToQB(char *);
+extern void handleGetQuestion(Students *);
+extern int handleDisplayQuestion(int, char *, Students *);
+extern void storeQuestions(char *, Students *);
+extern char* getQuestionHTML(int, char *, Students *);
 extern void urlDecode(char *, char *);
 // TM_QB.c
 extern char* getFinishHTML(int, char *, int, char *);
-extern int QBcheckMCQAnswer(char *);
-extern int QBcheckPCQAnswer(char *);
+extern int handleQBcheck(char *, char *, char *);
+extern int sendQBCheck(int, char *, char *, char *);
+extern void handleQBget(char *);
+extern void sendQBget(int, char *);

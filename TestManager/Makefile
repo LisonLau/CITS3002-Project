@@ -22,3 +22,6 @@ user.o : user.c $(HEADERS)
 
 ques.o : ques.c $(HEADERS)
 		$(C11) $(CFLAGS) -c ques.c
+
+clean:
+	rm -f $(PROJECT) $(OBJ)
