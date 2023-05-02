@@ -12,23 +12,20 @@ void handleGetQuestion(Students *currStudent) {
 }
 
 int handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
-    int     isCorrect = 0;
-    int     quesIdx;
-    char    *username = currStudent->username;
-    char    *password = currStudent->password;
-    
     // Create custom filename
     char filename[BUFFERSIZE] = "";
-    strcat(filename, username);
-    strcat(filename, password);
+    strcat(filename, currStudent->username);
+    strcat(filename, currStudent->password);
     strcat(filename, ".csv");
 
     // If student file already exists
+    int quesIdx;
     if (access(filename, F_OK) == 0) {
         quesIdx = currStudent->quesIdx;
         storeStudentQuestions(filename, currStudent);
     } else { // If student file does not exists, create one
         currStudent->quesIdx = 0;
+        currStudent->grade = 0;
         quesIdx = currStudent->quesIdx;
         handleGetQuestion(currStudent);
         // Store student's allocated questions
@@ -42,6 +39,7 @@ int handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
     free(quesHTML);
 
     // Get the answer inputted by user
+    int isCorrect = 0;
     if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
         
         char encoded_ans[BUFFERSIZE];

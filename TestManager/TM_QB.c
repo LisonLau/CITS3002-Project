@@ -75,8 +75,7 @@ int handleQBcheck(char *type, char *ques, char *ans) {
         exit(EXIT_FAILURE);
     }
     printf("[+] Connection to QB successful.\n");
-
-    printf("handleQBcheck ques %s\n", ques);
+    
     isCorrect = sendQBCheck(clisockfd, type, ques, ans);
 
     close(clisockfd);
@@ -84,7 +83,6 @@ int handleQBcheck(char *type, char *ques, char *ans) {
 }
 
 int sendQBCheck(int socket, char *type, char *question, char *answer) {
-    printf("sendQBCheck ques %s\n", question);
     char message[BUFFERSIZE] = "";
     strcat(message, type);
     strcat(message, ",");
