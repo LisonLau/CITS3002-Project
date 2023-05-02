@@ -1,5 +1,5 @@
-Write a C function that takes two integers as input and returns their sum.
-Write a C function that takes a string as input and returns the length of the string.
-Write a C function that takes an array of integers as input and returns the sum of all the even numbers in the array.
-Write a C function that takes a string as input and returns the reverse of that string.
-Write a C function that takes an array of strings as input and returns the length of the longest string in the array.
+Write a C function that takes two integers as input and returns their sum.@int sum(int a, int b) {int result = a + b; return result;}
+Write a C function that takes a string as input and returns the length of the string.@#include <string.h> int string_length(char* str) {return strlen(str);}
+Write a C function that takes an array of integers as input and returns the sum of all the even numbers in the array.@int sum_even(int arr[], int size) {int sum = 0; for (int i = 0; i < size; i++) {if (arr[i] % 2 == 0) sum += arr[i];} return sum;}
+Write a C function that takes a string as input and returns the reverse of that string.@#include <string.h> void reverse_string(char* str) {int len = strlen(str); for (int i = 0; i < len/2; i++) {char temp = str[i]; str[i] = str[len - i - 1]; str[len - i - 1] = temp;}}
+Write a C function that takes an array of strings as input and returns the length of the longest string in the array.@#include <stdio.h> int longest(char* arr[], int size) {int longest_len = 0; for (int i = 0; i < size; i++) {int len = strlen(arr[i]); if (len > longest_len) longest_len = len;} return longest_len;}

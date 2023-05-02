@@ -1,5 +1,5 @@
-Write a Python function that takes two numbers as input and returns their sum.
-Write a Python function that takes a string as input and returns the length of the string.
-Write a Python function that takes a list of numbers as input and returns the sum of all the even numbers in the list.
-Write a Python function that takes a string as input and returns the reverse of that string.
-Write a Python function that takes a list of strings as input and returns the length of the longest string in the list.
+Write a Python function that takes two numbers as input and returns their sum.@def sum(a, b): return a + b
+Write a Python function that takes a string as input and returns the length of the string.@def string_len(input_string): return len(input_string)
+Write a Python function that takes a list of numbers as input and returns the sum of all the even numbers in the list.@def sum_even(numbers): total = 0 for num in numbers: if num % 2 == 0: total += num return total
+Write a Python function that takes a string as input and returns the reverse of that string.@def reverse_str(input_str): return input_string[::-1]
+Write a Python function that takes a list of strings as input and returns the length of the longest string in the list.@def longest_strlen(string_list): max_length = 0 for s in string_list: if len(s) > max_length: max_length = len(s) return max_length
