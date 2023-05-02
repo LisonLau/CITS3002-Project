@@ -37,7 +37,7 @@ int handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
 
     // Display questions
     char *quesHTML = {0};
-    quesHTML = getQuestionHTML(quesIdx, quesHTML, currStudent);
+    quesHTML = getQuestionHTML(quesHTML, currStudent);
     sendResponse(socket, quesHTML);
     free(quesHTML);
 
@@ -65,11 +65,11 @@ int handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
             isCorrect = handleQBcheck("pcqc", currStudent->allocated[quesIdx].question, decoded_ans);   // If wrong, minus mark by 1
         }
     }
-    currStudent->quesIdx++;
     return isCorrect;
 }
 
-char* getQuestionHTML(int idx, char *quesHTML, Students *currStudent) {
+char* getQuestionHTML(char *quesHTML, Students *currStudent) {
+    int idx = currStudent->quesIdx;
     quesHTML = (char*) realloc(quesHTML, BUFSIZ);
     if (currStudent->allocated[idx].isMCQ) { // MCQ
         sprintf(quesHTML, "<html><body><h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><p>%s</p><form method=\"post\">\

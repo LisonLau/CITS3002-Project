@@ -143,29 +143,32 @@ void runTMforWeb() {
                         }
 
                         // Handle display question page of current question
-                        if (currStudent.allocated[quesIdx].isCorrect) {
-                            // If student attempts 2nd time after correct, no change
-                            if (currStudent.allocated[quesIdx].numAttempts == 2) {
-                                currStudent.grade -= 2;
-                            } else if (currStudent.allocated[quesIdx].numAttempts == 3) {
-                                currStudent.grade -= 1;
-                            }
-                        }
+                        handleDisplayQuestion(sockfd, buffer, &currStudent);
+                        currStudent.quesIdx = currStudent.quesIdx + 1; 
+                        // TODO SOMETHING WRONG HERE
+                        // TODO QUES INDEX NOT INCREMENTING
+                        // currStudent.grade += isCorrect;
+                        // currStudent.allocated[quesIdx].isCorrect = isCorrect;
+                        // currStudent.allocated[quesIdx].numAttempts++;
 
-                        int isCorrect = handleDisplayQuestion(sockfd, buffer, &currStudent);
-                        currStudent.grade += isCorrect;
-                        currStudent.allocated[quesIdx].isCorrect = isCorrect;
-                        currStudent.allocated[quesIdx].numAttempts++;
+                        // if (currStudent.allocated[quesIdx].isCorrect) {
+                        //     // If student attempts 2nd time after correct, no change
+                        //     if (currStudent.allocated[quesIdx].numAttempts == 2) {
+                        //         currStudent.grade -= 2;
+                        //     } else if (currStudent.allocated[quesIdx].numAttempts == 3) {
+                        //         currStudent.grade -= 1;
+                        //     }
+                        // }
 
-                        if (currStudent.allocated[quesIdx].isCorrect) {
-                            // If student gets the question right 1st attempt
-                            if (currStudent.allocated[quesIdx].numAttempts == 1)
-                                currStudent.grade += 3;    
-                            else if (currStudent.allocated[quesIdx].numAttempts == 2)
-                                currStudent.grade += 2;
-                            else if (currStudent.allocated[quesIdx].numAttempts == 3)
-                                currStudent.grade += 1;
-                        }  
+                        // if (currStudent.allocated[quesIdx].isCorrect) {
+                        //     // If student gets the question right 1st attempt
+                        //     if (currStudent.allocated[quesIdx].numAttempts == 1)
+                        //         currStudent.grade += 3;    
+                        //     else if (currStudent.allocated[quesIdx].numAttempts == 2)
+                        //         currStudent.grade += 2;
+                        //     else if (currStudent.allocated[quesIdx].numAttempts == 3)
+                        //         currStudent.grade += 1;
+                        // }  
                     }            
                 }
             }

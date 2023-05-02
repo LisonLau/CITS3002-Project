@@ -59,7 +59,7 @@ extern void sendResponse(int, char *);
 // ques.c
 extern void handleGetQuestion(Students *);
 extern int handleDisplayQuestion(int, char *, Students *);
-extern char* getQuestionHTML(int, char *, Students *);
+extern char* getQuestionHTML(char *, Students *);
 extern void urlDecode(char *, char *);
 // TM_QB.c
 extern char* getFinishHTML(int, char *, int, char *);
