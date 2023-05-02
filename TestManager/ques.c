@@ -62,6 +62,18 @@ int handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
             urlDecode(encoded_ans, decoded_ans); 
             isCorrect = handleQBcheck("pcqc", currStudent->allocated[quesIdx].question, decoded_ans);   // If wrong, minus mark by 1
         }
+
+        currStudent->allocated[quesIdx].isCorrect = isCorrect;
+        printf("isCorrect %d\n", isCorrect);
+        printf("numAttempts before %d\n", currStudent->allocated[quesIdx].numAttempts);
+        if (isCorrect == 1 || currStudent->allocated[quesIdx].numAttempts == 0){
+            currStudent->grade += currStudent->allocated[quesIdx].numAttempts;
+            currStudent->quesIdx++; // when no next button
+        } 
+        if (isCorrect == 0) {
+            currStudent->allocated[quesIdx].numAttempts--;
+        }
+        printf("numAttempts after %d\n", currStudent->allocated[quesIdx].numAttempts);
     }
     return isCorrect;
 }
@@ -70,6 +82,7 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent) {
     int idx = currStudent->quesIdx;
     quesHTML = (char*) realloc(quesHTML, BUFSIZ);
     char *backButton = "<input type=\"button\" value=\"Back\" onclick=\"history.back()\">";
+    // char *nextButton = "<input type=\"button\" value=\"Next\" method=\"post\">";
     if (currStudent->allocated[idx].isMCQ) { // MCQ
         sprintf(quesHTML, "<html><body><h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><p>%s</p><form method=\"post\">\
                         <input type=\"radio\" id=\"a\" name=\"%s\" value=\"%s\"><label>%s</label><br>                   \

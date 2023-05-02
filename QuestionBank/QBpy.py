@@ -39,3 +39,11 @@ class QuestionBankPython:
             if mcq[1] == question and mcq[6] == student_answer:
                 return True
         return False
+    
+    # Grade Python PCQ
+    def gradePCQ(self, question, student_answer):
+        AllPCQ = self.getPCQ()
+        for i in range(len(AllPCQ)):
+            if AllPCQ[i][1] == question:
+                if i == 1:
+                    pass

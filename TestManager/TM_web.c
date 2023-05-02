@@ -12,7 +12,6 @@ void runTMforWeb() {
     char                buffer[BUFFERSIZE];
     // char                hostname[255];
     int                 isLoggedIn = 0;
-    int                 isCorrect;
 
     // Retrieving HOST IP address
     // gethostname(hostname, 255);
@@ -144,22 +143,7 @@ void runTMforWeb() {
                         }
 
                         // Handle display question page of current question
-                        isCorrect = handleDisplayQuestion(sockfd, buffer, &currStudent);
-                        currStudent.quesIdx = currStudent.quesIdx + 1; 
-                        // TODO SOMETHING WRONG HERE
-                        // TODO QUES INDEX NOT INCREMENTING
-                        currStudent.allocated[quesIdx].isCorrect = isCorrect;
-                        currStudent.allocated[quesIdx].numAttempts++;
-
-                        if (currStudent.allocated[quesIdx].isCorrect) {
-                            // If student gets the question right 1st attempt
-                            if (currStudent.allocated[quesIdx].numAttempts == 1)
-                                currStudent.grade += 3;    
-                            else if (currStudent.allocated[quesIdx].numAttempts == 2)
-                                currStudent.grade += 2;
-                            else if (currStudent.allocated[quesIdx].numAttempts == 3)
-                                currStudent.grade += 1;
-                        }  
+                        handleDisplayQuestion(sockfd, buffer, &students[index]);
                     }            
                 }
             }
@@ -213,7 +197,7 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
 }
 
 int checkLoggedIn(char *var, int getIndex) {
-    for (int i = 0; i < MAX_CLIENTS; i++) {
+    for (int i = 0; i < MAX_STUDENTS; i++) {
         // Checks if a student is associated with this IP and is logged in
         if (getIndex && (strcmp(students[i].username, var) == 0 || strcmp(students[i].ipAddress, var) == 0)) {
             return i; // returns index of the student
