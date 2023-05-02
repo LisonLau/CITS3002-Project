@@ -48,22 +48,23 @@ int         numStudents;
 char        *HOST;
 
 // user.c
-extern void storeUsers();
-extern int  authenticateUsers(char *, char *);
-extern void storeStudentQuestions(char *, Students *);
+extern void  storeUsers();
+extern int   authenticateUsers(char *, char *);
+extern void  storeStudentQuestions(char *, Students *);
 // TM_web.c
-extern void runTMforWeb();
-extern int checkLoggedIn(char *, int);
-extern int handleUserLogin(int, char *, char *);
-extern void sendResponse(int, char *);
+extern void  runTMforWeb();
+extern int   checkLoggedIn(char *, int);
+extern int   handleUserLogin(int, char *, char *);
+extern void  sendResponse(int, char *);
 // ques.c
-extern void handleGetQuestion(Students *);
-extern int handleDisplayQuestion(int, char *, Students *);
+extern void  handleGetQuestion(Students *);
+extern int   handleDisplayQuestion(int, char *, Students *);
+extern char* getAnswerHTML(char *, Students *, int, char *);
 extern char* getQuestionHTML(char *, Students *);
-extern void urlDecode(char *, char *);
+extern void  urlDecode(char *, char *);
 // TM_QB.c
 extern char* getFinishHTML(int, char *, int, char *);
-extern int handleQBcheck(char *, char *, char *);
-extern int sendQBCheck(int, char *, char *, char *);
-extern void handleQBget(char *);
-extern void sendQBget(int, char *);
+extern int   handleQBcheck(char *, char *, char *);
+extern int   sendQBCheck(int, char *, char *, char *);
+extern void  handleQBget(char *);
+extern void  sendQBget(int, char *);

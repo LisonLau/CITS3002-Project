@@ -69,6 +69,10 @@ int handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
         if (isCorrect == 1 || currStudent->allocated[quesIdx].numAttempts == 0){
             currStudent->grade += currStudent->allocated[quesIdx].numAttempts;
             currStudent->quesIdx++; // when no next button
+            char *answerHTML = {0};
+            answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, decoded_ans);
+            sendResponse(socket, answerHTML);
+            free(answerHTML);
         } 
         if (isCorrect == 0) {
             currStudent->allocated[quesIdx].numAttempts--;
@@ -76,6 +80,20 @@ int handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
         printf("numAttempts after %d\n", currStudent->allocated[quesIdx].numAttempts);
     }
     return isCorrect;
+}
+
+char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char *stuAnswer) {
+    int idx = currStudent->quesIdx;
+    answerHTML = (char*) realloc(answerHTML, BUFSIZ);
+    char *correctMessage    = "<p>Your answer is correct!</p>";
+    char *wrongMessage      = "<p>Your answer is wrong!</p>";
+    sprintf(answerHTML, "<html><body><h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><  \
+                        <p>%s</p<p>Your answer is: %s</p>%s<p>Correct answer is: %s</p>   \
+                        <input type=\"button\" value=\"Back\" onclick=\"history.back()\"> \
+                        <input type=\"button\" value=\"Next\">",                          \
+                        idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated[idx].question,\
+                        stuAnswer, isCorrect ? correctMessage : wrongMessage, "correct answer");
+    return answerHTML;
 }
 
 char* getQuestionHTML(char *quesHTML, Students *currStudent) {
