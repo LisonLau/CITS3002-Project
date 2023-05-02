@@ -39,7 +39,7 @@ typedef struct Students {
     int  loggedIn;
     int  quesIdx;
     int  grade;
-    Questions allocated_ques[MAX_QUESTIONS];
+    Questions allocated[MAX_QUESTIONS];
 } Students;
 
 Questions   questions[MAX_QUESTIONS];  
@@ -50,6 +50,7 @@ char        *HOST;
 // user.c
 extern void storeUsers();
 extern int  authenticateUsers(char *, char *);
+extern void storeStudentQuestions(char *, Students *);
 // TM_web.c
 extern void runTMforWeb();
 extern int checkLoggedIn(char *, int);
@@ -58,7 +59,6 @@ extern void sendResponse(int, char *);
 // ques.c
 extern void handleGetQuestion(Students *);
 extern int handleDisplayQuestion(int, char *, Students *);
-extern void storeQuestions(char *, Students *);
 extern char* getQuestionHTML(int, char *, Students *);
 extern void urlDecode(char *, char *);
 // TM_QB.c

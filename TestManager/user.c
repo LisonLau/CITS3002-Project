@@ -39,3 +39,46 @@ int authenticateUsers(char *username, char *password) {
     }
     return 0;
 }
+
+void storeStudentQuestions(char *filename, Students *currStudent) {
+    FILE *fp;
+    char line[BUFFERSIZE];
+    char *token;
+    int quesIdx = 0;
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        perror("Error opening file.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    while (fgets(line, BUFFERSIZE, fp)) {
+        char* type = strtok(line, ",");
+        char* ques = strtok(NULL, ",");
+        // Stops after reading 10 questions
+        if (quesIdx == MAX_QUESTIONS) {
+            continue;
+        }
+        // Check the question type and store the values accordingly
+        if (strcmp(type, "pcqpy") == 0 || strcmp(type, "pcqc") == 0) {
+            strncpy(currStudent->allocated[quesIdx].type, type, 10);
+            strncpy(currStudent->allocated[quesIdx].question, ques, MAX_QUESTION_LENGTH);
+            currStudent->allocated[quesIdx].isMCQ = 0;
+            quesIdx++;
+        } else if (strcmp(type, "mcqpy") == 0 || strcmp(type, "mcqc") == 0) {
+            strncpy(currStudent->allocated[quesIdx].type, type, 10);
+            strncpy(currStudent->allocated[quesIdx].question, ques, MAX_QUESTION_LENGTH);
+            currStudent->allocated[quesIdx].isMCQ = 1;
+            // Store options
+            for (int j = 0; j < MAX_OPTIONS; j++) {
+                token = strtok(NULL, ",");
+                strcpy(currStudent->allocated[quesIdx].options[j], token);
+            }
+            quesIdx++;
+        } else {
+            perror("[-] Invalid question type.\n");
+            continue;
+        }
+    }
+    fclose(fp);
+}

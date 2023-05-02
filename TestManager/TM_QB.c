@@ -19,6 +19,7 @@ void handleQBget(char *filename) {
     // Connect to server
     if (connect(clisockfd, (struct sockaddr *)&qb_addr, sizeof(qb_addr)) < 0) {
         perror("[-] Error in connecting to QB.");
+        exit(EXIT_FAILURE);
     }
     printf("[+] Connection to QB successful.\n");
 
@@ -36,6 +37,7 @@ void sendQBget(int socket, char *filename) {
     // Send the request for file message
     if (send(socket, message, strlen(message), 0) < 0) {
         perror("[-] Message 'get' failed to send.");
+        exit(EXIT_FAILURE);
     }
     printf("[+] Message 'get' sent successfully.\n");
 
@@ -70,9 +72,11 @@ int handleQBcheck(char *type, char *ques, char *ans) {
     // Connect to server
     if (connect(clisockfd, (struct sockaddr *)&qb_addr, sizeof(qb_addr)) < 0) {
         perror("[-] Error in connecting to QB.");
+        exit(EXIT_FAILURE);
     }
     printf("[+] Connection to QB successful.\n");
 
+    printf("handleQBcheck ques %s\n", ques);
     isCorrect = sendQBCheck(clisockfd, type, ques, ans);
 
     close(clisockfd);
@@ -80,6 +84,7 @@ int handleQBcheck(char *type, char *ques, char *ans) {
 }
 
 int sendQBCheck(int socket, char *type, char *question, char *answer) {
+    printf("sendQBCheck ques %s\n", question);
     char message[BUFFERSIZE] = "";
     strcat(message, type);
     strcat(message, ",");
@@ -90,6 +95,7 @@ int sendQBCheck(int socket, char *type, char *question, char *answer) {
     // Send the message
     if (send(socket, message, strlen(message), 0) < 0) {
         perror("[-] Message 'check' failed to send.");
+        exit(EXIT_FAILURE);
     }
     printf("[+] Message 'check' sent successfully.\n");
 
@@ -98,6 +104,7 @@ int sendQBCheck(int socket, char *type, char *question, char *answer) {
     int response_bytes = recv(socket, response, BUFFERSIZE, 0);
     if (response_bytes < 0) {
         perror("[-] Failed to receive QB response.");
+        exit(EXIT_FAILURE);
     }
     response[response_bytes] = '\0';
     printf("[+] QB response received successfully.\n");

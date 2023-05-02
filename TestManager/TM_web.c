@@ -4,29 +4,29 @@ void runTMforWeb() {
     int                 opt = 1;
     int                 max_sd, activity, sersockfd, newsockfd, sockfd, valread;
     int                 client_socket[MAX_CLIENTS] = {0};
-    struct hostent      *hostInfo;
-    struct in_addr      **addr_list;
+    // struct hostent      *hostInfo;
+    // struct in_addr      **addr_list;
     struct sockaddr_in  addr;
     socklen_t           addrsize;
     fd_set              readset;
     char                buffer[BUFFERSIZE];
-    char                hostname[255];
+    // char                hostname[255];
     int                 isLoggedIn = 0;
 
     // Retrieving HOST IP address
-    gethostname(hostname, 255);
-    hostInfo = gethostbyname(hostname);
-    addr_list = (struct in_addr **)hostInfo->h_addr_list;
-    HOST = inet_ntoa(*addr_list[0]);
-    if (strcmp(HOST, "127.0.0.1") == 0) {
-        HOST = inet_ntoa(*addr_list[1]);
-    }
+    // gethostname(hostname, 255);
+    // hostInfo = gethostbyname(hostname);
+    // addr_list = (struct in_addr **)hostInfo->h_addr_list;
+    // HOST = inet_ntoa(*addr_list[0]);
+    // if (strcmp(HOST, "127.0.0.1") == 0) {
+    //     HOST = inet_ntoa(*addr_list[1]);
+    // }
 
     // Create socket file descriptor
     if ((sersockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("[-] Error in socket.");
         exit(EXIT_FAILURE);
-    }
+    } 
     printf("[+] Server socket created.\n");
 
     // Set socket options
@@ -38,7 +38,7 @@ void runTMforWeb() {
 
     addr.sin_family      = AF_INET;
     addr.sin_port        = htons(SERVER_PORT);
-    addr.sin_addr.s_addr = inet_addr(HOST);
+    addr.sin_addr.s_addr = INADDR_ANY;
 
     // Bind socket to port
     addrsize = sizeof(addr);
@@ -143,29 +143,27 @@ void runTMforWeb() {
                         }
 
                         // Handle display question page of current question
-                        if (currStudent.allocated_ques[quesIdx].isCorrect) {
+                        if (currStudent.allocated[quesIdx].isCorrect) {
                             // If student attempts 2nd time after correct, no change
-                            if (currStudent.allocated_ques[quesIdx].numAttempts == 2) {
+                            if (currStudent.allocated[quesIdx].numAttempts == 2) {
                                 currStudent.grade -= 2;
-                            } else if (currStudent.allocated_ques[quesIdx].numAttempts == 3) {
+                            } else if (currStudent.allocated[quesIdx].numAttempts == 3) {
                                 currStudent.grade -= 1;
                             }
                         }
 
-                        handleGetQuestion(&currStudent);
-
                         int isCorrect = handleDisplayQuestion(sockfd, buffer, &currStudent);
                         currStudent.grade += isCorrect;
-                        currStudent.allocated_ques[quesIdx].isCorrect = isCorrect;
-                        currStudent.allocated_ques[quesIdx].numAttempts++;
+                        currStudent.allocated[quesIdx].isCorrect = isCorrect;
+                        currStudent.allocated[quesIdx].numAttempts++;
 
-                        if (currStudent.allocated_ques[quesIdx].isCorrect) {
+                        if (currStudent.allocated[quesIdx].isCorrect) {
                             // If student gets the question right 1st attempt
-                            if (currStudent.allocated_ques[quesIdx].numAttempts == 1)
+                            if (currStudent.allocated[quesIdx].numAttempts == 1)
                                 currStudent.grade += 3;    
-                            else if (currStudent.allocated_ques[quesIdx].numAttempts == 2)
+                            else if (currStudent.allocated[quesIdx].numAttempts == 2)
                                 currStudent.grade += 2;
-                            else if (currStudent.allocated_ques[quesIdx].numAttempts == 3)
+                            else if (currStudent.allocated[quesIdx].numAttempts == 3)
                                 currStudent.grade += 1;
                         }  
                     }            

@@ -82,8 +82,9 @@ class QuestionBank:
             print("[+] Response 'wrong' sent successfully.")
     
     def runQBserver(self):
-        hostname = socket.gethostname()
-        host = socket.gethostbyname(hostname)  
+        # hostname = socket.gethostname()
+        # host = socket.gethostbyname(hostname)  
+        host = '127.0.0.1'
         port = 8888
         thread_count = 0
         
