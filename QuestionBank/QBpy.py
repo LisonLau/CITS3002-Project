@@ -29,7 +29,10 @@ class QuestionBankPython:
         with open(self.pcqpyCSV, "r") as lines:
             for line in lines:
                 type = "pcqpy"
-                PCquestions.append([type, line.rstrip()])
+                x = line.split('@')
+                x.insert(0, type)
+                PCquestions.append(x)
+                #PCquestions.append([type, line.rstrip()])
         return PCquestions
 
     # Grade Python MCQ
