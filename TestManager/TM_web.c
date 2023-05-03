@@ -70,7 +70,7 @@ void runTMforWeb() {
             sockfd = client_socket[i];
             if (sockfd > 0) {FD_SET(sockfd, &readset);}
             if (sockfd > max_sd) {max_sd = sockfd;}
-        } 
+        }
 
         // Waiting for one of the sockets to do something, waits indefinitely
         printf("[+] Waiting...\n");
@@ -135,7 +135,7 @@ void runTMforWeb() {
                         printf("[.] Student is: %s, index:%i quesIdx:%i\n", currStudent.username, index, quesIdx);
 
                         // Handle display finish page after test is done
-                        if (quesIdx == MAX_QUESTIONS) {
+                        if (quesIdx >= MAX_QUESTIONS) {
                             char *finishHTML = {0};
                             finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML);
                             sendResponse(sockfd, finishHTML);

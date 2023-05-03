@@ -4,6 +4,7 @@
         "inet.h": "c",
         "socket.h": "c",
         "types.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "type_traits": "c"
     }
 }

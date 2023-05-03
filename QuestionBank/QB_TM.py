@@ -48,10 +48,8 @@ class QuestionBank:
     
     def categoriseMessage(self, message):
         if len(message.split(",")) == 2:
-            print("[+] Message 'get' from TM received.")
             return "get"
         elif len(message.split(",")) == 3:
-            print("[+] Message 'check' from TM received.")
             return "check"
         
     def executeSendFile(self, message, TMsocket):
@@ -122,9 +120,18 @@ class QuestionBank:
                 # Categorise message received as 'get' or 'check'
                 # Perform required send operations
                 if self.categoriseMessage(message) == "get":
+                    print("[+] Message 'get' from TM received.")
                     self.executeSendFile(message, TMsocket)
                 elif self.categoriseMessage(message) == "check":
+                    print("[+] Message 'check' from TM received.")
                     self.executeCheckAnswer(message, TMsocket)
+                    
+                # Receive acknowledgement for sent data
+                ack = TMsocket.recv(BUFFERSIZE).decode()
+                if ack == "ACK":
+                    print("[+] Acknowledgement received for sent data.")
+                else:
+                    print("[-] Acknowledgement not received.")
                     
                 TMsocket.close()
         # If the user presses Ctrl+C, close the connection and the socket
