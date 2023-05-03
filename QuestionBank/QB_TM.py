@@ -48,8 +48,10 @@ class QuestionBank:
     
     def categoriseMessage(self, message):
         if len(message.split(",")) == 2:
+            print("[+] Message 'get' from TM received.")
             return "get"
         elif len(message.split(",")) == 3:
+            print("[+] Message 'check' from TM received.")
             return "check"
         
     def executeSendFile(self, message, TMsocket):
