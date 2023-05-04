@@ -1,6 +1,6 @@
 #include "TM.h"
 
-void handleQBget(char *filename) {
+void handleQBgetFile(char *filename) {
     int clisockfd;
     struct sockaddr_in qb_addr;
 
@@ -23,12 +23,12 @@ void handleQBget(char *filename) {
     }
     printf("[+] Connection to QB successful.\n");
 
-    sendQBget(clisockfd, filename);
+    sendQBgetFile(clisockfd, filename);
 
     close(clisockfd);
 }
 
-void sendQBget(int socket, char *filename) {
+void sendQBgetFile(int socket, char *filename) {
     char message[BUFFERSIZE] = "";
     strcat(message, "get");
     strcat(message, ",");
@@ -36,10 +36,10 @@ void sendQBget(int socket, char *filename) {
 
     // Send the request for file message
     if (send(socket, message, strlen(message), 0) < 0) {
-        perror("[-] Message 'get' failed to send.");
+        perror("[-] Message 'get file' failed to send.");
         exit(EXIT_FAILURE);
     }
-    printf("[+] Message 'get' sent successfully.\n");
+    printf("[+] Message 'get file' sent successfully.\n");
 
     // Receive the file from QB
     char filelines[BUFFERSIZE];
@@ -100,10 +100,10 @@ int sendQBCheck(int socket, char *type, char *question, char *answer) {
 
     // Send the message
     if (send(socket, message, strlen(message), 0) < 0) {
-        perror("[-] Message 'check' failed to send.");
+        perror("[-] Message 'check answer' failed to send.");
         exit(EXIT_FAILURE);
     }
-    printf("[+] Message 'check' sent successfully.\n");
+    printf("[+] Message 'check answer' sent successfully.\n");
 
     // Receive QB response
     char response[BUFFERSIZE];
@@ -130,4 +130,64 @@ int sendQBCheck(int socket, char *type, char *question, char *answer) {
         return 0;
     }
     return 0;
+}
+
+char* handleQBgetAns(char *type, char *ques) {
+    char *correctAns;
+    int clisockfd;
+    struct sockaddr_in qb_addr;
+
+    // Create a client socket
+    if ((clisockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("[-] Error in creating TM client socket.");
+        exit(EXIT_FAILURE);
+    }
+    printf("[+] TM client socket created to check answer.\n");
+
+    // Set server address and port
+    qb_addr.sin_addr.s_addr = INADDR_ANY;
+    qb_addr.sin_family      = AF_INET;
+    qb_addr.sin_port        = htons(CLIENT_PORT);
+
+    // Connect to server
+    if (connect(clisockfd, (struct sockaddr *)&qb_addr, sizeof(qb_addr)) < 0) {
+        perror("[-] Error in connecting to QB.");
+        exit(EXIT_FAILURE);
+    }
+    printf("[+] Connection to QB successful.\n");
+    
+    correctAns = sendQBgetAns(clisockfd, type, ques);
+
+    close(clisockfd);
+    return correctAns;
+}
+
+char* sendQBgetAns(int socket, char *type, char *question) {
+    char message[BUFFERSIZE] = "";
+    strcat(message, "get");
+    strcat(message, ",");
+    strcat(message, "answer");
+    strcat(message, ",");
+    strcat(message, type);
+    strcat(message, ",");
+    strcat(message, question);
+
+    // Send the message
+    if (send(socket, message, strlen(message), 0) < 0) {
+        perror("[-] Message 'get answer' failed to send.");
+        exit(EXIT_FAILURE);
+    }
+    printf("[+] Message 'get answer' sent successfully.\n");
+
+    // Receive QB response
+    char *response = malloc(BUFFERSIZE);
+    int response_bytes = recv(socket, response, BUFFERSIZE, 0);
+    if (response_bytes < 0) {
+        perror("[-] Failed to receive QB response.");
+        exit(EXIT_FAILURE);
+    }
+    response[response_bytes] = '\0';
+    printf("[+] QB response received successfully.\n");
+
+    return response;
 }

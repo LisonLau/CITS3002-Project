@@ -40,6 +40,13 @@ class QuestionBankPython:
                 return True
         return False
     
+    # Get MCQ answer from given question
+    def getMCQanswer(self, question):
+        AllMCQ = self.getMCQ()
+        for mcq in AllMCQ:
+            if mcq[1] == question:
+                return mcq[6]
+    
     # Grade Python PCQ
     def gradePCQ(self, question, student_answer):
         AllPCQ = self.getPCQ()

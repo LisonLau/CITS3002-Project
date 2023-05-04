@@ -41,7 +41,7 @@ char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML) {
     return finishHTML;
 }
 
-char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char *stuAnswer) {
+char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char *studentAns, char *correctAns) {
     int idx = currStudent->quesIdx;
     answerHTML = (char*) realloc(answerHTML, BUFSIZ);
     char *logoutButton = "<form method=\'post\'><input type=\"submit\" name=\'logout\' value=\"Logout\"></form>";
@@ -53,8 +53,8 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char
                         <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p>  \
                         %s%s</body></html>", \
                         logoutButton, idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3,\
-                        currStudent->allocated[idx].question, stuAnswer, isCorrect ? correctMessage : wrongMessage,\
-                        "correct answer", idx > 0 ? backButton : "", nextButton);
+                        currStudent->allocated[idx].question, studentAns, isCorrect ? correctMessage : wrongMessage,\
+                        correctAns, idx > 0 ? backButton : "", nextButton);
     return answerHTML;
 }
 

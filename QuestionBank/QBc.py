@@ -39,3 +39,10 @@ class QuestionBankC:
             if mcq[1] == question and mcq[6] == student_answer:
                 return True
         return False
+    
+    # Get MCQ answer from given question
+    def getMCQanswer(self, question):
+        AllMCQ = self.getMCQ()
+        for mcq in AllMCQ:
+            if mcq[1] == question:
+                return mcq[6]

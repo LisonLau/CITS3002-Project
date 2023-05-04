@@ -45,12 +45,26 @@ class QuestionBank:
         elif type == "pcqpy":   # PYTHON programming challenge question
             isCorrect = False
         return isCorrect
+
+    def getAnswer(self, type, ques):
+        answer = ""
+        if type == "mcqc":      # C multiple choice question
+            answer = self.QBcInstance.getMCQanswer(ques)
+        elif type == "pcqc":    # C programming challenge question
+            answer = "NOT IMPLEMENTED YET"
+        elif type == "mcqpy":   # PYTHON multiple choice question
+            answer = self.QBpyInstance.getMCQanswer(ques)
+        elif type == "pcqpy":   # PYTHON programming challenge question
+            answer = "NOT IMPLEMENTED YET"
+        return answer
     
     def categoriseMessage(self, message):
         if len(message.split(",")) == 2:
-            return "get"
+            return "get_file"
         elif len(message.split(",")) == 3:
             return "check"
+        elif len(message.split(",")) == 4:
+            return "get_ans"
         
     def executeSendFile(self, message, TMsocket):
         # Get filename and create question file
@@ -80,6 +94,14 @@ class QuestionBank:
         else:
             TMsocket.send("wrong".encode())
             print("[+] Response 'wrong' sent successfully.")
+            
+    def executeSendAnswer(self, message, TMsocket):
+        # Find correct answer for given question
+        type = message.split(",")[2]
+        question = message.split(",")[3]
+        correctAns = self.getAnswer(type, question)
+        TMsocket.send(correctAns.encode())
+        print(f"[+] Answer '{correctAns}' sent successfully.")
     
     def runQBserver(self):
         # hostname = socket.gethostname()
@@ -119,12 +141,16 @@ class QuestionBank:
                 
                 # Categorise message received as 'get' or 'check'
                 # Perform required send operations
-                if self.categoriseMessage(message) == "get":
-                    print("[+] Message 'get' from TM received.")
+                if self.categoriseMessage(message) == "get_file":
+                    print("[+] Message 'get file' from TM received.")
                     self.executeSendFile(message, TMsocket)
                 elif self.categoriseMessage(message) == "check":
                     print("[+] Message 'check' from TM received.")
                     self.executeCheckAnswer(message, TMsocket)
+                elif self.categoriseMessage(message) == "get_ans":
+                    print("[+] Message 'get answer' from TM received.")
+                    self.executeSendAnswer(message, TMsocket)
+                    
                     
                 # Receive acknowledgement for sent data
                 # ack = TMsocket.recv(BUFFERSIZE).decode()
