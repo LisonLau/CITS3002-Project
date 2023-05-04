@@ -63,8 +63,8 @@ void handleMarkAttempts(int socket, Result result, Students *currStudent) {
     int numAttempts = currStudent->allocated[currStudent->quesIdx].numAttempts;
     int isCorrect = currStudent->allocated[currStudent->quesIdx].isCorrect;
     
-    printf("isCorrect %d\n", isCorrect);
-    printf("numAttempts before %d\n", numAttempts);
+    printf("isCorrect %d\n", currStudent->allocated[currStudent->quesIdx].isCorrect);
+    printf("numAttempts before %d\n", currStudent->allocated[currStudent->quesIdx].numAttempts);
     
     // If question is correct OR 3 attempts made
     if (isCorrect == 1 || numAttempts == 0){
@@ -77,7 +77,7 @@ void handleMarkAttempts(int socket, Result result, Students *currStudent) {
     } else if (isCorrect == 0) { // If question is wrong, decrement number of attempts
         currStudent->allocated[currStudent->quesIdx].numAttempts--;
     }
-    printf("numAttempts after %d\n", numAttempts);
+    printf("numAttempts after %d\n", currStudent->allocated[currStudent->quesIdx].numAttempts);
 }
 
 void handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {

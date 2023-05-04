@@ -123,12 +123,18 @@ void runTMforWeb() {
                     isLoggedIn = checkLoggedIn(inet_ntoa(addr.sin_addr), 0);
                     printf("[!] %s isLoggedIn: %d\n",inet_ntoa(addr.sin_addr), isLoggedIn);
 
+                    // If student logs out
+                    // if (strstr(buffer, "GET / HTTP/1.1") != NULL && strstr(buffer, "logout=Logout") != NULL) {
+                    // } 
+
+                    // If student is not logged in
                     if (isLoggedIn == -1) {
                         isLoggedIn = handleUserLogin(sockfd, inet_ntoa(addr.sin_addr), buffer);
                     }
 
+                    // If student is logged in
                     if (isLoggedIn) {
-                        // If a student is logged in, i need to find that student
+                        // Find that student
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         Students currStudent = students[index];
                         int quesIdx = currStudent.quesIdx;
