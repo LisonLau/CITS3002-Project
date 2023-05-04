@@ -123,13 +123,21 @@ void runTMforWeb() {
                     isLoggedIn = checkLoggedIn(inet_ntoa(addr.sin_addr), 0);
                     printf("[!] %s isLoggedIn: %d\n",inet_ntoa(addr.sin_addr), isLoggedIn);
 
-                    // If student logs out
-                    // if (strstr(buffer, "GET / HTTP/1.1") != NULL && strstr(buffer, "logout=Logout") != NULL) {
-                    // } 
-
                     // If student is not logged in
                     if (isLoggedIn == -1) {
                         isLoggedIn = handleUserLogin(sockfd, inet_ntoa(addr.sin_addr), buffer);
+                    }
+
+                    // If a student logs out
+                    if (strstr(buffer, "POST / HTTP/1.1") != NULL && strstr(buffer, "logout=Logout") != NULL) {
+                        char *loginHTML = "<html><body><h1>Login</h1><form method=\"post\">\
+                                        <label for=\"uname\">Username : </label>\
+                                        <input type=\"text\" name=\"uname\" value=\"\" required><br><br>\
+                                        <label for=\"pword\">Password : </label>\
+                                        <input type=\"text\" name=\"pword\" value=\"\" required><br><br>\
+                                        <button type=\"submit\">Login</button></form></body></html>";
+                        sendResponse(sockfd, loginHTML);
+                        isLoggedIn = -1;
                     }
 
                     // If student is logged in
