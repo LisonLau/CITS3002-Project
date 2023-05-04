@@ -143,7 +143,7 @@ void runTMforWeb() {
                         }
 
                         // Handle display question page of current question
-                        handleDisplayQuestion(sockfd, buffer, &students[index]);
+                        handleDisplayTest(sockfd, buffer, &students[index]);
                     }            
                 }
             }
@@ -210,7 +210,7 @@ int checkLoggedIn(char *var, int getIndex) {
 }
 
 void sendResponse(int socket, char *message) {
-    char response[BUFFERSIZE] = {0};
+    char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
     send(socket, response, strlen(response), 0);
 }
