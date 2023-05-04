@@ -135,15 +135,16 @@ void runTMforWeb() {
                         printf("[.] Student is: %s, index:%i quesIdx:%i\n", currStudent.username, index, quesIdx);
 
                         // Handle display finish page after test is done
-                        if (quesIdx >= MAX_QUESTIONS) {
+                        if (currStudent.allocated[quesIdx].isDone == 1 && quesIdx >= MAX_QUESTIONS-1) {
                             char *finishHTML = {0};
                             finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML);
                             sendResponse(sockfd, finishHTML);
                             free(finishHTML);
-                        }
-
+                        } 
                         // Handle display question page of current question
-                        handleDisplayTest(sockfd, buffer, &students[index]);
+                        else {
+                            handleDisplayTest(sockfd, buffer, &students[index]);
+                        }
                     }            
                 }
             }
