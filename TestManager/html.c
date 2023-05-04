@@ -54,6 +54,6 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char
                         %s%s</body></html>", \
                         logoutButton, idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3,\
                         currStudent->allocated[idx].question, stuAnswer, isCorrect ? correctMessage : wrongMessage,\
-                        "correct answer", backButton, nextButton);
+                        "correct answer", idx > 0 ? backButton : "", nextButton);
     return answerHTML;
 }
