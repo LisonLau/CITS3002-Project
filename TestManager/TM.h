@@ -31,6 +31,7 @@ typedef struct Questions {
     char options[MAX_OPTIONS][MAX_OPTION_LENGTH];
     int  numAttempts;
     int  isCorrect;
+    int  isDone; // 1 means question is done, 0 means not done
 } Questions; 
 
 typedef struct Students {
@@ -64,8 +65,9 @@ extern int    handleUserLogin(int, char *, char *);
 extern void   sendResponse(int, char *);
 // ques.c
 extern int    handleDisplayTest(int, char *, Students *);
-extern void   handleDisplayQuestion(int, char *, Students *);
 extern Result handleUserAnswers(char *, Students *);
+extern void   handleMarkAttempts(int, Result, Students *);
+extern void   handleDisplayQuestion(int, char *, Students *);
 extern void   urlDecode(char *, char *);
 // TM_QB.c
 extern int    handleQBcheck(char *, char *, char *);

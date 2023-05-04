@@ -59,6 +59,8 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
         if (quesIdx == MAX_QUESTIONS) {
             continue;
         }
+        
+        currStudent->allocated[quesIdx].isDone = 0;
         currStudent->allocated[quesIdx].isCorrect = 0;
         currStudent->allocated[quesIdx].numAttempts = 3;
         // Check the question type and store the values accordingly

@@ -20,45 +20,17 @@ int handleDisplayTest(int socket, char *buffer, Students *currStudent) {
     // Handle the test
     Result result;
     if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
-    
-        // Handle display questions
-        handleDisplayQuestion(socket, buffer, currStudent);
-    
-        // Handle user answers
+        // Handle user answers WHEN submit
         result = handleUserAnswers(buffer, currStudent);
-     
+
         // Handle grading and number of attempts
         currStudent->allocated[currStudent->quesIdx].isCorrect = result.isCorrect;
-        printf("isCorrect %d\n", result.isCorrect);
-        printf("numAttempts before %d\n", currStudent->allocated[currStudent->quesIdx].numAttempts);
-        
-        
-        if (currStudent->allocated[currStudent->quesIdx].isCorrect == 1 || currStudent->allocated[currStudent->quesIdx].numAttempts == 0){
-            currStudent->grade += currStudent->allocated[currStudent->quesIdx].numAttempts;
-            char *answerHTML = {0};
-            answerHTML = getAnswerHTML(answerHTML, currStudent, result.isCorrect, result.stuAnswer);
-            printf("%s\n", answerHTML);
-            sendResponse(socket, answerHTML);
-            free(answerHTML);
-        } 
-        else if (currStudent->allocated[currStudent->quesIdx].isCorrect == 0) {
-            currStudent->allocated[currStudent->quesIdx].numAttempts--;
-        }
-        printf("numAttempts after %d\n", currStudent->allocated[currStudent->quesIdx].numAttempts);
+        handleMarkAttempts(socket, result, currStudent);
+
+        // Handle display questions WHEN nothing to do
+        handleDisplayQuestion(socket, buffer, currStudent);
     }
     return result.isCorrect;
-}
-
-void handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
-    // Increment quesIdx on NEXT button press
-    if (strstr(buffer, "next=Next") != NULL) {
-        currStudent->quesIdx++;
-    } 
-    // Display the question
-    char *quesHTML = {0};
-    quesHTML = getQuestionHTML(quesHTML, currStudent);
-    sendResponse(socket, quesHTML);
-    free(quesHTML);
 }
 
 Result handleUserAnswers(char *buffer, Students *currStudent) {
@@ -85,6 +57,41 @@ Result handleUserAnswers(char *buffer, Students *currStudent) {
         result.isCorrect = handleQBcheck("pcqc", currStudent->allocated[currStudent->quesIdx].question, result.stuAnswer);   // If wrong, minus mark by 1
     }
     return result;
+}
+
+void handleMarkAttempts(int socket, Result result, Students *currStudent) {
+    int numAttempts = currStudent->allocated[currStudent->quesIdx].numAttempts;
+    int isCorrect = currStudent->allocated[currStudent->quesIdx].isCorrect;
+    
+    printf("isCorrect %d\n", isCorrect);
+    printf("numAttempts before %d\n", numAttempts);
+    
+    // If question is correct OR 3 attempts made
+    if (isCorrect == 1 || numAttempts == 0){
+        currStudent->allocated[currStudent->quesIdx].isDone = 1;
+        currStudent->grade += numAttempts;
+        char *answerHTML = {0};
+        answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, result.stuAnswer);
+        sendResponse(socket, answerHTML);
+        free(answerHTML);
+    } else if (isCorrect == 0) { // If question is wrong, decrement number of attempts
+        currStudent->allocated[currStudent->quesIdx].numAttempts--;
+    }
+    printf("numAttempts after %d\n", numAttempts);
+}
+
+void handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
+    // Increment quesIdx on NEXT button press
+    if (strstr(buffer, "next=Next") != NULL) {
+        currStudent->quesIdx++;
+    } 
+    // Display the question if student is not done with the question
+    if (currStudent->allocated[currStudent->quesIdx].isDone == 0) {
+        char *quesHTML = {0};
+        quesHTML = getQuestionHTML(quesHTML, currStudent);
+        sendResponse(socket, quesHTML);
+        free(quesHTML);
+    }
 }
 
 void urlDecode(char *str, char *out) {
