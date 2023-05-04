@@ -127,11 +127,11 @@ class QuestionBank:
                     self.executeCheckAnswer(message, TMsocket)
                     
                 # Receive acknowledgement for sent data
-                ack = TMsocket.recv(BUFFERSIZE).decode()
-                if ack == "ACK":
-                    print("[+] Acknowledgement received for sent data.")
-                else:
-                    print("[-] Acknowledgement not received.")
+                # ack = TMsocket.recv(BUFFERSIZE).decode()
+                # if ack == "ACK":
+                #     print("[+] Acknowledgement received for sent data.")
+                # else:
+                #     print("[-] Acknowledgement not received.")
                     
                 TMsocket.close()
         # If the user presses Ctrl+C, close the connection and the socket

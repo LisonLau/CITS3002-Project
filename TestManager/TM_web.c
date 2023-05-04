@@ -117,7 +117,7 @@ void runTMforWeb() {
                     close(sockfd);
                 } 
                 else {
-                    printf("%s\n", buffer);
+                    printf("%s\n\n", buffer);
 
                     // Handle user login if user has not logged in
                     isLoggedIn = checkLoggedIn(inet_ntoa(addr.sin_addr), 0);
@@ -138,9 +138,7 @@ void runTMforWeb() {
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         students[index].loggedIn = 0;
                         strcpy(students[index].ipAddress, "");
-                        printf("students[index].ipAddress %s\n", students[index].ipAddress);
-                        printf("index %d\n", index);
-                        printf("students[index].loggedIn %d\n", students[index].loggedIn);
+                        continue;
                     }
 
                     // If student is logged in

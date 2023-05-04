@@ -52,12 +52,12 @@ void sendQBget(int socket, char *filename) {
     printf("[+] Question file '%s' received successfully.\n", filename);
 
     // Send acknowledgement for received data
-    char ack[BUFFERSIZE] = "ACK";
-    if (send(socket, ack, strlen(ack), 0) < 0) {
-        perror("[-] Acknowledgement failed to send.");
-        exit(EXIT_FAILURE);
-    }
-    printf("[+] Acknowledgement sent successfully.\n");
+    // char ack[BUFFERSIZE] = "ACK";
+    // if (send(socket, ack, strlen(ack), 0) < 0) {
+    //     perror("[-] Acknowledgement failed to send.");
+    //     exit(EXIT_FAILURE);
+    // }
+    // printf("[+] Acknowledgement sent successfully.\n");
 }
 
 int handleQBcheck(char *type, char *ques, char *ans) {
@@ -116,12 +116,12 @@ int sendQBCheck(int socket, char *type, char *question, char *answer) {
     printf("[+] QB response received successfully.\n");
 
     // Send acknowledgement for received data
-    char ack[BUFFERSIZE] = "ACK";
-    if (send(socket, ack, strlen(ack), 0) < 0) {
-        perror("[-] Acknowledgement failed to send.");
-        exit(EXIT_FAILURE);
-    }
-    printf("[+] Acknowledgement sent successfully.\n");
+    // char ack[BUFFERSIZE] = "ACK";
+    // if (send(socket, ack, strlen(ack), 0) < 0) {
+    //     perror("[-] Acknowledgement failed to send.");
+    //     exit(EXIT_FAILURE);
+    // }
+    // printf("[+] Acknowledgement sent successfully.\n");
     
     // If answer graded by QB is correct
     if (strcmp(response, "correct") == 0) {
