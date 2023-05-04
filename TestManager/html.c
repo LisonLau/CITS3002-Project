@@ -57,3 +57,13 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char
                         "correct answer", idx > 0 ? backButton : "", nextButton);
     return answerHTML;
 }
+
+char* getLoginHTML(char *loginHTML, int failed) {
+    loginHTML = (char*) realloc(loginHTML, BUFSIZ);
+    char *failMessage   = "<p>Login failed. Try again.</p><br>";
+    sprintf(loginHTML, "<html><body><h1>Login</h1><form method=\"post\">\
+                        <label for=\"uname\">Username : </label><input type=\"text\" name=\"uname\" value=\"\" required><br><br>\
+                        <label for=\"pword\">Password : </label><input type=\"text\" name=\"pword\" value=\"\" required><br><br>\
+                        %s<button type=\"submit\">Login</button></form></body></html>", failed ? failMessage : "");
+    return loginHTML;
+}

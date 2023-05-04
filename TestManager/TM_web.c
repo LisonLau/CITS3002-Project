@@ -130,13 +130,10 @@ void runTMforWeb() {
 
                     // If a student logs out
                     if (strstr(buffer, "POST / HTTP/1.1") != NULL && strstr(buffer, "logout=Logout") != NULL) {
-                        char *loginHTML = "<html><body><h1>Login</h1><form method=\"post\">\
-                                        <label for=\"uname\">Username : </label>\
-                                        <input type=\"text\" name=\"uname\" value=\"\" required><br><br>\
-                                        <label for=\"pword\">Password : </label>\
-                                        <input type=\"text\" name=\"pword\" value=\"\" required><br><br>\
-                                        <button type=\"submit\">Login</button></form></body></html>";
+                        char *loginHTML = {0};
+                        loginHTML = getLoginHTML(loginHTML, 0);
                         sendResponse(sockfd, loginHTML);
+                        free(loginHTML);
                         isLoggedIn = -1;
                     }
 
@@ -170,13 +167,10 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
     char *form = strstr(buffer, "uname=");
     // Display login page
     if (strstr(buffer, "GET / HTTP/1.1") != NULL) {
-        char *loginHTML = "<html><body><h1>Login</h1><form method=\"post\">\
-                           <label for=\"uname\">Username : </label>\
-                           <input type=\"text\" name=\"uname\" value=\"\" required><br><br>\
-                           <label for=\"pword\">Password : </label>\
-                           <input type=\"text\" name=\"pword\" value=\"\" required><br><br>\
-                           <button type=\"submit\">Login</button></form></body></html>";
+        char *loginHTML = {0};
+        loginHTML = getLoginHTML(loginHTML, 0);
         sendResponse(socket, loginHTML);
+        free(loginHTML);
     } 
     // Extract the username and password from the form data
     else if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
@@ -193,14 +187,10 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
         } 
         // User failed to logged in, ask for login attempt
         else {
-            char *loginFAILED  = "<html><body><h1>Login</h1><form method=\"post\">\
-                                  <label for=\"uname\">Username : </label>\
-                                  <input type=\"text\" name=\"uname\" required><br><br>\
-                                  <label for=\"pword\">Password : </label>\
-                                  <input type=\"text\" name=\"pword\" required><br>\
-                                  <p>Login failed. Try again.</p><br>\
-                                  <button type=\"submit\">Login</button></form></body></html>";
-            sendResponse(socket, loginFAILED);
+            char *loginHTML = {0};
+            loginHTML = getLoginHTML(loginHTML, 1);
+            sendResponse(socket, loginHTML);
+            free(loginHTML);
         }
     }
     // Display 404 error page

@@ -78,3 +78,4 @@ extern void   sendQBget(int, char *);
 extern char*  getQuestionHTML(char *, Students *);
 extern char*  getFinishHTML(int, char *, int, char *);
 extern char*  getAnswerHTML(char *, Students *, int, char *);
+extern char*  getLoginHTML(char *, int);
