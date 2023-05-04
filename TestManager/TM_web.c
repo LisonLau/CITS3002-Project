@@ -135,7 +135,12 @@ void runTMforWeb() {
                         sendResponse(sockfd, loginHTML);
                         free(loginHTML);
                         isLoggedIn = -1;
-                        // TODO 
+                        int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
+                        students[index].loggedIn = 0;
+                        strcpy(students[index].ipAddress, "");
+                        printf("students[index].ipAddress %s\n", students[index].ipAddress);
+                        printf("index %d\n", index);
+                        printf("students[index].loggedIn %d\n", students[index].loggedIn);
                     }
 
                     // If student is logged in
