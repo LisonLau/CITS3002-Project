@@ -1,6 +1,6 @@
 #include "TM.h"
 
-int handleDisplayTest(int socket, char *buffer, Students *currStudent) {
+void handleDisplayTest(int socket, char *buffer, Students *currStudent) {
     // Create custom filename
     char filename[BUFFERSIZE] = "";
     strcat(filename, currStudent->username);
@@ -30,7 +30,6 @@ int handleDisplayTest(int socket, char *buffer, Students *currStudent) {
         // Handle display questions WHEN nothing to do
         handleDisplayQuestion(socket, buffer, currStudent);
     }
-    return result.isCorrect;
 }
 
 Result handleUserAnswers(char *buffer, Students *currStudent) {

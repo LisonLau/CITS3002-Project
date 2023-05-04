@@ -64,7 +64,7 @@ extern int    checkLoggedIn(char *, int);
 extern int    handleUserLogin(int, char *, char *);
 extern void   sendResponse(int, char *);
 // ques.c
-extern int    handleDisplayTest(int, char *, Students *);
+extern void   handleDisplayTest(int, char *, Students *);
 extern Result handleUserAnswers(char *, Students *);
 extern void   handleMarkAttempts(int, Result, Students *);
 extern void   handleDisplayQuestion(int, char *, Students *);

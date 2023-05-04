@@ -135,6 +135,7 @@ void runTMforWeb() {
                         sendResponse(sockfd, loginHTML);
                         free(loginHTML);
                         isLoggedIn = -1;
+                        // TODO 
                     }
 
                     // If student is logged in
@@ -144,19 +145,19 @@ void runTMforWeb() {
                         Students currStudent = students[index];
                         int quesIdx = currStudent.quesIdx;
                         printf("[.] Student is: %s, index:%i quesIdx:%i\n", currStudent.username, index, quesIdx);
-
+            
                         // Handle display finish page after test is done
                         if (currStudent.allocated[quesIdx].isDone == 1 && quesIdx >= MAX_QUESTIONS-1) {
                             char *finishHTML = {0};
                             finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML);
                             sendResponse(sockfd, finishHTML);
                             free(finishHTML);
-                        } 
+                        }
                         // Handle display question page of current question
                         else {
                             handleDisplayTest(sockfd, buffer, &students[index]);
                         }
-                    }            
+                    }
                 }
             }
         }
