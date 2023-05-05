@@ -3,7 +3,7 @@
 char* getQuestionHTML(char *quesHTML, Students *currStudent) {
     int idx = currStudent->quesIdx;
     quesHTML = (char*) realloc(quesHTML, HTMLSIZE);
-    char *backButton = "<input type=\"button\" name=\'back\' value=\"Back\" onclick=\"history.back()\">";
+    char *backButton = "<form method=\'post\'><input type=\'submit\' name=\'back\' value=\'Back\'></form>";
     char *nextButton = "<form method=\'post\'><input type=\'submit\' name=\'next\' value=\'Next\'></form>";
     char *logoutButton = "<form method=\'post\'><input type=\"submit\" name=\'logout\' value=\"Logout\"></form>";
     if (currStudent->allocated[idx].isMCQ) { // MCQ
@@ -13,7 +13,7 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent) {
                         <input type=\"radio\" id=\"b\" name=\"%s\" value=\"%s\"><label>%s</label><br>                   \
                         <input type=\"radio\" id=\"c\" name=\"%s\" value=\"%s\"><label>%s</label><br>                   \
                         <input type=\"radio\" id=\"d\" name=\"%s\" value=\"%s\"><label>%s</label><br>                   \
-                        <br>%s<button type=\"submit\">Submit</button>%s</form></body></html>",                          \
+                        <br><button type=\"submit\">Submit</button></form>%s%s</body></html>",                          \
                         logoutButton, idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated[idx].question,    \
                         currStudent->allocated[idx].type, currStudent->allocated[idx].options[0], currStudent->allocated[idx].options[0], \
                         currStudent->allocated[idx].type, currStudent->allocated[idx].options[1], currStudent->allocated[idx].options[1], \
@@ -24,7 +24,7 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent) {
         sprintf(quesHTML, "<html><body><form method=\"post\">%s\
                         <h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><label for=\"%s\">%s</label>               \
                         <form method=\"post\"><br><textarea name=\"pcq\" rows=\"20\" cols=\"60\"></textarea><br>     \
-                        <br>%s<button type=\"submit\">Submit</button>%s</form></body></html>",                        \
+                        <br><button type=\"submit\">Submit</button></form>%s%s</body></html>",                        \
                         logoutButton, idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3,              \
                         currStudent->allocated[idx].type, currStudent->allocated[idx].question, \
                         idx > 0 ? backButton : "", idx < MAX_QUESTIONS-1 ? nextButton : "");

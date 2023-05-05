@@ -12,7 +12,7 @@ void handleDisplayTest(int socket, char *buffer, Students *currStudent) {
         handleQBgetFile(filename);
         currStudent->quesIdx = 0;
         currStudent->grade = 0;
-    }
+    } 
 
     // Store student's allocated questions
     storeStudentQuestions(filename, currStudent); // TODO ask lianne about &
@@ -86,6 +86,9 @@ void handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
     if (strstr(buffer, "next=Next") != NULL) {
         currStudent->quesIdx++;
     } 
+    if (strstr(buffer, "back=Back") != NULL) {
+        currStudent->quesIdx--;
+    }
     // Display the question if student is not done with the question
     if (currStudent->allocated[currStudent->quesIdx].isDone == 0) {
         char *quesHTML = {0};
