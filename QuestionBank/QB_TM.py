@@ -65,6 +65,8 @@ class QuestionBank:
             return "check"
         elif len(message.split(",")) == 4:
             return "get_ans"
+        else:
+            return ""
         
     def executeSendFile(self, message, TMsocket):
         # Get filename and create question file
@@ -111,56 +113,57 @@ class QuestionBank:
         thread_count = 0
         
         # Create server socket
-        QBsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        QBserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print('[+] Server socket created.')
         
         # Set socket opt
-        QBsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        QBserver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         print('[+] Set socket options successful.')
         
         # Bind socket to host and port
         try:
-            QBsocket.bind((host, port))
+            QBserver.bind((host, port))
         except socket.error as e:  
             print(f'[-] {str(e)}')
             return 0
         print('[+] Binding successful.')
 
         # Listen for connections
-        QBsocket.listen(5)
+        QBserver.listen(5)
         print(f"[*] Listening as {host}:{port}")
         
         try:
             while True:
                 # Establish connection 
-                TMsocket, TMaddress = QBsocket.accept()
+                TMclient, TMaddress = QBserver.accept()
                 print('[+] Connected to: ' + TMaddress[0] + ':' + str(TMaddress[1]))
                 
                 # Receive a string message
-                message = TMsocket.recv(BUFFERSIZE).decode()
+                message = TMclient.recv(BUFFERSIZE).decode()
                 
                 # Categorise message received as 'get' or 'check'
                 # Perform required send operations
                 if self.categoriseMessage(message) == "get_file":
                     print("[+] Message 'get file' from TM received.")
-                    self.executeSendFile(message, TMsocket)
+                    self.executeSendFile(message, TMclient)
                 elif self.categoriseMessage(message) == "check":
                     print("[+] Message 'check' from TM received.")
-                    self.executeCheckAnswer(message, TMsocket)
+                    self.executeCheckAnswer(message, TMclient)
                 elif self.categoriseMessage(message) == "get_ans":
                     print("[+] Message 'get answer' from TM received.")
-                    self.executeSendAnswer(message, TMsocket)
-                    
-                    
+                    self.executeSendAnswer(message, TMclient)
+                else:
+                    print("[!] Error: message received was not understood.")
+
                 # Receive acknowledgement for sent data
-                # ack = TMsocket.recv(BUFFERSIZE).decode()
+                # ack = TMclient.recv(BUFFERSIZE).decode()
                 # if ack == "ACK":
                 #     print("[+] Acknowledgement received for sent data.")
                 # else:
                 #     print("[-] Acknowledgement not received.")
                     
-                TMsocket.close()
+                TMclient.close()
         # If the user presses Ctrl+C, close the connection and the socket
         except KeyboardInterrupt:
-            QBsocket.close()    # close QB socket
+            QBserver.close()    # close QB socket
             print("[-] Connection closed.")

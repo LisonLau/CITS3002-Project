@@ -49,10 +49,10 @@ typedef struct Result {
     char studentAns[BUFFERSIZE];
 } Result;
 
-int currQuestion[MAX_STUDENTS]; // records current question the student is at
-
+// Global variables
 Questions   questions[MAX_QUESTIONS];  
 Students    students[MAX_STUDENTS];
+int         currQuestion[MAX_STUDENTS]; // records current question the student is at
 int         numStudents;
 char        *HOST;
 
@@ -64,7 +64,7 @@ extern void   storeStudentQuestions(char *, Students *);
 extern void   runTMforWeb();
 extern int    checkLoggedIn(char *, int);
 extern int    handleUserLogin(int, char *, char *);
-extern void   sendResponse(int, char *);
+extern void   sendHTMLpage(int, char *);
 // ques.c
 extern void   handleDisplayTest(int, char *, Students *, int);
 extern Result handleUserAnswers(char *, Students *, int);
@@ -72,12 +72,11 @@ extern void   handleMarkAttempts(int, Result, Students *, int, char *);
 extern void   handleDisplayQuestion(int, char *, Students *, int);
 extern void   urlDecode(char *, char *);
 // TM_QB.c
+extern int    createTMclient();
 extern int    handleQBcheck(char *, char *, char *);
-extern int    sendQBCheck(int, char *, char *, char *);
 extern void   handleQBgetFile(char *);
-extern void   sendQBgetFile(int, char *);
 extern char*  handleQBgetAns();
-extern char*  sendQBgetAns(int, char *, char *);
+extern void   socketSend(int, char *, char *);
 // html.c
 extern char*  getQuestionHTML(char *, Students *, int);
 extern char*  getFinishHTML(int, char *, int, char *, int);
