@@ -94,7 +94,7 @@ void handleMarkAttempts(int socket, Result result, Students *currStudent, int in
         && strstr(buffer, "next=") == 0 && strstr(buffer, "logout=") == 0) {
             if (isCorrect || numAttempts == 0) {
                 currStudent->allocated[currQuestion[index]].isDone = 1;
-                if (currQuestion[index] == 0) 
+                if (currQuestion[index] == 0 && numAttempts > 0) 
                     currStudent->grade += numAttempts + 1;
                 else
                     currStudent->grade += numAttempts;
