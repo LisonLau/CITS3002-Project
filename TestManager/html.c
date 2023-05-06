@@ -1,7 +1,8 @@
 #include "TM.h"
 
-char* getQuestionHTML(char *quesHTML, Students *currStudent) {
-    int idx = currStudent->quesIdx;
+char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
+    int idx = currQuestion[index];
+    printf("Get questionHTML idx: %d\n", idx);
     quesHTML = (char*) realloc(quesHTML, HTMLSIZE);
     char *backButton = "<form method=\'post\'><input type=\'submit\' name=\'back\' value=\'Back\'></form>";
     char *nextButton = "<form method=\'post\'><input type=\'submit\' name=\'next\' value=\'Next\'></form>";
@@ -32,7 +33,7 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent) {
     return quesHTML;
 }
 
-char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML) {
+char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML, int index) {
     finishHTML = (char*) realloc(finishHTML, BUFFERSIZE);
     char *logoutButton = "<form method=\'post\'><input type=\"submit\" name=\'logout\' value=\"Logout\"></form>";
     sprintf(finishHTML, "<html><body>%s<h1>Test Finished</h1>       \
@@ -41,8 +42,8 @@ char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML) {
     return finishHTML;
 }
 
-char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char *studentAns, char *correctAns) {
-    int idx = currStudent->quesIdx;
+char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char *studentAns, char *correctAns, int index) {
+    int idx = currQuestion[index];
     answerHTML = (char*) realloc(answerHTML, BUFSIZ);
     char *logoutButton = "<form method=\'post\'><input type=\"submit\" name=\'logout\' value=\"Logout\"></form>";
     char *backButton = "<input type=\"button\" name=\'back\' value=\"Back\" onclick=\"history.back()\">";

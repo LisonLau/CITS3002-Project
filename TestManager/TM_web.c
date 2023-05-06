@@ -146,19 +146,28 @@ void runTMforWeb() {
                         // Find that student
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         Students currStudent = students[index];
-                        int quesIdx = currStudent.quesIdx;
+                        int quesIdx = currQuestion[index];
                         printf("[.] Student is: %s, index:%i quesIdx:%i\n", currStudent.username, index, quesIdx);
             
                         // Handle display finish page after test is done
                         if (currStudent.allocated[quesIdx].isDone == 1 && quesIdx >= MAX_QUESTIONS-1) {
                             char *finishHTML = {0};
-                            finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML);
+                            finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML, index);
                             sendResponse(sockfd, finishHTML);
                             free(finishHTML);
                         }
                         // Handle display question page of current question
                         else {
-                            handleDisplayTest(sockfd, buffer, &students[index]);
+                            // Increment quesIdx on NEXT button press
+                            if (strstr(buffer, "next=Next") != NULL) {
+                                currQuestion[index]++;
+                                //currStudent.allocated[currQuestion[index]].numAttempts++;
+                            } 
+                            if (strstr(buffer, "back=Back") != NULL) {
+                                currQuestion[index]--;
+                                //currStudent.allocated[currQuestion[index]].numAttempts++;
+                            }
+                            handleDisplayTest(sockfd, buffer, &students[index], index);
                         }
                     }
                 }

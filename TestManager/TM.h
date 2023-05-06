@@ -49,6 +49,8 @@ typedef struct Result {
     char studentAns[BUFFERSIZE];
 } Result;
 
+int currQuestion[MAX_STUDENTS]; // records current question the student is at
+
 Questions   questions[MAX_QUESTIONS];  
 Students    students[MAX_STUDENTS];
 int         numStudents;
@@ -64,10 +66,10 @@ extern int    checkLoggedIn(char *, int);
 extern int    handleUserLogin(int, char *, char *);
 extern void   sendResponse(int, char *);
 // ques.c
-extern void   handleDisplayTest(int, char *, Students *);
-extern Result handleUserAnswers(char *, Students *);
-extern void   handleMarkAttempts(int, Result, Students *);
-extern void   handleDisplayQuestion(int, char *, Students *);
+extern void   handleDisplayTest(int, char *, Students *, int);
+extern Result handleUserAnswers(char *, Students *, int);
+extern void   handleMarkAttempts(int, Result, Students *, int, char *);
+extern void   handleDisplayQuestion(int, char *, Students *, int);
 extern void   urlDecode(char *, char *);
 // TM_QB.c
 extern int    handleQBcheck(char *, char *, char *);
@@ -77,7 +79,7 @@ extern void   sendQBgetFile(int, char *);
 extern char*  handleQBgetAns();
 extern char*  sendQBgetAns(int, char *, char *);
 // html.c
-extern char*  getQuestionHTML(char *, Students *);
-extern char*  getFinishHTML(int, char *, int, char *);
-extern char*  getAnswerHTML(char *, Students *, int, char *, char *);
+extern char*  getQuestionHTML(char *, Students *, int);
+extern char*  getFinishHTML(int, char *, int, char *, int);
+extern char*  getAnswerHTML(char *, Students *, int, char *, char *, int);
 extern char*  getLoginHTML(char *, int);
