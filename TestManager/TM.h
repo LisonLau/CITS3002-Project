@@ -46,7 +46,7 @@ typedef struct Students {
 
 typedef struct Result {
     int  isCorrect;
-    char stuAnswer[BUFFERSIZE];
+    char studentAns[BUFFERSIZE];
 } Result;
 
 Questions   questions[MAX_QUESTIONS];  
@@ -72,10 +72,12 @@ extern void   urlDecode(char *, char *);
 // TM_QB.c
 extern int    handleQBcheck(char *, char *, char *);
 extern int    sendQBCheck(int, char *, char *, char *);
-extern void   handleQBget(char *);
-extern void   sendQBget(int, char *);
+extern void   handleQBgetFile(char *);
+extern void   sendQBgetFile(int, char *);
+extern char*  handleQBgetAns();
+extern char*  sendQBgetAns(int, char *, char *);
 // html.c
 extern char*  getQuestionHTML(char *, Students *);
 extern char*  getFinishHTML(int, char *, int, char *);
-extern char*  getAnswerHTML(char *, Students *, int, char *);
+extern char*  getAnswerHTML(char *, Students *, int, char *, char *);
 extern char*  getLoginHTML(char *, int);

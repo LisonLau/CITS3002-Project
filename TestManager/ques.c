@@ -9,7 +9,7 @@ void handleDisplayTest(int socket, char *buffer, Students *currStudent) {
 
     // If student file does not exists, create one
     if (access(filename, F_OK) != 0) {
-        handleQBget(filename);
+        handleQBgetFile(filename);
         currStudent->quesIdx = 0;
         currStudent->grade = 0;
     }
@@ -40,20 +40,20 @@ Result handleUserAnswers(char *buffer, Students *currStudent) {
     
     if (strstr(buffer, "mcqpy=") != NULL) {                         // MCQPY
         sscanf(strstr(buffer, "mcqpy="), "mcqpy=%s", encoded_ans);
-        urlDecode(encoded_ans, result.stuAnswer); 
-        result.isCorrect = handleQBcheck("mcqpy", currStudent->allocated[currStudent->quesIdx].question, result.stuAnswer);  // If wrong, minus mark by 1
+        urlDecode(encoded_ans, result.studentAns); 
+        result.isCorrect = handleQBcheck("mcqpy", currStudent->allocated[currStudent->quesIdx].question, result.studentAns);  // If wrong, minus mark by 1
     } else if (strstr(buffer, "mcqc=") != NULL) {                   // MCQC
         sscanf(strstr(buffer, "mcqc="), "mcqc=%s", encoded_ans);
-        urlDecode(encoded_ans, result.stuAnswer); 
-        result.isCorrect = handleQBcheck("mcqc", currStudent->allocated[currStudent->quesIdx].question, result.stuAnswer);   // If wrong, minus mark by 1
+        urlDecode(encoded_ans, result.studentAns); 
+        result.isCorrect = handleQBcheck("mcqc", currStudent->allocated[currStudent->quesIdx].question, result.studentAns);   // If wrong, minus mark by 1
     } else if (strstr(buffer, "pcqpy=") != NULL) {                  // PCQPY
         sscanf(strstr(buffer, "pcqpy="), "pcqpy=%s", encoded_ans);
-        urlDecode(encoded_ans, result.stuAnswer); 
-        result.isCorrect = handleQBcheck("pcqpy", currStudent->allocated[currStudent->quesIdx].question, result.stuAnswer);  // If wrong, minus mark by 1
+        urlDecode(encoded_ans, result.studentAns); 
+        result.isCorrect = handleQBcheck("pcqpy", currStudent->allocated[currStudent->quesIdx].question, result.studentAns);  // If wrong, minus mark by 1
     } else if (strstr(buffer, "pcqc=") != NULL) {                   // PCQC
         sscanf(strstr(buffer, "pcqc="), "pcqc=%s", encoded_ans);
-        urlDecode(encoded_ans, result.stuAnswer); 
-        result.isCorrect = handleQBcheck("pcqc", currStudent->allocated[currStudent->quesIdx].question, result.stuAnswer);   // If wrong, minus mark by 1
+        urlDecode(encoded_ans, result.studentAns); 
+        result.isCorrect = handleQBcheck("pcqc", currStudent->allocated[currStudent->quesIdx].question, result.studentAns);   // If wrong, minus mark by 1
     }
     return result;
 }
@@ -70,9 +70,11 @@ void handleMarkAttempts(int socket, Result result, Students *currStudent) {
         currStudent->allocated[currStudent->quesIdx].isDone = 1;
         currStudent->grade += numAttempts;
         char *answerHTML = {0};
-        answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, result.stuAnswer);
+        char *correctAns = handleQBgetAns(currStudent->allocated[currStudent->quesIdx].type, currStudent->allocated[currStudent->quesIdx].question);
+        answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, result.studentAns, correctAns);
         sendResponse(socket, answerHTML);
         free(answerHTML);
+        free(correctAns);
     } else if (isCorrect == 0) { // If question is wrong, decrement number of attempts
         currStudent->allocated[currStudent->quesIdx].numAttempts--;
     }
