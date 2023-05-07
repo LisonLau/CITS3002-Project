@@ -61,10 +61,6 @@ Result handleUserAnswers(char *buffer, Students *currStudent, int index) {
 void handleMarkAttempts(int socket, Result result, Students *currStudent, int index, char *buffer) {
     int numAttempts = currStudent->allocated[currQuestion[index]].numAttempts;
     int isCorrect = currStudent->allocated[currQuestion[index]].isCorrect;
-    printf("isCorrect %d\n", currStudent->allocated[currQuestion[index]].isCorrect);
-    printf("numAttempts before %d\n", currStudent->allocated[currQuestion[index]].numAttempts);
-    printf("stu answer %s\n", result.studentAns);
-    printf("final answer %s\n", currStudent->allocated[currQuestion[index]].finalStuAns);
     char *answerHTML = {0};
     char *correctAns = {0};
     // If question is correct OR 3 attempts made 
@@ -78,18 +74,10 @@ void handleMarkAttempts(int socket, Result result, Students *currStudent, int in
             } else if (numAttempts == 1) {
                 currStudent->grade += numAttempts-1;
             } 
-            correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
-            answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, result.studentAns, correctAns, index);
-            sendHTMLpage(socket, answerHTML);
         }
     }
-    printf("final answer %s\n", currStudent->allocated[currQuestion[index]].finalStuAns);
-    printf("numAttempts after %d\n", currStudent->allocated[currQuestion[index]].numAttempts);
-    printf("isDone %d\n", currStudent->allocated[currQuestion[index]].isDone);
     // Display answer page
     if (currStudent->allocated[currQuestion[index]].isDone) {
-        printf("type %s\n", currStudent->allocated[currQuestion[index]].type);
-        printf("question %s\n", currStudent->allocated[currQuestion[index]].question);
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
         answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, result.studentAns, correctAns, index);
         sendHTMLpage(socket, answerHTML);
