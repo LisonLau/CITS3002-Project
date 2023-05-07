@@ -162,6 +162,7 @@ void runTMforWeb() {
                             if (strstr(buffer, "next=Next") != NULL) {
                                 currQuestion[index]++;
                             } 
+                            // Decrement quesIdx on BACK button press
                             if (strstr(buffer, "back=Back") != NULL) {
                                 currQuestion[index]--;
                             }

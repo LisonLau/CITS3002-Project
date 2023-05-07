@@ -26,6 +26,9 @@ void handleDisplayTest(int socket, char *buffer, Students *currStudent, int inde
         currStudent->allocated[currQuestion[index]].isCorrect = result.isCorrect;
         handleMarkAttempts(socket, result, currStudent, index, buffer);
 
+        // Handle display answer page AFTER question is done
+        handleDisplayAnswer(socket, result, currStudent, index);
+
         // Handle display questions WHEN nothing to do
         handleDisplayQuestion(socket, buffer, currStudent, index);
     }
@@ -73,13 +76,15 @@ void handleMarkAttempts(int socket, Result result, Students *currStudent, int in
                 currStudent->grade += numAttempts-1;
         }
     }
+}
 
-    // Display answer page
+void handleDisplayAnswer(int socket, Result result, Students *currStudent, int index) {
+    // Display answer page when question is already done
     if (currStudent->allocated[currQuestion[index]].isDone) {
         char *answerHTML = {0};
         char *correctAns = {0};
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
-        answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, result.studentAns, correctAns, index);
+        answerHTML = getAnswerHTML(answerHTML, currStudent, currStudent->allocated[currQuestion[index]].isCorrect, result.studentAns, correctAns, index);
         sendHTMLpage(socket, answerHTML);
         free(answerHTML);
         free(correctAns);

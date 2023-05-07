@@ -69,6 +69,7 @@ extern void   sendHTMLpage(int, char *);
 extern void   handleDisplayTest(int, char *, Students *, int);
 extern Result handleUserAnswers(char *, Students *, int);
 extern void   handleMarkAttempts(int, Result, Students *, int, char *);
+extern void   handleDisplayAnswer(int, Result, Students *, int);
 extern void   handleDisplayQuestion(int, char *, Students *, int);
 extern void   urlDecode(char *, char *);
 // TM_QB.c

@@ -5,6 +5,7 @@ char *backButton   = "<form method=\'post\'><input type=\'submit\' name=\'back\'
 char *nextButton   = "<form method=\'post\'><input type=\'submit\' name=\'next\' value=\'Next\'></form>";
 char *logoutButton = "<form method=\'post\'><input type=\"submit\" name=\'logout\' value=\"Logout\"></form>";
 char *failMessage  = "<p>Login failed. Try again.</p><br>";
+char *wrongAnswer  = "<p>Your answer is wrong. Try again.</p>";
 char *correctMessage = "<p>Your answer is correct!</p>";
 char *wrongMessage   = "<p>Your answer is wrong!</p>";
 
@@ -18,21 +19,23 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
                         <input type=\"radio\" id=\"b\" name=\"%s\" value=\"%s\"><label>%s</label><br>   \
                         <input type=\"radio\" id=\"c\" name=\"%s\" value=\"%s\"><label>%s</label><br>   \
                         <input type=\"radio\" id=\"d\" name=\"%s\" value=\"%s\"><label>%s</label><br>   \
-                        <br><button type=\"submit\">Submit</button></form></body></html>",              \
-                        logoutButton, idx > 0 ? backButton : "", idx < MAX_QUESTIONS-1 ? nextButton : "",               \
-                        idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated[currQuestion[index]].numAttempts, currStudent->allocated[idx].question,\
-                        currStudent->allocated[idx].type, currStudent->allocated[idx].options[0], currStudent->allocated[idx].options[0], \
-                        currStudent->allocated[idx].type, currStudent->allocated[idx].options[1], currStudent->allocated[idx].options[1], \
-                        currStudent->allocated[idx].type, currStudent->allocated[idx].options[2], currStudent->allocated[idx].options[2], \
-                        currStudent->allocated[idx].type, currStudent->allocated[idx].options[3], currStudent->allocated[idx].options[3]);
+                        <br><button type=\"submit\">Submit</button>%s</form></body></html>",            \
+                        logoutButton, idx > 0 ? backButton : "", idx < MAX_QUESTIONS-1 ? nextButton : "", idx+1, MAX_QUESTIONS,             \
+                        currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated[idx].numAttempts, currStudent->allocated[idx].question, \
+                        currStudent->allocated[idx].type, currStudent->allocated[idx].options[0], currStudent->allocated[idx].options[0],   \
+                        currStudent->allocated[idx].type, currStudent->allocated[idx].options[1], currStudent->allocated[idx].options[1],   \
+                        currStudent->allocated[idx].type, currStudent->allocated[idx].options[2], currStudent->allocated[idx].options[2],   \
+                        currStudent->allocated[idx].type, currStudent->allocated[idx].options[3], currStudent->allocated[idx].options[3],   \
+                        (currStudent->allocated[idx].isCorrect || currStudent->allocated[idx].numAttempts == 3) ? "" : wrongAnswer);
     } else { // PCQ
         sprintf(quesHTML, "<html><body>%s%s%s<form method=\"post\">\
-                        <h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><label for=\"%s\">%s</label>      \
-                        <form method=\"post\"><br><textarea name=\"pcq\" rows=\"20\" cols=\"60\"></textarea>\
-                        <br><br><button type=\"submit\">Submit</button></form></body></html>",              \
-                        logoutButton, idx > 0 ? backButton : "", idx < MAX_QUESTIONS-1 ? nextButton : "",   \
-                        idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3,                          \
-                        currStudent->allocated[idx].type, currStudent->allocated[idx].question);
+                        <h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><label for=\"%s\">%s</label>       \
+                        <form method=\"post\"><br><textarea name=\"pcq\" rows=\"20\" cols=\"60\"></textarea> \
+                        <br><br><button type=\"submit\">Submit</button>%s</form></body></html>",             \
+                        logoutButton, (idx > 0) ? backButton : "", (idx < MAX_QUESTIONS-1) ? nextButton : "",\
+                        idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3,                           \
+                        currStudent->allocated[idx].type, currStudent->allocated[idx].question,              \
+                        (currStudent->allocated[idx].isCorrect || currStudent->allocated[idx].numAttempts == 3) ? "" : wrongAnswer);
     }
     return quesHTML;
 }
@@ -50,7 +53,7 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char
     answerHTML = (char*) realloc(answerHTML, BUFSIZ);
     sprintf(answerHTML, "<html><body>%s%s%s<h1>Question %d/%d</h1><p>Your grade is: %d/%d</p>           \
                         <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p></body></html>",\
-                        logoutButton, idx > 0 ? backButton : "", nextButton, idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3,\
+                        logoutButton, (idx > 0) ? backButton : "", nextButton, idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3,\
                         currStudent->allocated[idx].question, currStudent->allocated[idx].finalStuAns, currStudent->allocated[idx].isCorrect ? correctMessage : wrongMessage, correctAns);
     return answerHTML;
 }
