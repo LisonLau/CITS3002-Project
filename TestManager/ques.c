@@ -63,24 +63,39 @@ void handleMarkAttempts(int socket, Result result, Students *currStudent, int in
     int isCorrect = currStudent->allocated[currQuestion[index]].isCorrect;
     printf("isCorrect %d\n", currStudent->allocated[currQuestion[index]].isCorrect);
     printf("numAttempts before %d\n", currStudent->allocated[currQuestion[index]].numAttempts);
-
-    if (strstr(buffer, "back=") == 0 && strstr(buffer, "next=") == 0 && strstr(buffer, "logout=") == 0) {
-        if (isCorrect || numAttempts == 0 || numAttempts == -1) { // temporarily -1
+    printf("stu answer %s\n", result.studentAns);
+    printf("final answer %s\n", currStudent->allocated[currQuestion[index]].finalStuAns);
+    char *answerHTML = {0};
+    char *correctAns = {0};
+    // If question is correct OR 3 attempts made 
+    if (strstr(buffer, "mcq") || strstr(buffer, "pcq")) {
+        currStudent->allocated[currQuestion[index]].numAttempts--;
+        if (isCorrect || numAttempts == 1) {
             currStudent->allocated[currQuestion[index]].isDone = 1;
-            if (currQuestion[index] == 0 && numAttempts > 0) 
-                currStudent->grade += numAttempts + 1;
-            else
+            strcpy(currStudent->allocated[currQuestion[index]].finalStuAns, result.studentAns);
+            if (isCorrect) {
                 currStudent->grade += numAttempts;
-            char *answerHTML = {0};
-            char *correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
+            } else if (numAttempts == 1) {
+                currStudent->grade += numAttempts-1;
+            } 
+            correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
             answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, result.studentAns, correctAns, index);
             sendHTMLpage(socket, answerHTML);
-            free(answerHTML);
-            free(correctAns);
         }
-        currStudent->allocated[currQuestion[index]].numAttempts--;
     }
+    printf("final answer %s\n", currStudent->allocated[currQuestion[index]].finalStuAns);
     printf("numAttempts after %d\n", currStudent->allocated[currQuestion[index]].numAttempts);
+    printf("isDone %d\n", currStudent->allocated[currQuestion[index]].isDone);
+    // Display answer page
+    if (currStudent->allocated[currQuestion[index]].isDone) {
+        printf("type %s\n", currStudent->allocated[currQuestion[index]].type);
+        printf("question %s\n", currStudent->allocated[currQuestion[index]].question);
+        correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
+        answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, result.studentAns, correctAns, index);
+        sendHTMLpage(socket, answerHTML);
+    }
+    free(answerHTML);
+    free(correctAns);
 }
 
 void handleDisplayQuestion(int socket, char *buffer, Students *currStudent, int index) {

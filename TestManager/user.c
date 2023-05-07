@@ -63,8 +63,7 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
             continue;
         }
         
-        currStudent->allocated[quesIdx].isDone = 0;
-        currStudent->allocated[quesIdx].isCorrect = 0;
+        // currStudent->allocated[quesIdx].isDone = 0;
         //currStudent->allocated[quesIdx].isCorrect = 0;
         // Check the question type and store the values accordingly
         if (strcmp(type, "pcqpy") == 0 || strcmp(type, "pcqc") == 0) {

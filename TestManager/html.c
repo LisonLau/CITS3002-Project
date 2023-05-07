@@ -52,7 +52,7 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, int isCorrect, char
     sprintf(answerHTML, "<html><body>%s%s%s<h1>Question %d/%d</h1><p>Your grade is: %d/%d</p>           \
                         <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p></body></html>",\
                         logoutButton, idx > 0 ? backButton : "", nextButton, idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3,\
-                        currStudent->allocated[idx].question, studentAns, isCorrect ? correctMessage : wrongMessage, correctAns);
+                        currStudent->allocated[idx].question, currStudent->allocated[idx].finalStuAns, currStudent->allocated[idx].isCorrect ? correctMessage : wrongMessage, correctAns);
     return answerHTML;
 }
 

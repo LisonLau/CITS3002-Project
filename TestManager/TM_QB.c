@@ -47,8 +47,8 @@ void handleQBgetFile(char *filename) {
     printf("[+] Question file '%s' received successfully.\n", filename);
 
     // Send acknowledgement for received data
-    // char ack[BUFFERSIZE] = "ACK";
-    // socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
+    char ack[BUFFERSIZE] = "ACK";
+    socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
 
     close(TMclient);
 }

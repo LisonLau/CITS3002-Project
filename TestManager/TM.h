@@ -29,6 +29,7 @@ typedef struct Questions {
     char question[MAX_QUESTION_LENGTH];
     int  isMCQ;  // 1 means MCQ, 0 means PCQ
     char options[MAX_OPTIONS][MAX_OPTION_LENGTH];
+    char finalStuAns[BUFFERSIZE];
     int  numAttempts;
     int  isCorrect;
     int  isDone; // 1 means question is done, 0 means not done
@@ -50,7 +51,6 @@ typedef struct Result {
 } Result;
 
 // Global variables
-Questions   questions[MAX_QUESTIONS];  
 Students    students[MAX_STUDENTS];
 int         currQuestion[MAX_STUDENTS]; // records current question the student is at
 int         numStudents;

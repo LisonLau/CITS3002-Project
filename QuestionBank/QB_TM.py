@@ -1,6 +1,7 @@
 import csv
 import random
 import socket
+import time
 from _thread import *
 
 from QBc  import *
@@ -104,6 +105,20 @@ class QuestionBank:
         correctAns = self.getAnswer(type, question)
         TMsocket.send(correctAns.encode())
         print(f"[+] Answer '{correctAns}' sent successfully.")
+        
+    def sendToTM(self, message, TMclient):
+        # Categorise message received as 'get' or 'check'
+        if self.categoriseMessage(message) == "get_file":
+            print("[+] Message 'get file' from TM received.")
+            self.executeSendFile(message, TMclient)
+        elif self.categoriseMessage(message) == "check":
+            print("[+] Message 'check' from TM received.")
+            self.executeCheckAnswer(message, TMclient)
+        elif self.categoriseMessage(message) == "get_ans":
+            print("[+] Message 'get answer' from TM received.")
+            self.executeSendAnswer(message, TMclient)
+        else:
+            print("[!] Error: message received was not understood.")
     
     def runQBserver(self):
         # hostname = socket.gethostname()
@@ -141,19 +156,8 @@ class QuestionBank:
                 # Receive a string message
                 message = TMclient.recv(BUFFERSIZE).decode()
                 
-                # Categorise message received as 'get' or 'check'
-                # Perform required send operations
-                if self.categoriseMessage(message) == "get_file":
-                    print("[+] Message 'get file' from TM received.")
-                    self.executeSendFile(message, TMclient)
-                elif self.categoriseMessage(message) == "check":
-                    print("[+] Message 'check' from TM received.")
-                    self.executeCheckAnswer(message, TMclient)
-                elif self.categoriseMessage(message) == "get_ans":
-                    print("[+] Message 'get answer' from TM received.")
-                    self.executeSendAnswer(message, TMclient)
-                else:
-                    print("[!] Error: message received was not understood.")
+                # Perform the required send operation
+                self.sendToTM(message, TMclient)
 
                 # Receive acknowledgement for sent data
                 # ack = TMclient.recv(BUFFERSIZE).decode()
