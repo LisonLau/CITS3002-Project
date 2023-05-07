@@ -10,7 +10,6 @@ void handleDisplayTest(int socket, char *buffer, Students *currStudent, int inde
     // If student file does not exists, create one
     if (access(filename, F_OK) != 0) {
         handleQBgetFile(filename);
-        //currStudent->quesIdx = 0;
         currStudent->grade = 0;
     } 
 
@@ -61,29 +60,30 @@ Result handleUserAnswers(char *buffer, Students *currStudent, int index) {
 void handleMarkAttempts(int socket, Result result, Students *currStudent, int index, char *buffer) {
     int numAttempts = currStudent->allocated[currQuestion[index]].numAttempts;
     int isCorrect = currStudent->allocated[currQuestion[index]].isCorrect;
-    char *answerHTML = {0};
-    char *correctAns = {0};
+
     // If question is correct OR 3 attempts made 
     if (strstr(buffer, "mcq") || strstr(buffer, "pcq")) {
         currStudent->allocated[currQuestion[index]].numAttempts--;
         if (isCorrect || numAttempts == 1) {
             currStudent->allocated[currQuestion[index]].isDone = 1;
             strcpy(currStudent->allocated[currQuestion[index]].finalStuAns, result.studentAns);
-            if (isCorrect) {
+            if (isCorrect)
                 currStudent->grade += numAttempts;
-            } else if (numAttempts == 1) {
+            else if (numAttempts == 1)
                 currStudent->grade += numAttempts-1;
-            } 
         }
     }
+
     // Display answer page
     if (currStudent->allocated[currQuestion[index]].isDone) {
+        char *answerHTML = {0};
+        char *correctAns = {0};
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
         answerHTML = getAnswerHTML(answerHTML, currStudent, isCorrect, result.studentAns, correctAns, index);
         sendHTMLpage(socket, answerHTML);
+        free(answerHTML);
+        free(correctAns);
     }
-    free(answerHTML);
-    free(correctAns);
 }
 
 void handleDisplayQuestion(int socket, char *buffer, Students *currStudent, int index) {

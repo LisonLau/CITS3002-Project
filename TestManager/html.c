@@ -10,7 +10,6 @@ char *wrongMessage   = "<p>Your answer is wrong!</p>";
 
 char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
     int idx = currQuestion[index];
-    printf("Get questionHTML idx: %d\n", idx);
     quesHTML = (char*) realloc(quesHTML, HTMLSIZE);
     if (currStudent->allocated[idx].isMCQ) { // MCQ
         sprintf(quesHTML, "<html><body>%s%s%s<h1>Question %d/%d</h1><p>Your grade is: %d/%d</p>         \

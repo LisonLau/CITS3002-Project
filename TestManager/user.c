@@ -48,7 +48,6 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
     char line[BUFFERSIZE];
     char *token;
     int quesIdx = 0;
-    printf("Current student question index is: %d\n", quesIdx);
     fp = fopen(filename, "r");
     if (fp == NULL) {
         perror("Error opening file.\n");
@@ -63,8 +62,6 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
             continue;
         }
         
-        // currStudent->allocated[quesIdx].isDone = 0;
-        //currStudent->allocated[quesIdx].isCorrect = 0;
         // Check the question type and store the values accordingly
         if (strcmp(type, "pcqpy") == 0 || strcmp(type, "pcqc") == 0) {
             strncpy(currStudent->allocated[quesIdx].type, type, 10);
