@@ -62,6 +62,7 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
             continue;
         }
         
+        currStudent->allocated[quesIdx].isCorrect = -1;
         // Check the question type and store the values accordingly
         if (strcmp(type, "pcqpy") == 0 || strcmp(type, "pcqc") == 0) {
             strncpy(currStudent->allocated[quesIdx].type, type, 10);

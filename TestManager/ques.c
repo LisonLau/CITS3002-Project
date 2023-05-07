@@ -84,7 +84,7 @@ void handleDisplayAnswer(int socket, Result result, Students *currStudent, int i
         char *answerHTML = {0};
         char *correctAns = {0};
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
-        answerHTML = getAnswerHTML(answerHTML, currStudent, currStudent->allocated[currQuestion[index]].isCorrect, result.studentAns, correctAns, index);
+        answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
         sendHTMLpage(socket, answerHTML);
         free(answerHTML);
         free(correctAns);

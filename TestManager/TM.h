@@ -81,5 +81,5 @@ extern void   socketSend(int, char *, char *);
 // html.c
 extern char*  getQuestionHTML(char *, Students *, int);
 extern char*  getFinishHTML(int, char *, int, char *, int);
-extern char*  getAnswerHTML(char *, Students *, int, char *, char *, int);
+extern char*  getAnswerHTML(char *, Students *, char *, int);
 extern char*  getLoginHTML(char *, int);
