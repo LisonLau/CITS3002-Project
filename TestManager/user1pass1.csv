@@ -1,0 +1,10 @@
+mcqpy,Which of the operators is used for concatenation in Python?,+,*,%,/,+
+mcqpy,Which of the following is not a data type in Python?,integer,float,decimal,boolean,decimal
+mcqpy,What is the keyword used in Python to define a function?,module,function,class,def,def
+mcqpy,What is the symbol used in Python for single line comments?,//,#,!,/,#
+mcqpy,What is the extension of a Python source code file?,.py,.java,.cpp,.html,.py
+mcqc,What is the symbol used for a single-line comment in C programming language?,#,/*,*/,//,//
+mcqc,What is the purpose of the 'scanf()' function in C programming?,To read input from the user,To print output to the console,To allocate memory dynamically,To compare two strings,To read input from the user
+mcqc,What is the correct syntax to declare an array in C programming language?,array arr[10];,int arr = [10];,int arr[10];,None of the above,int arr[10];
+mcqc,What is the extension of a C source code file?,.cpp,.h,.c,.exe,.c
+mcqc,Which keyword is used to define a constant in C programming?,const,var,let,final,const
