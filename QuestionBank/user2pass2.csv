@@ -1,0 +1,10 @@
+pcqpy,Write a Python function that takes two numbers as input and returns their sum.
+mcqpy,What is the symbol used in Python for single line comments?,//,#,!,/
+mcqc,What is the extension of a C source code file?,.cpp,.h,.c,.exe
+mcqpy,Which of the operators is used for concatenation in Python?,+,*,%,/
+mcqc,Which keyword is used to define a constant in C programming?,const,var,let,final
+pcqc,Write a C function that takes two integers as input and returns their sum.
+pcqc,Write a C function that takes a string as input and returns the length of the string.
+pcqc,Write a C function that takes an array of strings as input and returns the length of the longest string in the array.
+pcqc,Write a C function that takes a string as input and returns the reverse of that string.
+pcqpy,Write a Python function that takes a list of strings as input and returns the length of the longest string in the list.

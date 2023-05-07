@@ -4,23 +4,23 @@ void runTMforWeb() {
     int                 opt = 1;
     int                 max_sd, activity, sersockfd, newsockfd, sockfd, valread;
     int                 client_socket[MAX_CLIENTS] = {0};
-    // struct hostent      *hostInfo;
-    // struct in_addr      **addr_list;
+    struct hostent      *hostInfo;
+    struct in_addr      **addr_list;
     struct sockaddr_in  addr;
     socklen_t           addrsize;
     fd_set              readset;
     char                buffer[BUFFERSIZE];
-    // char                hostname[255];
+    char                hostname[255];
     int                 isLoggedIn = 0;
 
     // Retrieving HOST IP address
-    // gethostname(hostname, 255);
-    // hostInfo = gethostbyname(hostname);
-    // addr_list = (struct in_addr **)hostInfo->h_addr_list;
-    // HOST = inet_ntoa(*addr_list[0]);
-    // if (strcmp(HOST, "127.0.0.1") == 0) {
-    //     HOST = inet_ntoa(*addr_list[1]);
-    // }
+    gethostname(hostname, 255);
+    hostInfo = gethostbyname(hostname);
+    addr_list = (struct in_addr **)hostInfo->h_addr_list;
+    HOST = inet_ntoa(*addr_list[0]);
+    if (strcmp(HOST, "127.0.0.1") == 0) {
+        HOST = inet_ntoa(*addr_list[1]);
+    }
 
     // Create socket file descriptor
     if ((sersockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -38,7 +38,7 @@ void runTMforWeb() {
 
     addr.sin_family      = AF_INET;
     addr.sin_port        = htons(SERVER_PORT);
-    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_addr.s_addr = inet_addr(HOST);//INADDR_ANY;
 
     // Bind socket to port
     addrsize = sizeof(addr);
@@ -137,7 +137,7 @@ void runTMforWeb() {
                         isLoggedIn = -1;
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         students[index].loggedIn = 0;
-                        strcpy(students[index].ipAddress, "");
+                        // strcpy(students[index].ipAddress, "");
                         continue;
                     }
 
@@ -208,10 +208,11 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
 int checkLoggedIn(char *var, int getIndex) {
     for (int i = 0; i < MAX_STUDENTS; i++) {
         // Checks if a student is associated with this IP and is logged in
-        if (getIndex && (strcmp(students[i].username, var) == 0 || strcmp(students[i].ipAddress, var) == 0)) {
+        if (getIndex == 1 && (strcmp(students[i].username, var) == 0 || strcmp(students[i].ipAddress, var) == 0)) {
             return i; // returns index of the student
         }
-        else if (!getIndex && strcmp(students[i].ipAddress, var) == 0 && students[i].loggedIn == 1) {
+        else if (getIndex == 0 && strcmp(students[i].ipAddress, var) == 0 && students[i].loggedIn == 1) {
+            printf("ip: %s, loggedIn: %d", students[i].ipAddress, students[i].loggedIn);
             return 1; // returns 1 for true user is logged in
         }
     }
