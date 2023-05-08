@@ -1,6 +1,6 @@
 def PCQ1(x, y):
     return x + y
-        
+
 def PCQ2(s):
     return len(s)
 

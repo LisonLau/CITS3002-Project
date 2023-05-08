@@ -40,11 +40,11 @@ class QuestionBank:
         if type == "mcqc":      # C multiple choice question
             isCorrect = self.QBcInstance.gradeMCQ(ques, ans)
         elif type == "pcqc":    # C programming challenge question
-            isCorrect = False
+            isCorrect = self.QBcInstance.gradePCQ(ques, ans)
         elif type == "mcqpy":   # PYTHON multiple choice question
             isCorrect = self.QBpyInstance.gradeMCQ(ques, ans)
         elif type == "pcqpy":   # PYTHON programming challenge question
-            isCorrect = False
+            isCorrect = self.QBpyInstance.gradePCQ(ques, ans)
         return isCorrect
 
     def getAnswer(self, type, ques):
@@ -52,11 +52,11 @@ class QuestionBank:
         if type == "mcqc":      # C multiple choice question
             answer = self.QBcInstance.getMCQanswer(ques)
         elif type == "pcqc":    # C programming challenge question
-            answer = "NOT IMPLEMENTED YET"
+            answer = self.QBcInstance.getPCQanswer(ques)
         elif type == "mcqpy":   # PYTHON multiple choice question
             answer = self.QBpyInstance.getMCQanswer(ques)
         elif type == "pcqpy":   # PYTHON programming challenge question
-            answer = "NOT IMPLEMENTED YET"
+            answer = self.QBcInstance.getPCQanswer(ques)
         return answer
     
     def categoriseMessage(self, message):
