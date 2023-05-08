@@ -22,14 +22,17 @@
 #define MAX_OPTION_LENGTH   100
 #define MAX_CLIENTS         30
 #define BUFFERSIZE          1024
+#define HTMLSIZE            16384
 
 typedef struct Questions {
     char type[10];
     char question[MAX_QUESTION_LENGTH];
     int  isMCQ;  // 1 means MCQ, 0 means PCQ
     char options[MAX_OPTIONS][MAX_OPTION_LENGTH];
+    char finalStuAns[BUFFERSIZE];
     int  numAttempts;
     int  isCorrect;
+    int  isDone; // 1 means question is done, 0 means not done
 } Questions; 
 
 typedef struct Students {
@@ -39,31 +42,44 @@ typedef struct Students {
     int  loggedIn;
     int  quesIdx;
     int  grade;
-    Questions allocated_ques[MAX_QUESTIONS];
+    Questions allocated[MAX_QUESTIONS];
 } Students;
 
-Questions   questions[MAX_QUESTIONS];  
+typedef struct Result {
+    int  isCorrect;
+    char studentAns[BUFFERSIZE];
+} Result;
+
+// Global variables
 Students    students[MAX_STUDENTS];
+int         currQuestion[MAX_STUDENTS]; // records current question the student is at
 int         numStudents;
 char        *HOST;
 
 // user.c
-extern void storeUsers();
-extern int  authenticateUsers(char *, char *);
+extern void   storeUsers();
+extern int    authenticateUsers(char *, char *);
+extern void   storeStudentQuestions(char *, Students *);
 // TM_web.c
-extern void runTMforWeb();
-extern int checkLoggedIn(char *, int);
-extern int handleUserLogin(int, char *, char *);
-extern void sendResponse(int, char *);
+extern void   runTMforWeb();
+extern int    checkLoggedIn(char *, int);
+extern int    handleUserLogin(int, char *, char *);
+extern void   sendHTMLpage(int, char *);
 // ques.c
-extern void handleGetQuestion(Students *);
-extern int handleDisplayQuestion(int, char *, Students *);
-extern void storeQuestions(char *, Students *);
-extern char* getQuestionHTML(int, char *, Students *);
-extern void urlDecode(char *, char *);
+extern void   handleDisplayTest(int, char *, Students *, int);
+extern Result handleUserAnswers(char *, Students *, int);
+extern void   handleMarkAttempts(int, Result, Students *, int, char *);
+extern void   handleDisplayAnswer(int, Result, Students *, int);
+extern void   handleDisplayQuestion(int, char *, Students *, int);
+extern void   urlDecode(char *, char *);
 // TM_QB.c
-extern char* getFinishHTML(int, char *, int, char *);
-extern int handleQBcheck(char *, char *, char *);
-extern int sendQBCheck(int, char *, char *, char *);
-extern void handleQBget(char *);
-extern void sendQBget(int, char *);
+extern int    createTMclient();
+extern int    handleQBcheck(char *, char *, char *);
+extern void   handleQBgetFile(char *);
+extern char*  handleQBgetAns();
+extern void   socketSend(int, char *, char *);
+// html.c
+extern char*  getQuestionHTML(char *, Students *, int);
+extern char*  getFinishHTML(int, char *, int, char *, int);
+extern char*  getAnswerHTML(char *, Students *, char *, int);
+extern char*  getLoginHTML(char *, int);
