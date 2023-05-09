@@ -46,6 +46,7 @@ Questions   questions[MAX_QUESTIONS];
 Students    students[MAX_STUDENTS];
 int         numStudents;
 char        *HOST;
+const char  *clientIpAddr;
 
 // user.c
 extern void storeUsers();
