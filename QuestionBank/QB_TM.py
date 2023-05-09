@@ -123,6 +123,19 @@ class QuestionBank:
             print("[+] Message 'get answer' from TM received.")
         else:
             print("[!] Error: message received was not understood.")
+            
+    def receiveACK(self, message, TMclient):
+        ack = ""
+        while (ack != "ACK"):
+            ack = TMclient.recv(BUFFERSIZE).decode()
+            if ack == "ACK":    # ack received, can close connection
+                print("[+] Acknowledgement from TM received.")
+                break
+            else:               # ack not received, retry sending data
+                print("[-] Acknowledgement from TM not received.")
+                print("[.] Retrying in 5 seconds...")
+                time.sleep(5)
+                self.sendToTM(message, TMclient)
     
     def runQBserver(self):
         # hostname = socket.gethostname()
@@ -155,7 +168,7 @@ class QuestionBank:
             while True:
                 # Establish connection 
                 TMclient, TMaddress = QBserver.accept()
-                print("----- Connected to: " + TMaddress[0] + ':' + str(TMaddress[1]) + " -----")
+                print("----- Connected to: " + TMaddress[0] + ':' + str(TMaddress[1]) + " ------------")
                 
                 # Receive a string message
                 message = TMclient.recv(BUFFERSIZE).decode()
@@ -170,11 +183,7 @@ class QuestionBank:
                 self.sendToTM(message, TMclient)
 
                 # Receive TM acknowledgement for sent data
-                ack = TMclient.recv(BUFFERSIZE).decode()
-                if ack == "ACK":
-                    print("[+] Acknowledgement from TM received.")
-                else:
-                    print("[-] Acknowledgement from TM not received.")
+                self.receiveACK(message, TMclient)
                     
                 TMclient.close()
                 print("----- Connection to " + TMaddress[0] + ':' + str(TMaddress[1]) + " closed -----")

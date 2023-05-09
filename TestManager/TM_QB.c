@@ -21,7 +21,7 @@ int createTMclient() {
         perror("[-] Error in connecting to QB.\n");
         exit(EXIT_FAILURE);
     }
-    printf("----- Connection to QB successful -----\n");
+    printf("------- Connection to QB successful -------\n");
     return TMclient;
 }
 
@@ -36,7 +36,7 @@ void handleQBgetFile(char *filename) {
     socketSend(TMclient, message, "get file");
 
     // Receive QB acknowledgement for sent request
-    receiveACK(TMclient);
+    receiveACK(TMclient, message, "get file");
 
     // Receive the file from QB
     char filelines[BUFSIZ];
@@ -51,7 +51,7 @@ void handleQBgetFile(char *filename) {
     socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
 
     close(TMclient);
-    printf("------- Connection to QB closed -------\n");
+    printf("--------- Connection to QB closed ---------\n");
 }
 
 // Create TM client to send request from QB to check answer
@@ -69,7 +69,7 @@ int handleQBcheck(char *type, char *ques, char *ans) {
     socketSend(TMclient, message, "check answer");
 
     // Receive QB acknowledgement for sent request
-    receiveACK(TMclient);
+    receiveACK(TMclient, message, "check answer");
 
     // Receive QB response
     char response[BUFFERSIZE];
@@ -93,7 +93,7 @@ int handleQBcheck(char *type, char *ques, char *ans) {
     }
 
     close(TMclient);
-    printf("------- Connection to QB closed -------\n");
+    printf("--------- Connection to QB closed ---------\n");
     return isCorrect;
 }
 
@@ -111,7 +111,7 @@ char* handleQBgetAns(char *type, char *ques) {
     socketSend(TMclient, message, "get answer");
 
     // Receive QB acknowledgement for sent request
-    receiveACK(TMclient);
+    receiveACK(TMclient, message, "get answer");
     
     // Receive QB response
     char *correctAns = malloc(BUFFERSIZE);
@@ -128,7 +128,7 @@ char* handleQBgetAns(char *type, char *ques) {
     socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
 
     close(TMclient);
-    printf("------- Connection to QB closed -------\n");
+    printf("--------- Connection to QB closed ---------\n");
     return correctAns;
 }
 
@@ -141,16 +141,24 @@ void socketSend(int socket, char *message, char *type) {
     printf("[+] Message '%s' sent successfully.\n", type);
 }
 
-void receiveACK(int TMclient) {
-    // Receive QB acknowledgement for sent request
-    char *ACK = malloc(BUFFERSIZE);
-    int ack_bytes = recv(TMclient, ACK, BUFFERSIZE, 0);
-    if (ack_bytes < 0) {
-        perror("[-] Acknowledgement from QB not received.\n");
-        exit(EXIT_FAILURE);
-    }
-    ACK[ack_bytes] = '\0';
-    if (strcmp(ACK, "ACK") == 0) {
-        printf("[+] Acknowledgement from QB received.\n");
+// Receive QB acknowledgement for sent request
+void receiveACK(int TMclient, char *message, char *type) {
+    char ack[BUFFERSIZE] = "";
+    while (strcmp(ack, "ACK") != 0) {
+        int ack_bytes = recv(TMclient, ack, BUFFERSIZE, 0);
+        if (ack_bytes < 0) {
+            perror("[-] Acknowledgement from QB not received.\n");
+            exit(EXIT_FAILURE);
+        }
+        ack[ack_bytes] = '\0';
+        if (strcmp(ack, "ACK") == 0) {
+            printf("[+] Acknowledgement from QB received.\n");
+            break;
+        } else {
+            printf("[-] Acknowledgement from QB not received.\n");
+            printf("[.] Retrying in 5 seconds...\n");
+            sleep(5);
+            socketSend(TMclient, message, type);
+        }
     }
 }
