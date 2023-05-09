@@ -1,163 +1,104 @@
 #include "TM.h"
 
-void handleGetQuestion(Students *currStudent) {
+void handleDisplayTest(int socket, char *buffer, Students *currStudent, int index) {
     // Create custom filename
     char filename[BUFFERSIZE] = "";
     strcat(filename, currStudent->username);
     strcat(filename, currStudent->password);
     strcat(filename, ".csv");
 
-    // Get question file from QB
-    handleQBget(filename);
-}
+    // If student file does not exists, create one
+    if (access(filename, F_OK) != 0) {
+        handleQBgetFile(filename);
+        currStudent->grade = 0;
+    } 
 
-int handleDisplayQuestion(int socket, char *buffer, Students *currStudent) {
-    int     isCorrect = 0;
-    int     quesIdx;
-    char    *username = currStudent->username;
-    char    *password = currStudent->password;
-    
-    // Create custom filename
-    char filename[BUFFERSIZE] = "";
-    strcat(filename, username);
-    strcat(filename, password);
-    strcat(filename, ".csv");
+    // Store student's allocated questions
+    storeStudentQuestions(filename, currStudent);
 
-    // TODO: check if student file already exits
-    if (access(filename, F_OK) == 0) {
-        // file exists
-        quesIdx = currStudent->quesIdx;
-    } else {
-        currStudent->quesIdx = 0;
-        quesIdx = currStudent->quesIdx;
-        // file doesn't exist...
-        // Need to make one and get questions from QB 
-    }
-
-    // Store questions in Question struct
-    storeQuestions(filename, currStudent);
-
-    // Display questions
-    char *quesHTML = {0};
-    quesHTML = getQuestionHTML(quesIdx, quesHTML, currStudent);
-    sendResponse(socket, quesHTML);
-
-    // Get the answer inputted by user
+    // Handle the test
+    Result result;
     if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
-        
-        char encoded_ans[BUFFERSIZE];
-        char decoded_ans[BUFFERSIZE];
- 
-        if (strstr(buffer, "mcqpy=") != NULL) {                         // MCQPY
-            sscanf(strstr(buffer, "mcqpy="), "mcqpy=%s", encoded_ans);
-            urlDecode(encoded_ans, decoded_ans); 
-            isCorrect = handleQBcheck("mcqpy", currStudent->allocated_ques[quesIdx-1].question, decoded_ans);  // If wrong, minus mark by 1
-        } else if (strstr(buffer, "mcqc=") != NULL) {                   // MCQC
-            sscanf(strstr(buffer, "mcqc="), "mcqc=%s", encoded_ans);
-            urlDecode(encoded_ans, decoded_ans); 
-            isCorrect = handleQBcheck("mcqc", currStudent->allocated_ques[quesIdx-1].question, decoded_ans);   // If wrong, minus mark by 1
-        } else if (strstr(buffer, "pcqpy=") != NULL) {                  // PCQPY
-            sscanf(strstr(buffer, "pcqpy="), "pcqpy=%s", encoded_ans);
-            urlDecode(encoded_ans, decoded_ans); 
-            isCorrect = handleQBcheck("pcqpy", currStudent->allocated_ques[quesIdx-1].question, decoded_ans);  // If wrong, minus mark by 1
-        } else if (strstr(buffer, "pcqc=") != NULL) {                   // PCQC
-            sscanf(strstr(buffer, "pcqc="), "pcqc=%s", encoded_ans);
-            urlDecode(encoded_ans, decoded_ans); 
-            isCorrect = handleQBcheck("pcqc", currStudent->allocated_ques[quesIdx-1].question, decoded_ans);   // If wrong, minus mark by 1
-        }
+        // Handle user answers WHEN submit
+        result = handleUserAnswers(buffer, currStudent, index);
+
+        // Handle grading and number of attempts
+        currStudent->allocated[currQuestion[index]].isCorrect = result.isCorrect;
+        handleMarkAttempts(socket, result, currStudent, index, buffer);
+
+        // Handle display answer page AFTER question is done
+        handleDisplayAnswer(socket, result, currStudent, index);
+
+        // Handle display questions WHEN nothing to do
+        handleDisplayQuestion(socket, buffer, currStudent, index);
     }
-    currStudent->quesIdx++;
-    free(quesHTML);
-    return isCorrect;
 }
 
-void storeQuestions(char *filename, Students *currStudent) {
-    FILE *fp;
-    char line[BUFFERSIZE];
-    char *token;
-    int quesIdx = 0;
-
-    fp = fopen(filename, "r");
-    if (fp == NULL) {
-        perror("Error opening file.\n");
-        exit(EXIT_FAILURE);
+Result handleUserAnswers(char *buffer, Students *currStudent, int index) {
+    // Get the answer inputted by user on SUBMIT button press
+    Result result;
+    result.isCorrect = 0;
+    char encoded_ans[BUFFERSIZE];
+    
+    if (strstr(buffer, "mcqpy=") != NULL) {                         // MCQPY
+        sscanf(strstr(buffer, "mcqpy="), "mcqpy=%s", encoded_ans);
+        urlDecode(encoded_ans, result.studentAns); 
+        result.isCorrect = handleQBcheck("mcqpy", currStudent->allocated[currQuestion[index]].question, result.studentAns);  // If wrong, minus mark by 1
+    } else if (strstr(buffer, "mcqc=") != NULL) {                   // MCQC
+        sscanf(strstr(buffer, "mcqc="), "mcqc=%s", encoded_ans);
+        urlDecode(encoded_ans, result.studentAns); 
+        result.isCorrect = handleQBcheck("mcqc", currStudent->allocated[currQuestion[index]].question, result.studentAns);   // If wrong, minus mark by 1
+    } else if (strstr(buffer, "pcqpy=") != NULL) {                  // PCQPY
+        sscanf(strstr(buffer, "pcqpy="), "pcqpy=%s", encoded_ans);
+        urlDecode(encoded_ans, result.studentAns); 
+        result.isCorrect = handleQBcheck("pcqpy", currStudent->allocated[currQuestion[index]].question, result.studentAns);  // If wrong, minus mark by 1
+    } else if (strstr(buffer, "pcqc=") != NULL) {                   // PCQC
+        sscanf(strstr(buffer, "pcqc="), "pcqc=%s", encoded_ans);
+        urlDecode(encoded_ans, result.studentAns); 
+        result.isCorrect = handleQBcheck("pcqc", currStudent->allocated[currQuestion[index]].question, result.studentAns);   // If wrong, minus mark by 1
     }
-
-    while (fgets(line, BUFFERSIZE, fp)) {
-        char* type = strtok(line, ",");
-        char* ques = strtok(NULL, ",");
-        // Stops after reading 10 questions
-        if (quesIdx == MAX_QUESTIONS) {
-            continue;
-        }
-        // Check the question type and store the values accordingly
-        if (strcmp(type, "pcqpy") == 0 || strcmp(type, "pcqc") == 0) {
-            strncpy(currStudent->allocated_ques[quesIdx].type, type, 10);
-            strncpy(currStudent->allocated_ques[quesIdx].question, ques, MAX_QUESTION_LENGTH);
-            currStudent->allocated_ques[quesIdx].isMCQ = 0;
-            quesIdx++;
-        } else if (strcmp(type, "mcqpy") == 0 || strcmp(type, "mcqc") == 0) {
-            strncpy(currStudent->allocated_ques[quesIdx].type, type, 10);
-            strncpy(currStudent->allocated_ques[quesIdx].question, ques, MAX_QUESTION_LENGTH);
-            currStudent->allocated_ques[quesIdx].isMCQ = 1;
-            // Store options
-            for (int j = 0; j < MAX_OPTIONS; j++) {
-                token = strtok(NULL, ",");
-                strcpy(currStudent->allocated_ques[quesIdx].options[j], token);
-            }
-            quesIdx++;
-        } else {
-            perror("[-] Invalid question type.\n");
-            continue;
-        }
-    }
-    fclose(fp);
+    return result;
 }
 
-char* getQuestionHTML(int idx, char *quesHTML, Students *currStudent) {
-    quesHTML = (char*) realloc(quesHTML, BUFFERSIZE);
-    if (currStudent->allocated_ques[idx].isMCQ) { // MCQ
-        if (idx > 0) {  // If it's not the first question, display the Back button
-            sprintf(quesHTML, "<html><body><h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><p>%s</p><form method=\"post\">    \
-                            <input type=\"radio\" id=\"a\" name=\"%s\" value=\"%s\"><label>%s</label><br>                       \
-                            <input type=\"radio\" id=\"b\" name=\"%s\" value=\"%s\"><label>%s</label><br>                       \
-                            <input type=\"radio\" id=\"c\" name=\"%s\" value=\"%s\"><label>%s</label><br>                       \
-                            <input type=\"radio\" id=\"d\" name=\"%s\" value=\"%s\"><label>%s</label><br><br>                   \
-                            <input type=\"button\" value=\"Back\" onclick=\"history.back()\">                                   \
-                            <input type=\"submit\" value=\"Submit\">                                                            \
-                            </form></body></html>", idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated_ques[idx].question,         \
-                            currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].options[0], currStudent->allocated_ques[idx].options[0], \
-                            currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].options[1], currStudent->allocated_ques[idx].options[1], \
-                            currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].options[2], currStudent->allocated_ques[idx].options[2], \
-                            currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].options[3], currStudent->allocated_ques[idx].options[3]);
-        } else { // If it's first question
-            sprintf(quesHTML, "<html><body><h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><p>%s</p><form method=\"post\">    \
-                            <input type=\"radio\" id=\"a\" name=\"%s\" value=\"%s\"><label>%s</label><br>                       \
-                            <input type=\"radio\" id=\"b\" name=\"%s\" value=\"%s\"><label>%s</label><br>                       \
-                            <input type=\"radio\" id=\"c\" name=\"%s\" value=\"%s\"><label>%s</label><br>                       \
-                            <input type=\"radio\" id=\"d\" name=\"%s\" value=\"%s\"><label>%s</label><br><br>                   \
-                            <input type=\"submit\" value=\"Submit\">                                                            \
-                            </form></body></html>", idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated_ques[idx].question,         \
-                            currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].options[0], currStudent->allocated_ques[idx].options[0], \
-                            currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].options[1], currStudent->allocated_ques[idx].options[1], \
-                            currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].options[2], currStudent->allocated_ques[idx].options[2], \
-                            currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].options[3], currStudent->allocated_ques[idx].options[3]);
-        }
-    } else { // PCQ
-        if (idx > 0) {
-            sprintf(quesHTML, "<html><body><h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><label for=\"%s\">%s</label><form method=\"post\"><br>\
-                            <textarea name=\"pcq\" rows=\"20\" cols=\"60\"></textarea><br><br>\
-                            <input type=\"button\" value=\"Back\" onclick=\"history.back()\">\
-                            <input type=\"submit\" value=\"Submit\">\
-                            </form></body></html>", idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].question);
-        } else {
-            sprintf(quesHTML, "<html><body><h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><label for=\"%s\">%s</label><form method=\"post\"><br>\
-                            <textarea name=\"pcq\" rows=\"20\" cols=\"60\"></textarea><br><br>\
-                            <input type=\"submit\" value=\"Submit\">\
-                            </form></body></html>", idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated_ques[idx].type, currStudent->allocated_ques[idx].question);
+void handleMarkAttempts(int socket, Result result, Students *currStudent, int index, char *buffer) {
+    int numAttempts = currStudent->allocated[currQuestion[index]].numAttempts;
+    int isCorrect = currStudent->allocated[currQuestion[index]].isCorrect;
+
+    // If question is correct OR 3 attempts made 
+    if (strstr(buffer, "mcq") || strstr(buffer, "pcq")) {
+        currStudent->allocated[currQuestion[index]].numAttempts--;
+        if (isCorrect || numAttempts == 1) {
+            currStudent->allocated[currQuestion[index]].isDone = 1;
+            strcpy(currStudent->allocated[currQuestion[index]].finalStuAns, result.studentAns);
+            if (isCorrect)
+                currStudent->grade += numAttempts;
+            else if (numAttempts == 1)
+                currStudent->grade += numAttempts-1;
         }
     }
-    return quesHTML;
+}
+
+void handleDisplayAnswer(int socket, Result result, Students *currStudent, int index) {
+    // Display answer page when question is already done
+    if (currStudent->allocated[currQuestion[index]].isDone) {
+        char *answerHTML = {0};
+        char *correctAns = {0};
+        correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
+        answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
+        sendHTMLpage(socket, answerHTML);
+        free(answerHTML);
+        free(correctAns);
+    }
+}
+
+void handleDisplayQuestion(int socket, char *buffer, Students *currStudent, int index) {
+    // Display the question if student is not done with the question
+    if (currStudent->allocated[currQuestion[index]].isDone == 0) {
+        char *quesHTML = {0};
+        quesHTML = getQuestionHTML(quesHTML, currStudent, index);
+        sendHTMLpage(socket, quesHTML);
+        free(quesHTML);
+    }
 }
 
 void urlDecode(char *str, char *out) {

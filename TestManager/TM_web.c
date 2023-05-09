@@ -4,29 +4,29 @@ void runTMforWeb() {
     int                 opt = 1;
     int                 max_sd, activity, sersockfd, newsockfd, sockfd, valread;
     int                 client_socket[MAX_CLIENTS] = {0};
-    struct hostent      *hostInfo;
-    struct in_addr      **addr_list;
+    // struct hostent      *hostInfo;
+    // struct in_addr      **addr_list;
     struct sockaddr_in  addr;
     socklen_t           addrsize;
     fd_set              readset;
     char                buffer[BUFFERSIZE];
-    char                hostname[255];
+    // char                hostname[255];
     int                 isLoggedIn = 0;
 
     // Retrieving HOST IP address
-    gethostname(hostname, 255);
-    hostInfo = gethostbyname(hostname);
-    addr_list = (struct in_addr **)hostInfo->h_addr_list;
-    HOST = inet_ntoa(*addr_list[0]);
-    if (strcmp(HOST, "127.0.0.1") == 0) {
-        HOST = inet_ntoa(*addr_list[1]);
-    }
+    // gethostname(hostname, 255);
+    // hostInfo = gethostbyname(hostname);
+    // addr_list = (struct in_addr **)hostInfo->h_addr_list;
+    // HOST = inet_ntoa(*addr_list[0]);
+    // if (strcmp(HOST, "127.0.0.1") == 0) {
+    //     HOST = inet_ntoa(*addr_list[1]);
+    // }
 
     // Create socket file descriptor
     if ((sersockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("[-] Error in socket.");
         exit(EXIT_FAILURE);
-    }
+    } 
     printf("[+] Server socket created.\n");
 
     // Set socket options
@@ -38,7 +38,7 @@ void runTMforWeb() {
 
     addr.sin_family      = AF_INET;
     addr.sin_port        = htons(SERVER_PORT);
-    addr.sin_addr.s_addr = inet_addr(HOST);
+    addr.sin_addr.s_addr = INADDR_ANY;
 
     // Bind socket to port
     addrsize = sizeof(addr);
@@ -70,7 +70,7 @@ void runTMforWeb() {
             sockfd = client_socket[i];
             if (sockfd > 0) {FD_SET(sockfd, &readset);}
             if (sockfd > max_sd) {max_sd = sockfd;}
-        } 
+        }
 
         // Waiting for one of the sockets to do something, waits indefinitely
         printf("[+] Waiting...\n");
@@ -117,58 +117,58 @@ void runTMforWeb() {
                     close(sockfd);
                 } 
                 else {
-                    printf("%s\n", buffer);
+                    printf("%s\n\n", buffer);
 
                     // Handle user login if user has not logged in
                     isLoggedIn = checkLoggedIn(inet_ntoa(addr.sin_addr), 0);
                     printf("[!] %s isLoggedIn: %d\n",inet_ntoa(addr.sin_addr), isLoggedIn);
 
+                    // If student is not logged in
                     if (isLoggedIn == -1) {
                         isLoggedIn = handleUserLogin(sockfd, inet_ntoa(addr.sin_addr), buffer);
                     }
 
+                    // If a student logs out
+                    if (strstr(buffer, "POST / HTTP/1.1") != NULL && strstr(buffer, "logout=Logout") != NULL) {
+                        char *loginHTML = {0};
+                        loginHTML = getLoginHTML(loginHTML, 0);
+                        sendHTMLpage(sockfd, loginHTML);
+                        free(loginHTML);
+                        isLoggedIn = -1;
+                        int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
+                        students[index].loggedIn = 0;
+                        strcpy(students[index].ipAddress, "");
+                        continue;
+                    }
+
+                    // If student is logged in
                     if (isLoggedIn) {
-                        // If a student is logged in, i need to find that student
+                        // Find that student
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         Students currStudent = students[index];
-                        int quesIdx = currStudent.quesIdx;
+                        int quesIdx = currQuestion[index];
                         printf("[.] Student is: %s, index:%i quesIdx:%i\n", currStudent.username, index, quesIdx);
-
+            
                         // Handle display finish page after test is done
-                        if (quesIdx == MAX_QUESTIONS) {
+                        if (currStudent.allocated[quesIdx].isDone == 1 && quesIdx >= MAX_QUESTIONS-1) {
                             char *finishHTML = {0};
-                            finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML);
-                            sendResponse(sockfd, finishHTML);
+                            finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML, index);
+                            sendHTMLpage(sockfd, finishHTML);
                             free(finishHTML);
                         }
-
                         // Handle display question page of current question
-                        if (currStudent.allocated_ques[quesIdx].isCorrect) {
-                            // If student attempts 2nd time after correct, no change
-                            if (currStudent.allocated_ques[quesIdx].numAttempts == 2) {
-                                currStudent.grade -= 2;
-                            } else if (currStudent.allocated_ques[quesIdx].numAttempts == 3) {
-                                currStudent.grade -= 1;
+                        else {
+                            // Increment quesIdx on NEXT button press
+                            if (strstr(buffer, "next=Next") != NULL) {
+                                currQuestion[index]++;
+                            } 
+                            // Decrement quesIdx on BACK button press
+                            if (strstr(buffer, "back=Back") != NULL) {
+                                currQuestion[index]--;
                             }
+                            handleDisplayTest(sockfd, buffer, &students[index], index);
                         }
-
-                        handleGetQuestion(&currStudent);
-
-                        int isCorrect = handleDisplayQuestion(sockfd, buffer, &currStudent);
-                        currStudent.grade += isCorrect;
-                        currStudent.allocated_ques[quesIdx].isCorrect = isCorrect;
-                        currStudent.allocated_ques[quesIdx].numAttempts++;
-
-                        if (currStudent.allocated_ques[quesIdx].isCorrect) {
-                            // If student gets the question right 1st attempt
-                            if (currStudent.allocated_ques[quesIdx].numAttempts == 1)
-                                currStudent.grade += 3;    
-                            else if (currStudent.allocated_ques[quesIdx].numAttempts == 2)
-                                currStudent.grade += 2;
-                            else if (currStudent.allocated_ques[quesIdx].numAttempts == 3)
-                                currStudent.grade += 1;
-                        }  
-                    }            
+                    }
                 }
             }
         }
@@ -179,13 +179,10 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
     char *form = strstr(buffer, "uname=");
     // Display login page
     if (strstr(buffer, "GET / HTTP/1.1") != NULL) {
-        char *loginHTML = "<html><body><h1>Login</h1><form method=\"post\">\
-                           <label for=\"uname\">Username : </label>\
-                           <input type=\"text\" name=\"uname\" value=\"\" required><br><br>\
-                           <label for=\"pword\">Password : </label>\
-                           <input type=\"text\" name=\"pword\" value=\"\" required><br><br>\
-                           <button type=\"submit\">Login</button></form></body></html>";
-        sendResponse(socket, loginHTML);
+        char *loginHTML = {0};
+        loginHTML = getLoginHTML(loginHTML, 0);
+        sendHTMLpage(socket, loginHTML);
+        free(loginHTML);
     } 
     // Extract the username and password from the form data
     else if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
@@ -202,14 +199,10 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
         } 
         // User failed to logged in, ask for login attempt
         else {
-            char *loginFAILED  = "<html><body><h1>Login</h1><form method=\"post\">\
-                                  <label for=\"uname\">Username : </label>\
-                                  <input type=\"text\" name=\"uname\" required><br><br>\
-                                  <label for=\"pword\">Password : </label>\
-                                  <input type=\"text\" name=\"pword\" required><br>\
-                                  <p>Login failed. Try again.</p><br>\
-                                  <button type=\"submit\">Login</button></form></body></html>";
-            sendResponse(socket, loginFAILED);
+            char *loginHTML = {0};
+            loginHTML = getLoginHTML(loginHTML, 1);
+            sendHTMLpage(socket, loginHTML);
+            free(loginHTML);
         }
     }
     // Display 404 error page
@@ -221,7 +214,7 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
 }
 
 int checkLoggedIn(char *var, int getIndex) {
-    for (int i = 0; i < MAX_CLIENTS; i++) {
+    for (int i = 0; i < MAX_STUDENTS; i++) {
         // Checks if a student is associated with this IP and is logged in
         if (getIndex && (strcmp(students[i].username, var) == 0 || strcmp(students[i].ipAddress, var) == 0)) {
             return i; // returns index of the student
@@ -233,8 +226,8 @@ int checkLoggedIn(char *var, int getIndex) {
     return -1; // not 0 because i need to differentiate between index 0 and false
 }
 
-void sendResponse(int socket, char *message) {
-    char response[BUFFERSIZE] = {0};
+void sendHTMLpage(int socket, char *message) {
+    char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
     send(socket, response, strlen(response), 0);
 }

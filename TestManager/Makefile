@@ -1,6 +1,6 @@
 PROJECT = TM
 HEADERS = $(PROJECT).h
-OBJ = TM.o TM_web.o TM_QB.o user.o ques.o
+OBJ = TM.o TM_web.o TM_QB.o user.o ques.o html.o
 
 C11 = cc -std=c11
 CFLAGS = -Wall -Werror
@@ -22,6 +22,9 @@ user.o : user.c $(HEADERS)
 
 ques.o : ques.c $(HEADERS)
 		$(C11) $(CFLAGS) -c ques.c
+
+html.o : html.c $(HEADERS)
+		$(C11) $(CFLAGS) -c html.c
 
 clean:
 	rm -f $(PROJECT) $(OBJ)
