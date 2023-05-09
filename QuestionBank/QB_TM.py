@@ -76,12 +76,10 @@ class QuestionBank:
         
         # Check if the file exists
         if os.path.isfile(filename):
-            # Open the file and read its contents
-            with open(filename, 'rb') as f:
-                file_contents = f.read()
-
-            # Send the file contents to the client
-            TMsocket.sendall(file_contents)
+            # Open the file, read its contents and send it to the client
+            file = open(filename, 'r')
+            file_contents = file.read()
+            TMsocket.send(file_contents.encode())
             print(f"[+] Question file '{filename}' sent successfully.")
         else:
             print("[-] Failed to send question file.")   
@@ -107,16 +105,22 @@ class QuestionBank:
         print(f"[+] Answer '{correctAns}' sent successfully.")
         
     def sendToTM(self, message, TMclient):
-        # Categorise message received as 'get' or 'check'
+        # Categorise message received
         if self.categoriseMessage(message) == "get_file":
-            print("[+] Message 'get file' from TM received.")
             self.executeSendFile(message, TMclient)
         elif self.categoriseMessage(message) == "check":
-            print("[+] Message 'check' from TM received.")
             self.executeCheckAnswer(message, TMclient)
         elif self.categoriseMessage(message) == "get_ans":
-            print("[+] Message 'get answer' from TM received.")
             self.executeSendAnswer(message, TMclient)
+    
+    def printReceivedMsg(self, message):
+        # Categorise message received
+        if self.categoriseMessage(message) == "get_file":
+            print("[+] Message 'get file' from TM received.")
+        elif self.categoriseMessage(message) == "check":
+            print("[+] Message 'check answer' from TM received.")
+        elif self.categoriseMessage(message) == "get_ans":
+            print("[+] Message 'get answer' from TM received.")
         else:
             print("[!] Error: message received was not understood.")
     
@@ -151,23 +155,30 @@ class QuestionBank:
             while True:
                 # Establish connection 
                 TMclient, TMaddress = QBserver.accept()
-                print('[+] Connected to: ' + TMaddress[0] + ':' + str(TMaddress[1]))
+                print("----- Connected to: " + TMaddress[0] + ':' + str(TMaddress[1]) + " -----")
                 
                 # Receive a string message
                 message = TMclient.recv(BUFFERSIZE).decode()
                 
+                # Send acknowledgment for received data
+                if message:
+                    self.printReceivedMsg(message)
+                    TMclient.send("ACK".encode())
+                    print("[+] Message 'ACKNOWLEDGEMENT' sent successfully.")
+                
                 # Perform the required send operation
                 self.sendToTM(message, TMclient)
 
-                # Receive acknowledgement for sent data
-                # ack = TMclient.recv(BUFFERSIZE).decode()
-                # if ack == "ACK":
-                #     print("[+] Acknowledgement received for sent data.")
-                # else:
-                #     print("[-] Acknowledgement not received.")
+                # Receive TM acknowledgement for sent data
+                ack = TMclient.recv(BUFFERSIZE).decode()
+                if ack == "ACK":
+                    print("[+] Acknowledgement from TM received.")
+                else:
+                    print("[-] Acknowledgement from TM not received.")
                     
                 TMclient.close()
+                print("----- Connection to " + TMaddress[0] + ':' + str(TMaddress[1]) + " closed -----")
         # If the user presses Ctrl+C, close the connection and the socket
         except KeyboardInterrupt:
             QBserver.close()    # close QB socket
-            print("[-] Connection closed.")
+            print("[-] QB server connection closed.")
