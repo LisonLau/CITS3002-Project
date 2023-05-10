@@ -103,10 +103,10 @@ class QuestionBank:
         TMsocket.send(correctAns.encode())
         print(f"[+] Answer '{correctAns}' sent successfully.")
     
-    def runQBserver(self):
+    def runQBserver(self, ipAddress):
         # hostname = socket.gethostname()
         # host = socket.gethostbyname(hostname)  
-        host = '127.0.0.1'
+        host = ipAddress
         port = 8888
         thread_count = 0
         

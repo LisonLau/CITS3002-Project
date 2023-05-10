@@ -12,7 +12,7 @@ void handleQBgetFile(char *filename) {
     printf("[+] TM client socket created to get file.\n");
 
     // Set server address and port
-    qb_addr.sin_addr.s_addr = INADDR_ANY;
+    qb_addr.sin_addr.s_addr = inet_addr(clientIpAddr);
     qb_addr.sin_family      = AF_INET;
     qb_addr.sin_port        = htons(CLIENT_PORT);
 

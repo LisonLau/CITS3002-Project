@@ -53,6 +53,7 @@ Questions   questions[MAX_QUESTIONS];
 Students    students[MAX_STUDENTS];
 int         numStudents;
 char        *HOST;
+const char  *clientIpAddr;
 
 // user.c
 extern void   storeUsers();
@@ -74,7 +75,7 @@ extern int    handleQBcheck(char *, char *, char *);
 extern int    sendQBCheck(int, char *, char *, char *);
 extern void   handleQBgetFile(char *);
 extern void   sendQBgetFile(int, char *);
-extern char*  handleQBgetAns();
+extern char*  handleQBgetAns(char *, char *);
 extern char*  sendQBgetAns(int, char *, char *);
 // html.c
 extern char*  getQuestionHTML(char *, Students *);

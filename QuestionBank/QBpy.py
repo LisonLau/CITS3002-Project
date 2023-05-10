@@ -1,5 +1,7 @@
 import csv
 import os
+import sys
+import subprocess
 
 class QuestionBankPython:
     # Initialise path names for Python csv files
@@ -28,8 +30,9 @@ class QuestionBankPython:
         PCquestions = []
         with open(self.pcqpyCSV, "r") as lines:
             for line in lines:
+                line = line.split("|")
                 type = "pcqpy"
-                PCquestions.append([type, line.rstrip()])
+                PCquestions.append([type, line[0].rstrip()])
         return PCquestions
 
     # Grade Python MCQ
@@ -49,8 +52,26 @@ class QuestionBankPython:
     
     # Grade Python PCQ
     def gradePCQ(self, question, student_answer):
-        AllPCQ = self.getPCQ()
-        for i in range(len(AllPCQ)):
-            if AllPCQ[i][1] == question:
-                if i == 1:
-                    pass
+        print(question, student_answer)
+        # Find the corressponding question
+        functionCall
+        expectedOutput
+        with open(self.pcqpyCSV, "r") as lines:
+            for line in lines:
+                line = line.split("|")
+                if question == line[0]:
+                    functionCall = line[1]
+                    expectedOutput = line[2]
+                    break
+
+        # subprocess.run(["python3", os.path.abspath(tempTestFile.py)])
+        result = subprocess.run([sys.executable, "-c", student_answer], capture_output=True, text=True)
+
+        if (result.stdout == expectedOutput):
+            return True
+        return False
+        # pass
+    
+    # Get PCQ answer from given question
+    def getPCQanswer(self, question):
+        pass
