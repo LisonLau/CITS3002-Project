@@ -81,6 +81,9 @@ extern void   handleQBgetFile(char *);
 extern void   sendQBgetFile(int, char *);
 extern char*  handleQBgetAns(char *, char *);
 extern char*  sendQBgetAns(int, char *, char *);
+extern void   socketSend(int, char *, char *);
+extern void   receiveACK(int, char *, char *);
+
 // html.c
 extern char*  getQuestionHTML(char *, Students *, int);
 extern char*  getFinishHTML(int, char *, int, char *, int);

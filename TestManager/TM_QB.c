@@ -12,9 +12,9 @@ int createTMclient() {
     printf("[+] TM client socket created to get file.\n");
 
     // Set server address and port
-    qb_addr.sin_addr.s_addr = inet_addr(clientIpAddr);
-    qb_addr.sin_family      = AF_INET;
-    qb_addr.sin_port        = htons(CLIENT_PORT);
+    QBaddress.sin_addr.s_addr = inet_addr(clientIpAddr);
+    QBaddress.sin_family      = AF_INET;
+    QBaddress.sin_port        = htons(CLIENT_PORT);
 
     // Connect to server
     if (connect(TMclient, (struct sockaddr *)&QBaddress, sizeof(QBaddress)) < 0) {

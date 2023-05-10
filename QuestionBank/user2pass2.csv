@@ -1,10 +1,10 @@
-pcqpy,Write a Python function string_len(string) that takes a string as input and returns the length of the string.
-pcqpy,"Write a Python function add_nums(num1"""
-pcqc,Write a C function that takes an array of strings as input and returns the length of the longest string in the array.
+mcqc,Which keyword is used to define a constant in C programming?,const,var,let,final
 mcqpy,Which of the operators is used for concatenation in Python?,+,*,%,/
 mcqc,What is the extension of a C source code file?,.cpp,.h,.c,.exe
+pcqpy,Write a Python function reverse_string(string) that takes a string as input and returns the reverse of that string.
+pcqpy,Write a Python function longest_len(stringlist) that takes a list of strings as input and returns the length of the longest string in the list.
+pcqpy,Write a Python function string_len(string) that takes a string as input and returns the length of the string.
+pcqc,Write a C function that takes an array of strings as input and returns the length of the longest string in the array.
+pcqpy,"Write a Python function add_nums(num1,num2) that takes two numbers as input and returns their sum."
+mcqpy,What is the keyword used in Python to define a function?,module,function,class,def
 pcqc,Write a C function that takes an array of integers as input and returns the sum of all the even numbers in the array.
-pcqc,Write a C function that takes a string as input and returns the length of the string.
-mcqc,What is the symbol used for a single-line comment in C programming language?,#,/*,*/,//
-pcqpy,Write a Python function sum_even(numlist) that takes a list of numbers as input and returns the sum of all the even numbers in the list.
-mcqpy,What is the extension of a Python source code file?,.py,.java,.cpp,.html

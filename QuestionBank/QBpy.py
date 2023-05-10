@@ -52,26 +52,29 @@ class QuestionBankPython:
     
     # Grade Python PCQ
     def gradePCQ(self, question, student_answer):
-        print(question, student_answer)
         # Find the corressponding question
-        functionCall
-        expectedOutput
         with open(self.pcqpyCSV, "r") as lines:
             for line in lines:
                 line = line.split("|")
-                if question == line[0]:
-                    functionCall = line[1]
-                    expectedOutput = line[2]
+                if question.rstrip() == line[0].rstrip():
+                    print("REACHED")
+                    # subprocess.run(["python3", os.path.abspath(tempTestFile.py)])
+                    result = subprocess.run([sys.executable, "-c", student_answer+"\n"+line[1]], capture_output=True, text=True)
+                    print(result.stdout, line[2])
+                    if (result.stdout == line[2]):
+                        return True
                     break
 
-        # subprocess.run(["python3", os.path.abspath(tempTestFile.py)])
-        result = subprocess.run([sys.executable, "-c", student_answer], capture_output=True, text=True)
-
-        if (result.stdout == expectedOutput):
-            return True
         return False
         # pass
     
     # Get PCQ answer from given question
     def getPCQanswer(self, question):
-        pass
+        expectedOutput = ""
+        with open(self.pcqpyCSV, "r") as lines:
+            for line in lines:
+                line = line.split("|")
+                if question == line[0]:
+                    expectedOutput = line[2]
+                    break
+        return expectedOutput
