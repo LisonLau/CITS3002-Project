@@ -29,6 +29,7 @@ typedef struct Questions {
     char question[MAX_QUESTION_LENGTH];
     int  isMCQ;  // 1 means MCQ, 0 means PCQ
     char options[MAX_OPTIONS][MAX_OPTION_LENGTH];
+    char finalStuAns[BUFFERSIZE];
     int  numAttempts;
     int  isCorrect;
     int  isDone; // 1 means question is done, 0 means not done
@@ -49,10 +50,12 @@ typedef struct Result {
     char studentAns[BUFFERSIZE];
 } Result;
 
-Questions   questions[MAX_QUESTIONS];  
+// Global variables
 Students    students[MAX_STUDENTS];
+int         currQuestion[MAX_STUDENTS]; // records current question the student is at
 int         numStudents;
 char        *HOST;
+const char  *clientIpAddr;
 const char  *clientIpAddr;
 
 // user.c
@@ -63,22 +66,23 @@ extern void   storeStudentQuestions(char *, Students *);
 extern void   runTMforWeb();
 extern int    checkLoggedIn(char *, int);
 extern int    handleUserLogin(int, char *, char *);
-extern void   sendResponse(int, char *);
+extern void   sendHTMLpage(int, char *);
 // ques.c
-extern void   handleDisplayTest(int, char *, Students *);
-extern Result handleUserAnswers(char *, Students *);
-extern void   handleMarkAttempts(int, Result, Students *);
-extern void   handleDisplayQuestion(int, char *, Students *);
+extern void   handleDisplayTest(int, char *, Students *, int);
+extern Result handleUserAnswers(char *, Students *, int);
+extern void   handleMarkAttempts(int, Result, Students *, int, char *);
+extern void   handleDisplayAnswer(int, Result, Students *, int);
+extern void   handleDisplayQuestion(int, char *, Students *, int);
 extern void   urlDecode(char *, char *);
 // TM_QB.c
+extern int    createTMclient();
 extern int    handleQBcheck(char *, char *, char *);
-extern int    sendQBCheck(int, char *, char *, char *);
 extern void   handleQBgetFile(char *);
 extern void   sendQBgetFile(int, char *);
 extern char*  handleQBgetAns(char *, char *);
 extern char*  sendQBgetAns(int, char *, char *);
 // html.c
-extern char*  getQuestionHTML(char *, Students *);
-extern char*  getFinishHTML(int, char *, int, char *);
-extern char*  getAnswerHTML(char *, Students *, int, char *, char *);
+extern char*  getQuestionHTML(char *, Students *, int);
+extern char*  getFinishHTML(int, char *, int, char *, int);
+extern char*  getAnswerHTML(char *, Students *, char *, int);
 extern char*  getLoginHTML(char *, int);

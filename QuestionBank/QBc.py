@@ -46,3 +46,11 @@ class QuestionBankC:
         for mcq in AllMCQ:
             if mcq[1] == question:
                 return mcq[6]
+            
+    # Grade C PCQ
+    def gradePCQ(self, question, student_answer):
+        pass
+    
+    # Get PCQ answer from given question
+    def getPCQanswer(self, question):
+        pass

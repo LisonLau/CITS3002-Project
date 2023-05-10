@@ -132,7 +132,7 @@ void runTMforWeb() {
                     if (strstr(buffer, "POST / HTTP/1.1") != NULL && strstr(buffer, "logout=Logout") != NULL) {
                         char *loginHTML = {0};
                         loginHTML = getLoginHTML(loginHTML, 0);
-                        sendResponse(sockfd, loginHTML);
+                        sendHTMLpage(sockfd, loginHTML);
                         free(loginHTML);
                         isLoggedIn = -1;
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
@@ -146,19 +146,27 @@ void runTMforWeb() {
                         // Find that student
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         Students currStudent = students[index];
-                        int quesIdx = currStudent.quesIdx;
+                        int quesIdx = currQuestion[index];
                         printf("[.] Student is: %s, index:%i quesIdx:%i\n", currStudent.username, index, quesIdx);
             
                         // Handle display finish page after test is done
                         if (currStudent.allocated[quesIdx].isDone == 1 && quesIdx >= MAX_QUESTIONS-1) {
                             char *finishHTML = {0};
-                            finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML);
-                            sendResponse(sockfd, finishHTML);
+                            finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML, index);
+                            sendHTMLpage(sockfd, finishHTML);
                             free(finishHTML);
                         }
                         // Handle display question page of current question
                         else {
-                            handleDisplayTest(sockfd, buffer, &students[index]);
+                            // Increment quesIdx on NEXT button press
+                            if (strstr(buffer, "next=Next") != NULL) {
+                                currQuestion[index]++;
+                            } 
+                            // Decrement quesIdx on BACK button press
+                            if (strstr(buffer, "back=Back") != NULL) {
+                                currQuestion[index]--;
+                            }
+                            handleDisplayTest(sockfd, buffer, &students[index], index);
                         }
                     }
                 }
@@ -173,7 +181,7 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
     if (strstr(buffer, "GET / HTTP/1.1") != NULL) {
         char *loginHTML = {0};
         loginHTML = getLoginHTML(loginHTML, 0);
-        sendResponse(socket, loginHTML);
+        sendHTMLpage(socket, loginHTML);
         free(loginHTML);
     } 
     // Extract the username and password from the form data
@@ -193,7 +201,7 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
         else {
             char *loginHTML = {0};
             loginHTML = getLoginHTML(loginHTML, 1);
-            sendResponse(socket, loginHTML);
+            sendHTMLpage(socket, loginHTML);
             free(loginHTML);
         }
     }
@@ -219,7 +227,7 @@ int checkLoggedIn(char *var, int getIndex) {
     return -1; // not 0 because i need to differentiate between index 0 and false
 }
 
-void sendResponse(int socket, char *message) {
+void sendHTMLpage(int socket, char *message) {
     char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
     send(socket, response, strlen(response), 0);
