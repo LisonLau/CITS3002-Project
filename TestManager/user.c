@@ -24,6 +24,9 @@ void storeUsers() {
             strncpy(students[count].password, token, MAX_PASSWORD_LENGTH - 1);
             students[count].password[strcspn(students[count].password, "\r\n")] = 0;
         }
+        for (int i = 0; i < MAX_QUESTIONS; i++) {
+            students[count].allocated[i].numAttempts = 3;
+        }
         count++;
     }
 
@@ -45,13 +48,12 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
     char line[BUFFERSIZE];
     char *token;
     int quesIdx = 0;
-
     fp = fopen(filename, "r");
     if (fp == NULL) {
         perror("Error opening file.\n");
         exit(EXIT_FAILURE);
     }
-
+    
     while (fgets(line, BUFFERSIZE, fp)) {
         char* type = strtok(line, ",");
         char* ques = strtok(NULL, ",");
@@ -60,15 +62,15 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
             continue;
         }
         
-        currStudent->allocated[quesIdx].isDone = 0;
-        currStudent->allocated[quesIdx].isCorrect = 0;
-        currStudent->allocated[quesIdx].numAttempts = 3;
+        currStudent->allocated[quesIdx].isCorrect = -1;
         // Check the question type and store the values accordingly
         if (strcmp(type, "pcqpy") == 0 || strcmp(type, "pcqc") == 0) {
             strncpy(currStudent->allocated[quesIdx].type, type, 10);
             strncpy(currStudent->allocated[quesIdx].question, ques, MAX_QUESTION_LENGTH);
             currStudent->allocated[quesIdx].isMCQ = 0;
             quesIdx++;
+
+
         } else if (strcmp(type, "mcqpy") == 0 || strcmp(type, "mcqc") == 0) {
             strncpy(currStudent->allocated[quesIdx].type, type, 10);
             strncpy(currStudent->allocated[quesIdx].question, ques, MAX_QUESTION_LENGTH);
@@ -79,6 +81,7 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
                 strcpy(currStudent->allocated[quesIdx].options[j], token);
             }
             quesIdx++;
+
         } else {
             perror("[-] Invalid question type.\n");
             continue;

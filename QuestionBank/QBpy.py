@@ -49,8 +49,8 @@ class QuestionBankPython:
     
     # Grade Python PCQ
     def gradePCQ(self, question, student_answer):
-        AllPCQ = self.getPCQ()
-        for i in range(len(AllPCQ)):
-            if AllPCQ[i][1] == question:
-                if i == 1:
-                    pass
+        pass
+    
+    # Get PCQ answer from given question
+    def getPCQanswer(self, question):
+        pass
