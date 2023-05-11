@@ -1,6 +1,5 @@
 import csv
 import os
-import sys
 import subprocess
 
 class QuestionBankPython:
@@ -28,11 +27,10 @@ class QuestionBankPython:
     # Get and store C PCQ in a list
     def getPCQ(self):
         PCquestions = []
-        with open(self.pcqpyCSV, "r") as csvfile:
-            reader = csv.reader(csvfile)
-            for line in reader:
+        with open(self.pcqpyCSV, "r") as lines:
+            for line in lines:
                 type = "pcqpy"
-                PCquestions.append([type, line])
+                PCquestions.append([type, line.rstrip()])
         return PCquestions
 
     # Grade Python MCQ
@@ -75,8 +73,12 @@ class QuestionBankPython:
                     except OSError:
                         pass
 
+                    # TODO: store the user's output...because that needs to be shown...?
+                    #       like got: output if it was an error.... and expected: set answer
                     if (result.stdout.strip() == data[1].strip()):
                         return True
+                    # else:
+                    #       return result.stderr.strip()
         return False
     
     # Get PCQ answer from given question

@@ -58,6 +58,7 @@ char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML, int i
 char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, int index) {
     int idx = currQuestion[index];
     int isCorrect = !strcmp(currStudent->allocated[idx].finalStuAns, correctAns);
+    
     answerHTML = (char*) realloc(answerHTML, BUFSIZ);
     sprintf(answerHTML, "<html><body %s>%s%s%s<h1 %s>Question %d/%d</h1><p>Your grade is: %d/%d</p>     \
                         <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p></body></html>",\

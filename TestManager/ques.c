@@ -56,7 +56,9 @@ Result handleUserAnswers(char *buffer, Students *currStudent, int index) {
     } else if (strstr(buffer, "pcqc=") != NULL) {                   // PCQC
         sscanf(strstr(buffer, "pcqc="), "pcqc=%s", encoded_ans);
         urlDecode(encoded_ans, result.studentAns); 
+        printf("%s\n", result.studentAns);
         result.isCorrect = handleQBcheck("pcqc", currStudent->allocated[currQuestion[index]].question, result.studentAns);   // If wrong, minus mark by 1
+        printf("%s\n", result.studentAns);
     }
     return result;
 }

@@ -40,7 +40,7 @@ class QuestionBank:
         if type == "mcqc":      # C multiple choice question
             isCorrect = self.QBcInstance.gradeMCQ(ques, ans)
         elif type == "pcqc":    # C programming challenge question
-            isCorrect = self.QBpyInstance.gradePCQ(ques, ans)
+            isCorrect = self.QBcInstance.gradePCQ(ques, ans)
         elif type == "mcqpy":   # PYTHON multiple choice question
             isCorrect = self.QBpyInstance.gradeMCQ(ques, ans)
         elif type == "pcqpy":   # PYTHON programming challenge question
@@ -52,7 +52,7 @@ class QuestionBank:
         if type == "mcqc":      # C multiple choice question
             answer = self.QBcInstance.getMCQanswer(ques)
         elif type == "pcqc":    # C programming challenge question
-            answer = "NOT IMPLEMENTED YET"
+            answer = self.QBcInstance.getPCQanswer(ques)
         elif type == "mcqpy":   # PYTHON multiple choice question
             answer = self.QBpyInstance.getMCQanswer(ques)
         elif type == "pcqpy":   # PYTHON programming challenge question
@@ -118,7 +118,7 @@ class QuestionBank:
             print("[+] Message 'get answer' from TM received.")
             self.executeSendAnswer(message, TMclient)
         else:
-            print("[!] Error: message received was not understood.")
+            print("[!] Error: message received was not understood.", message)
     
     def runQBserver(self, clientNetworkIp):
         # hostname = socket.gethostname()

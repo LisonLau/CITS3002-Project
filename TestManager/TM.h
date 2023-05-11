@@ -48,6 +48,7 @@ typedef struct Students {
 typedef struct Result {
     int  isCorrect;
     char studentAns[BUFFERSIZE];
+    char studentOutput[BUFFERSIZE];
 } Result;
 
 // Global variables
