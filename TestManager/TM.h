@@ -77,7 +77,7 @@ extern void   urlDecode(char *, char *);
 extern int    createTMclient();
 extern int    handleQBcheck(char *, char *, char *);
 extern void   handleQBgetFile(char *);
-extern char*  handleQBgetAns();
+extern char*  handleQBgetAns(char *, char *);
 extern void   socketSend(int, char *, char *);
 // html.c
 extern char*  getQuestionHTML(char *, Students *, int);
