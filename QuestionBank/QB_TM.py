@@ -178,7 +178,9 @@ class QuestionBank:
                     self.printReceivedMsg(message)
                     TMclient.send("ACK".encode())
                     print("[+] Message 'ACKNOWLEDGEMENT' sent successfully.")
-                
+                else:
+                    break
+                    
                 # Perform the required send operation
                 self.sendToTM(message, TMclient)
 
