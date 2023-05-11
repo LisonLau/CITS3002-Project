@@ -28,11 +28,11 @@ class QuestionBankPython:
     # Get and store C PCQ in a list
     def getPCQ(self):
         PCquestions = []
-        with open(self.pcqpyCSV, "r") as lines:
-            for line in lines:
-                line = line.split("|")
+        with open(self.pcqpyCSV, "r") as csvfile:
+            reader = csv.reader(csvfile)
+            for line in reader:
                 type = "pcqpy"
-                PCquestions.append([type, line[0].rstrip()])
+                PCquestions.append([type, line])
         return PCquestions
 
     # Grade Python MCQ
@@ -53,28 +53,41 @@ class QuestionBankPython:
     # Grade Python PCQ
     def gradePCQ(self, question, student_answer):
         # Find the corressponding question
-        with open(self.pcqpyCSV, "r") as lines:
-            for line in lines:
-                line = line.split("|")
-                if question.rstrip() == line[0].rstrip():
-                    print("REACHED")
-                    # subprocess.run(["python3", os.path.abspath(tempTestFile.py)])
-                    result = subprocess.run([sys.executable, "-c", student_answer+"\n"+line[1]], capture_output=True, text=True)
-                    print(result.stdout, line[2])
-                    if (result.stdout == line[2]):
-                        return True
-                    break
+        with open(self.pcqpyCSV, "r") as file:
+            lines = file.readlines()
+            for i in range(len(lines)):
+                if question.rstrip() == lines[i].rstrip():
+                    # TODO: Issues with csv.... i want to cry
+                    # Find corresponding test from the pcqpy test file
+                    with open("./PythonQuestions/pcqpyTests.txt", "r") as testData:
+                        testData = testData.readlines()
+                        data = testData[i].split("|")
 
+                    with open("tempTestFile.py", "w") as temp:
+                        temp.write(student_answer + "\n")
+                        temp.write(data[0])
+                    result = subprocess.run(["python3", os.path.abspath("tempTestFile.py")], capture_output=True, text=True)
+                    print(result.stdout.strip(),data[1].strip())
+
+                    # Delete the file after the code is executed
+                    try:
+                        os.remove(os.path.abspath("tempTestFile.py"))
+                    except OSError:
+                        pass
+
+                    if (result.stdout.strip() == data[1].strip()):
+                        return True
         return False
-        # pass
     
     # Get PCQ answer from given question
     def getPCQanswer(self, question):
-        expectedOutput = ""
-        with open(self.pcqpyCSV, "r") as lines:
-            for line in lines:
-                line = line.split("|")
-                if question == line[0]:
-                    expectedOutput = line[2]
-                    break
-        return expectedOutput
+        with open(self.pcqpyCSV, "r") as file:
+            lines = file.readlines()
+            for i in range(len(lines)):
+                if question.rstrip() == lines[i].rstrip():
+                    with open("./PythonQuestions/pcqpyTests.txt", "r") as testData:
+                        testData = testData.readlines()
+                        data = testData[i].split("|")
+                        print(data[1].strip())
+                        return data[1].strip()
+        return ""

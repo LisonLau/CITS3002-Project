@@ -1,5 +1,6 @@
-Write a Python function add_nums(num1,num2) that takes two numbers as input and returns their sum.|add_nums(43,50)|93
-Write a Python function string_len(string) that takes a string as input and returns the length of the string.|print(string_len("Happiness")|,9
-Write a Python function sum_even(numlist) that takes a list of numbers as input and returns the sum of all the even numbers in the list.|print(sum_even([1,4,5,10])|20
-Write a Python function reverse_string(string) that takes a string as input and returns the reverse of that string.|reverse_string("Sunshine")|"enihsnuS"
-Write a Python function longest_len(stringlist) that takes a list of strings as input and returns the length of the longest string in the list.|longest_len(["hello","gosh","me"])|5
+Write a Python function add_nums(""num1,num2"") that takes two numbers as input and returns their sum.
+Write a Python function string_len(string) that takes a string as input and returns the length of the string.
+Write a Python function sum_even(numlist) that takes a list of numbers as input and returns the sum of all the even numbers in the list.
+Write a Python function reverse_string(string) that takes a string as input and returns the reverse of that string.
+Write a Python function longest_len(stringlist) that takes a list of strings as input and returns the length of the longest string in the list.
+print(longest_len(["hello","gosh","me"]))|5
