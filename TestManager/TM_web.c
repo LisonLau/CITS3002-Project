@@ -36,14 +36,14 @@ void runTMforWeb() {
     }
     printf("[+] Set socket options successful.\n");
 
+    addr.sin_addr.s_addr = inet_addr(SERVER_HOST);
     addr.sin_family      = AF_INET;
     addr.sin_port        = htons(SERVER_PORT);
-    addr.sin_addr.s_addr = INADDR_ANY;
 
     // Bind socket to port
     addrsize = sizeof(addr);
     if (bind(sersockfd, (struct sockaddr*)&addr, addrsize) < 0) {
-        perror("[-] Error in binding.");
+        perror("[-] Error in binding");
         exit(EXIT_FAILURE);
     }
     printf("[+] Binding successful.\n");

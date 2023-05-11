@@ -10,7 +10,9 @@ from QBpy import *
 BUFFERSIZE = 1024
 
 class QuestionBank:
-    def __init__(self):
+    def __init__(self, server_host):
+        self.SERVER_HOST = server_host
+        self.SERVER_PORT = 8888
         # Create C and Python QB instances
         self.QBcInstance  = QuestionBankC()
         self.QBpyInstance = QuestionBankPython()
@@ -121,12 +123,6 @@ class QuestionBank:
             print("[!] Error: message received was not understood.")
     
     def runQBserver(self):
-        # hostname = socket.gethostname()
-        # host = socket.gethostbyname(hostname)  
-        host = '127.0.0.1'
-        port = 8888
-        thread_count = 0
-        
         # Create server socket
         QBserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print('[+] Server socket created.')
@@ -137,7 +133,7 @@ class QuestionBank:
         
         # Bind socket to host and port
         try:
-            QBserver.bind((host, port))
+            QBserver.bind((self.SERVER_HOST, self.SERVER_PORT))
         except socket.error as e:  
             print(f'[-] {str(e)}')
             return 0
@@ -145,7 +141,7 @@ class QuestionBank:
 
         # Listen for connections
         QBserver.listen(5)
-        print(f"[*] Listening as {host}:{port}")
+        print(f"[*] Listening as {self.SERVER_HOST}:{self.SERVER_PORT}")
         
         try:
             while True:

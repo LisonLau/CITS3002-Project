@@ -54,8 +54,8 @@ typedef struct Result {
 Students    students[MAX_STUDENTS];
 int         currQuestion[MAX_STUDENTS]; // records current question the student is at
 int         numStudents;
-char        *HOST;
-const char  *clientIpAddr;
+const char  *SERVER_HOST;
+const char  *CLIENT_HOST;
 
 // user.c
 extern void   storeUsers();

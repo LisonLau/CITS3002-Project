@@ -12,7 +12,7 @@ int createTMclient() {
     printf("[+] TM client socket created to get file.\n");
 
     // Set server address and port
-    QBaddress.sin_addr.s_addr = INADDR_ANY;
+    QBaddress.sin_addr.s_addr = inet_addr(CLIENT_HOST);
     QBaddress.sin_family      = AF_INET;
     QBaddress.sin_port        = htons(CLIENT_PORT);
 
