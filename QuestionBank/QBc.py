@@ -76,8 +76,9 @@ class QuestionBankC:
                         return False
                     process = subprocess.Popen(["./TFF"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                     # result = subprocess.run([sys.executable, "./TTF"], capture_output=True, text=True)
-                    # stdout, stderr = process.communicate()
-                    print(process.stdout.strip(), data[1].strip())
+                    stdout, stderr = process.communicate()
+                    print(stdout)
+                    print(data[1].strip())
 
                     # Delete the file after the code is executed
                     try:
@@ -86,7 +87,7 @@ class QuestionBankC:
                     except OSError:
                         pass
 
-                    if (result.stdout.strip() == data[1].strip()):
+                    if (stdout.strip() == data[1].strip()):
                         return True
                     break
         return False
