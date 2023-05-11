@@ -4,8 +4,6 @@ void runTMforWeb() {
     int                 opt = 1;
     int                 max_sd, activity, sersockfd, newsockfd, sockfd, valread;
     int                 client_socket[MAX_CLIENTS] = {0};
-    // struct hostent      *hostInfo;
-    // struct in_addr      **addr_list;
     struct sockaddr_in  addr;
     socklen_t           addrsize;
     fd_set              readset;
@@ -14,6 +12,9 @@ void runTMforWeb() {
     int                 isLoggedIn = 0;
 
     // Retrieving HOST IP address
+    // struct hostent      *hostInfo;
+    // struct in_addr      **addr_list;
+    // char                hostname[255];
     // gethostname(hostname, 255);
     // hostInfo = gethostbyname(hostname);
     // addr_list = (struct in_addr **)hostInfo->h_addr_list;
@@ -36,14 +37,14 @@ void runTMforWeb() {
     }
     printf("[+] Set socket options successful.\n");
 
+    addr.sin_addr.s_addr = inet_addr(SERVER_HOST);
     addr.sin_family      = AF_INET;
     addr.sin_port        = htons(SERVER_PORT);
-    addr.sin_addr.s_addr = INADDR_ANY;
 
     // Bind socket to port
     addrsize = sizeof(addr);
     if (bind(sersockfd, (struct sockaddr*)&addr, addrsize) < 0) {
-        perror("[-] Error in binding.");
+        perror("[-] Error in binding");
         exit(EXIT_FAILURE);
     }
     printf("[+] Binding successful.\n");
