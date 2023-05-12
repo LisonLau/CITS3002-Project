@@ -68,8 +68,7 @@ class QuestionBank:
             return "check"
         elif len(message.split("@")) == 4:
             return "get_ans"
-        else:
-            return ""
+        return ""
         
     def executeSendFile(self, message, TMsocket):
         # Get filename and create question file
