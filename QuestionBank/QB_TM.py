@@ -178,6 +178,7 @@ class QuestionBank:
                     break
                     
                 # Perform the required send operation
+                time.sleep(0.1) # to prevent simultaneous ACK and message send
                 self.sendToTM(message, TMclient)
 
                 # Receive TM acknowledgement for sent data
