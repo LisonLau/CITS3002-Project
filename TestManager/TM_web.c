@@ -4,8 +4,6 @@ void runTMforWeb() {
     int                 opt = 1;
     int                 max_sd, activity, sersockfd, newsockfd, sockfd, valread;
     int                 client_socket[MAX_CLIENTS] = {0};
-    // struct hostent      *hostInfo;
-    // struct in_addr      **addr_list;
     struct sockaddr_in  addr;
     socklen_t           addrsize;
     fd_set              readset;
@@ -14,6 +12,9 @@ void runTMforWeb() {
     int                 isLoggedIn = 0;
 
     // Retrieving HOST IP address
+    // struct hostent      *hostInfo;
+    // struct in_addr      **addr_list;
+    // char                hostname[255];
     // gethostname(hostname, 255);
     // hostInfo = gethostbyname(hostname);
     // addr_list = (struct in_addr **)hostInfo->h_addr_list;
