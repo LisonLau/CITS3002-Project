@@ -25,4 +25,5 @@ int main(int argc, char const *argv[]) {
     
     storeUsers();
     runTMforWeb();
+    return EXIT_SUCCESS;
 }
