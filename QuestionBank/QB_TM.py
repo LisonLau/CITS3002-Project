@@ -130,7 +130,7 @@ class QuestionBank:
     def receiveACK(self, message, TMclient):
         ack = ""
         while (ack != "ACK"):
-            ack = TMclient.recv(BUFFERSIZE).decode()
+            ack = TMclient.recv(self.BUFFERSIZE).decode()
             if ack == "ACK":    # ack received, can close connection
                 print("[+] Acknowledgement from TM received.")
                 break
