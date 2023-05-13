@@ -15,21 +15,29 @@ class QuestionBankPython:
     # Get and store Python MCQ in a list 
     def getMCQ(self):
         MCquestions = []
-        with open(self.mcqpyCSV, "r") as csvfile:
-            reader = csv.reader(csvfile)
-            for line in reader:
-                type = "mcqpy"
-                line.insert(0, type)
-                MCquestions.append(line)
+        # Open the Python MCQ csv file
+        try:
+            with open(self.mcqpyCSV, "r") as csvfile:
+                reader = csv.reader(csvfile)
+                for line in reader:
+                    type = "mcqpy"
+                    line.insert(0, type)
+                    MCquestions.append(line)
+        except Exception as e:
+            print(f"Error occured: {str(e)}")
         return MCquestions
     
     # Get and store C PCQ in a list
     def getPCQ(self):
         PCquestions = []
-        with open(self.pcqpyCSV, "r") as lines:
-            for line in lines:
-                type = "pcqpy"
-                PCquestions.append([type, line.rstrip()])
+        # Open the Python PCQ csv file
+        try:
+            with open(self.pcqpyCSV, "r") as lines:
+                for line in lines:
+                    type = "pcqpy"
+                    PCquestions.append([type, line.rstrip()])
+        except Exception as e:
+            print(f"Error occured: {str(e)}")
         return PCquestions
 
     # Grade Python MCQ
