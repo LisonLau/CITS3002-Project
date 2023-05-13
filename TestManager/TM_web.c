@@ -10,7 +10,7 @@ void runTMforWeb() {
     struct sockaddr_in  addr;
     socklen_t           addrsize;
     fd_set              readset;
-    char                buffer[BUFFERSIZE];
+    char                HTTPrequest[BUFFERSIZE];
     // char                hostname[255];
     int                 isLoggedIn = 0;
 
@@ -110,9 +110,9 @@ void runTMforWeb() {
             if (FD_ISSET(sockfd, &readset)) {
 
                 // Read HTTP request
-                memset(buffer, 0, BUFFERSIZE);
+                memset(HTTPrequest, 0, BUFFERSIZE);
                 getpeername(sockfd, (struct sockaddr*)&addr, &addrsize);
-                if ((valread = read(sockfd, buffer, BUFFERSIZE))  == 0) {
+                if ((valread = read(sockfd, HTTPrequest, BUFFERSIZE))  == 0) {
                     // This client has disconnected
                     printf("[-] A client disconnected, ip: %s, port: %d\n",
                             inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
@@ -121,7 +121,7 @@ void runTMforWeb() {
                     close(sockfd);
                 } 
                 else {
-                    printf("%s\n\n", buffer);
+                    printf("%s\n\n", HTTPrequest);
 
                     // Handle user login if user has not logged in
                     isLoggedIn = checkLoggedIn(inet_ntoa(addr.sin_addr), 0);
@@ -129,11 +129,11 @@ void runTMforWeb() {
 
                     // If student is not logged in
                     if (isLoggedIn == -1) {
-                        isLoggedIn = handleUserLogin(sockfd, inet_ntoa(addr.sin_addr), buffer);
+                        isLoggedIn = handleUserLogin(sockfd, inet_ntoa(addr.sin_addr), HTTPrequest);
                     }
 
                     // If a student logs out
-                    if (strstr(buffer, "POST / HTTP/1.1") != NULL && strstr(buffer, "logout=Logout") != NULL) {
+                    if (strstr(HTTPrequest, "POST / HTTP/1.1") != NULL && strstr(HTTPrequest, "logout=Logout") != NULL) {
                         char *loginHTML = {0};
                         loginHTML = getLoginHTML(loginHTML, 0);
                         sendHTMLpage(sockfd, loginHTML);
@@ -163,14 +163,14 @@ void runTMforWeb() {
                         // Handle display question page of current question
                         else {
                             // Increment quesIdx on NEXT button press
-                            if (strstr(buffer, "next=Next") != NULL) {
+                            if (strstr(HTTPrequest, "next=Next") != NULL) {
                                 currQuestion[index]++;
                             } 
                             // Decrement quesIdx on BACK button press
-                            if (strstr(buffer, "back=Back") != NULL) {
+                            if (strstr(HTTPrequest, "back=Back") != NULL) {
                                 currQuestion[index]--;
                             }
-                            handleDisplayTest(sockfd, buffer, &students[index], index);
+                            handleDisplayTest(sockfd, HTTPrequest, &students[index], index);
                         }
                     }
                 }
@@ -245,11 +245,11 @@ int checkLoggedIn(char *var, int getIndex) {
 
 /**
  * @brief handles TM socket sending the HTML page to the web browser
- * @param socket TM socket file descriptor
+ * @param TMsocket TM socket file descriptor
  * @param message the HTML message to be send
  */
-void sendHTMLpage(int socket, char *message) {
+void sendHTMLpage(int TMsocket, char *message) {
     char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
-    send(socket, response, strlen(response), 0);
+    send(TMsocket, response, strlen(response), 0);
 }
