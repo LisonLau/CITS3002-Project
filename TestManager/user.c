@@ -1,5 +1,12 @@
+// Student 1: Allison Lau   (23123849)
+// Student 2: Alicia Lau    (22955092)
+// Student 3: Li-Anne Long  (23192171)
+
 #include "TM.h"
 
+/**
+ * @brief store registered users in the student structure
+ */
 void storeUsers() {
     FILE *fp;
     char line[BUFFERSIZE];
@@ -34,6 +41,12 @@ void storeUsers() {
     numStudents = count;
 }
 
+/**
+ * @brief checks and authenticates student login
+ * @param username username from web browser input
+ * @param password password from web browser input
+ * @return 1 if student login succeeds, 0 if fails
+ */
 int authenticateUsers(char *username, char *password) {
     for (int i = 0; i < numStudents; i++) {
         if (strcmp(username, students[i].username) == 0 && strcmp(password, students[i].password) == 0) {
@@ -43,6 +56,11 @@ int authenticateUsers(char *username, char *password) {
     return 0;
 }
 
+/**
+ * @brief store the current student's questions into a structure
+ * @param filename student's custom filename
+ * @param currStudent current student information
+ */
 void storeStudentQuestions(char *filename, Students *currStudent) {
     FILE *fp;
     char line[BUFFERSIZE];

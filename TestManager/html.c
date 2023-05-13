@@ -1,6 +1,17 @@
+// Student 1: Allison Lau   (23123849)
+// Student 2: Alicia Lau    (22955092)
+// Student 3: Li-Anne Long  (23192171)
+
 #include "TM.h"
 #include "html.h"
 
+/**
+ * @brief Updates quesHTML string with the question page HTML code
+ * @param quesHTML the string containing the question page HTML code
+ * @param currStudent current student information used to generate the question page HTML code
+ * @param index the index of the student's current question
+ * @return char* returns quesHTML string with the question page HTML code
+ */
 char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
     int idx = currQuestion[index];
     int isCorrect = currStudent->allocated[idx].isCorrect;
@@ -37,7 +48,13 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
     return quesHTML;
 }
 
-char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML, int index) {
+/**
+ * @brief Updates finishHTML string with the finish test page HTML code
+ * @param finishHTML the string containing the finish test page HTML code
+ * @param grade the student's final grade
+ * @return char* returns finishHTML string with the finish test page HTML code
+ */
+char* getFinishHTML(char *finishHTML, int grade) {
     finishHTML = (char*) realloc(finishHTML, BUFSIZ);
     if (finishHTML == NULL) {
         perror("[!] Error: Failed to allocate memory for finishHTML.\n");
@@ -49,6 +66,14 @@ char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML, int i
     return finishHTML;
 }
 
+/**
+ * @brief Updates answerHTML string with the finish question page HTML code
+ * @param answerHTML the string containing the finish question page HTML code
+ * @param currStudent current student information used to generate the finish question page HTML code
+ * @param correctAns QB's correct answer to be displayed
+ * @param index the index of the student's current question
+ * @return char* returns answerHTML string with the finish question page HTML code
+ */
 char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, int index) {
     int idx = currQuestion[index];
     int isCorrect = !strcmp(currStudent->allocated[idx].finalStuAns, correctAns);
@@ -65,6 +90,12 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, i
     return answerHTML;
 }
 
+/**
+ * @brief Updates loginHTML string with the login page HTML code
+ * @param loginHTML the string containing the login page HTML code
+ * @param failed 1 is user failed to login, 0 otherwise
+ * @return char* returns loginHTML string with the login page HTML code
+ */
 char* getLoginHTML(char *loginHTML, int failed) {
     loginHTML = (char*) realloc(loginHTML, BUFSIZ);
     if (loginHTML == NULL) {

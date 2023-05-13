@@ -1,3 +1,7 @@
+# Student 1: Allison Lau   (23123849)
+# Student 2: Alicia Lau    (22955092)
+# Student 3: Li-Anne Long  (23192171)
+
 import csv
 import os
 
@@ -44,6 +48,7 @@ class QuestionBankPython:
     def gradeMCQ(self, question, student_answer):
         AllMCQ = self.getMCQ()
         for mcq in AllMCQ:
+            # Check if the question and student answer match an MCQ question in the list
             if mcq[1] == question and mcq[6] == student_answer:
                 return True
         return False
@@ -52,6 +57,7 @@ class QuestionBankPython:
     def getMCQanswer(self, question):
         AllMCQ = self.getMCQ()
         for mcq in AllMCQ:
+            # Check if the question matches an MCQ question in the list
             if mcq[1] == question:
                 return mcq[6]
     

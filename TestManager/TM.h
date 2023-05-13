@@ -1,3 +1,7 @@
+// Student 1: Allison Lau   (23123849)
+// Student 2: Alicia Lau    (22955092)
+// Student 3: Li-Anne Long  (23192171)
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -22,10 +26,10 @@
 #define MAX_OPTION_LENGTH   100
 #define MAX_CLIENTS         30
 #define BUFFERSIZE          1024
-#define HTMLSIZE            16384
+#define HTMLSIZE            16384   
 
 typedef struct Questions {
-    char type[10];
+    char type[10];  
     char question[MAX_QUESTION_LENGTH];
     int  isMCQ;  // 1 means MCQ, 0 means PCQ
     char options[MAX_OPTIONS][MAX_OPTION_LENGTH];
@@ -40,7 +44,6 @@ typedef struct Students {
     char password[MAX_PASSWORD_LENGTH];
     char ipAddress[255];
     int  loggedIn;
-    int  quesIdx;
     int  grade;
     Questions allocated[MAX_QUESTIONS];
 } Students;
@@ -69,8 +72,8 @@ extern void   sendHTMLpage(int, char *);
 // ques.c
 extern void   handleDisplayTest(int, char *, Students *, int);
 extern Result handleUserAnswers(char *, Students *, int);
-extern void   handleMarkAttempts(int, Result, Students *, int, char *);
-extern void   handleDisplayAnswer(int, Result, Students *, int);
+extern void   handleMarkAttempts(int, char *, Students *, int, Result);
+extern void   handleDisplayAnswer(int, Students *, int, Result);
 extern void   handleDisplayQuestion(int, char *, Students *, int);
 extern void   urlDecode(char *, char *);
 // TM_QB.c
@@ -82,6 +85,6 @@ extern void   socketSend(int, char *, char *);
 extern void   receiveACK(int, char *, char *);
 // html.c
 extern char*  getQuestionHTML(char *, Students *, int);
-extern char*  getFinishHTML(int, char *, int, char *, int);
+extern char*  getFinishHTML(char *, int);
 extern char*  getAnswerHTML(char *, Students *, char *, int);
 extern char*  getLoginHTML(char *, int);
