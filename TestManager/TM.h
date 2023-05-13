@@ -22,10 +22,10 @@
 #define MAX_OPTION_LENGTH   100
 #define MAX_CLIENTS         30
 #define BUFFERSIZE          1024
-#define HTMLSIZE            16384
+#define HTMLSIZE            16384   
 
 typedef struct Questions {
-    char type[10];
+    char type[10];  
     char question[MAX_QUESTION_LENGTH];
     int  isMCQ;  // 1 means MCQ, 0 means PCQ
     char options[MAX_OPTIONS][MAX_OPTION_LENGTH];
@@ -40,7 +40,6 @@ typedef struct Students {
     char password[MAX_PASSWORD_LENGTH];
     char ipAddress[255];
     int  loggedIn;
-    int  quesIdx;
     int  grade;
     Questions allocated[MAX_QUESTIONS];
 } Students;
