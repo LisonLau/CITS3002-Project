@@ -1,18 +1,20 @@
+# Student 1: Allison Lau   (23123849)
+# Student 2: Alicia Lau    (22955092)
+# Student 3: Li-Anne Long  (23192171)
+
 import csv
 import random
 import socket
 import time
 from _thread import *
-
 from QBc  import *
 from QBpy import *
-
-BUFFERSIZE = 1024
 
 class QuestionBank:
     def __init__(self, server_host):
         self.SERVER_HOST = server_host
         self.SERVER_PORT = 8888
+        self.BUFFERSIZE  = 1024
         # Create C and Python QB instances
         self.QBcInstance  = QuestionBankC()
         self.QBpyInstance = QuestionBankPython()
@@ -33,9 +35,12 @@ class QuestionBank:
     def makeQuestionFile(self, filename):
         # filename format : student_password
         question_list = self.getRandom()
-        with open(filename, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerows(question_list)
+        try:
+            with open(filename, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerows(question_list)
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
             
     def gradeQuestion(self, type, ques, ans):
         isCorrect = False
@@ -47,6 +52,8 @@ class QuestionBank:
             isCorrect = self.QBpyInstance.gradeMCQ(ques, ans)
         elif type == "pcqpy":   # PYTHON programming challenge question
             isCorrect = self.QBpyInstance.gradePCQ(ques, ans)
+        else:
+            print("Error occurred: invalid question type")
         return isCorrect
 
     def getAnswer(self, type, ques):
@@ -59,6 +66,8 @@ class QuestionBank:
             answer = self.QBpyInstance.getMCQanswer(ques)
         elif type == "pcqpy":   # PYTHON programming challenge question
             answer = self.QBcInstance.getPCQanswer(ques)
+        else:
+            print("Error occurred: invalid question type")
         return answer
     
     def categoriseMessage(self, message):
@@ -68,7 +77,9 @@ class QuestionBank:
             return "check"
         elif len(message.split("@")) == 4:
             return "get_ans"
-        return ""
+        else:
+            print("Error occurred: invalid message")
+            return ""
         
     def executeSendFile(self, message, TMsocket):
         # Get filename and create question file
@@ -90,20 +101,26 @@ class QuestionBank:
         type, question, answer = message.split("@")
         isCorrect = self.gradeQuestion(type, question, answer)
         # Send response 'correct' or 'wrong'
-        if (isCorrect):
-            TMsocket.send("correct".encode())
-            print("[+] Response 'correct' sent successfully.")
-        else:
-            TMsocket.send("wrong".encode())
-            print("[+] Response 'wrong' sent successfully.")
+        try:
+            if (isCorrect):
+                TMsocket.send("correct".encode())
+                print("[+] Response 'correct' sent successfully.")
+            else:
+                TMsocket.send("wrong".encode())
+                print("[+] Response 'wrong' sent successfully.")
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
             
     def executeSendAnswer(self, message, TMsocket):
         # Find correct answer for given question
-        type = message.split("@")[2]
-        question = message.split("@")[3]
-        correctAns = self.getAnswer(type, question)
-        TMsocket.send(correctAns.encode())
-        print(f"[+] Answer '{correctAns}' sent successfully.")
+        try:
+            type = message.split("@")[2]
+            question = message.split("@")[3]
+            correctAns = self.getAnswer(type, question)
+            TMsocket.send(correctAns.encode())
+            print(f"[+] Answer '{correctAns}' sent successfully.")
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
         
     def sendToTM(self, message, TMclient):
         # Categorise message received
@@ -128,7 +145,7 @@ class QuestionBank:
     def receiveACK(self, message, TMclient):
         ack = ""
         while (ack != "ACK"):
-            ack = TMclient.recv(BUFFERSIZE).decode()
+            ack = TMclient.recv(self.BUFFERSIZE).decode()
             if ack == "ACK":    # ack received, can close connection
                 print("[+] Acknowledgement from TM received.")
                 break
@@ -139,25 +156,25 @@ class QuestionBank:
                 self.sendToTM(message, TMclient)
     
     def runQBserver(self):
-        # Create server socket
-        QBserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print('[+] Server socket created.')
-        
-        # Set socket opt
-        QBserver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        print('[+] Set socket options successful.')
-        
-        # Bind socket to host and port
         try:
+            # Create server socket
+            QBserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            print('[+] Server socket created.')
+            
+            # Set socket opt
+            QBserver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            print('[+] Set socket options successful.')
+            
+            # Bind socket to host and port
             QBserver.bind((self.SERVER_HOST, self.SERVER_PORT))
-        except socket.error as e:  
-            print(f'[-] {str(e)}')
-            return 0
-        print('[+] Binding successful.')
+            print('[+] Binding successful.')
 
-        # Listen for connections
-        QBserver.listen(5)
-        print(f"[*] Listening as {self.SERVER_HOST}:{self.SERVER_PORT}")
+            # Listen for connections
+            QBserver.listen(5)
+            print(f"[*] Listening as {self.SERVER_HOST}:{self.SERVER_PORT}")
+        except socket.error as e:
+            print(f'[-] Error in creating QB socket: {str(e)}')
+            QBserver.close()
         
         try:
             while True:
@@ -166,7 +183,7 @@ class QuestionBank:
                 print("----- Connected to: " + TMaddress[0] + ':' + str(TMaddress[1]) + " ------------")
                 
                 # Receive a string message
-                message = TMclient.recv(BUFFERSIZE).decode()
+                message = TMclient.recv(self.BUFFERSIZE).decode()
                 
                 # Send acknowledgment for received data
                 if message:

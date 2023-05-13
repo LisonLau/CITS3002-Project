@@ -6,13 +6,14 @@ import sys
 import ipaddress
 from QB_TM import *
 
+# Running the main program for QB
 if __name__ == '__main__':
     # Check if there is an argument
     if len(sys.argv) != 2:
         print(f"Usage: python {sys.argv[0]} <QB IP address>")
         sys.exit(1)
     
-    # Check if the argument is a valid IPv4 address
+    # Check if the argument is a valid IP address
     SERVER_HOST = sys.argv[1]
     try:
         ipaddress.ip_address(SERVER_HOST)
@@ -20,5 +21,6 @@ if __name__ == '__main__':
         print(f"Error: Invalid QB IP address: {SERVER_HOST}")
         sys.exit(1)
     
+    # Create an instance of QuestionBank and run the QB server
     QB = QuestionBank(SERVER_HOST)
     QB.runQBserver()

@@ -1,5 +1,13 @@
+// Student 1: Allison Lau   (23123849)
+// Student 2: Alicia Lau    (22955092)
+// Student 3: Li-Anne Long  (23192171)
+
 #include "TM.h"
 
+/**
+ * @brief create the TM client socket to connect to QB server
+ * @return int the TM client socket file descriptor
+ */
 int createTMclient() {
     int TMclient;
     struct sockaddr_in QBaddress;
@@ -25,7 +33,10 @@ int createTMclient() {
     return TMclient;
 }
 
-// Create TM client to send request from QB for question file
+/**
+ * @brief create TM client to send request from QB for question file
+ * @param filename student's custom filename to store the questions
+ */
 void handleQBgetFile(char *filename) {
     int TMclient = createTMclient();
 
@@ -41,6 +52,10 @@ void handleQBgetFile(char *filename) {
     // Receive the file from QB
     char filelines[BUFSIZ];
     FILE *fp = fopen(filename, "wb"); 
+    if (fp == NULL) {
+        fprintf(stderr, "[-] Error: Failed to open file '%s' for writing.\n", filename);
+        exit(EXIT_FAILURE);
+    }
     int bytes = recv(TMclient, filelines, BUFSIZ, 0);
     fwrite(filelines, sizeof(char), bytes, fp); 
     fclose(fp);
@@ -54,8 +69,14 @@ void handleQBgetFile(char *filename) {
     printf("--------- Connection to QB closed ---------\n");
 }
 
-// Create TM client to send request from QB to check answer
-int handleQBcheck(char *type, char *ques, char *ans) {
+/**
+ * @brief create TM client to send request from QB to check answer
+ * @param type type of question
+ * @param question the question 
+ * @param anwer the student answer
+ * @return int 1 if student answer is correct, 0 otherwise
+ */
+int handleQBcheck(char *type, char *question, char *answer) {
     int isCorrect = -1;
     int TMclient = createTMclient();
 
@@ -63,9 +84,9 @@ int handleQBcheck(char *type, char *ques, char *ans) {
     char message[BUFFERSIZE] = "";
     strcat(message, type);
     strcat(message, "@");
-    strcat(message, ques);
+    strcat(message, question);
     strcat(message, "@");
-    strcat(message, ans);
+    strcat(message, answer);
     socketSend(TMclient, message, "check answer");
 
     // Receive QB acknowledgement for sent request
@@ -97,8 +118,13 @@ int handleQBcheck(char *type, char *ques, char *ans) {
     return isCorrect;
 }
 
-// Create TM client to send request from QB to get answer
-char* handleQBgetAns(char *type, char *ques) {
+/**
+ * @brief create TM client to send request from QB to get answer
+ * @param type type of question
+ * @param question the question 
+ * @return char* the correct answer to the given question
+ */
+char* handleQBgetAns(char *type, char *question) {
     int TMclient = createTMclient();
 
     // Send the message
@@ -107,7 +133,7 @@ char* handleQBgetAns(char *type, char *ques) {
     strcat(message, "answer@");
     strcat(message, type);
     strcat(message, "@");
-    strcat(message, ques);
+    strcat(message, question);
     socketSend(TMclient, message, "get answer");
 
     // Receive QB acknowledgement for sent request
@@ -115,6 +141,10 @@ char* handleQBgetAns(char *type, char *ques) {
     
     // Receive QB response
     char *correctAns = malloc(BUFFERSIZE);
+    if (correctAns == NULL) {
+        perror("[!] Error: Failed to allocate memory for response.\n");
+        exit(EXIT_FAILURE);
+    }
     int response_bytes = recv(TMclient, correctAns, BUFFERSIZE, 0);
     if (response_bytes < 0) {
         perror("[-] Failed to receive QB response.\n");
@@ -132,16 +162,26 @@ char* handleQBgetAns(char *type, char *ques) {
     return correctAns;
 }
 
-// Socket send message
-void socketSend(int socket, char *message, char *type) {
-    if (send(socket, message, strlen(message), 0) < 0) {
-        printf("[-] Message '%s' failed to send.", type);
+/**
+ * @brief handles sending socket message
+ * @param TMclient TM client socket file descriptor
+ * @param message the string message to be sent
+ * @param type the type of request
+ */
+void socketSend(int TMclient, char *message, char *type) {
+    if (send(TMclient, message, strlen(message), 0) < 0) {
+        fprintf(stderr, "[-] Message '%s' failed to send.", type);
         exit(EXIT_FAILURE);
     }
     printf("[+] Message '%s' sent successfully.\n", type);
 }
 
-// Receive QB acknowledgement for sent request
+/**
+ * @brief receive QB acknowledgement for sent request
+ * @param TMclient TM client socket file descriptor
+ * @param message the string message to be sent
+ * @param type the type of request
+ */
 void receiveACK(int TMclient, char *message, char *type) {
     char ack[BUFFERSIZE] = "";
     while (strcmp(ack, "ACK") != 0) {
