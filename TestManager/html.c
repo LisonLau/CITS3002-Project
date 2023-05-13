@@ -18,6 +18,10 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
     int isCorrect = currStudent->allocated[idx].isCorrect; //(isCorrect ? correctColor : wrongColor)
     // int isDone = currStudent->allocated[idx].isDone;
     quesHTML = (char*) realloc(quesHTML, HTMLSIZE);
+    if (quesHTML == NULL) {
+        perror("[!] Error: Failed to allocate memory for quesHTML.\n");
+        exit(EXIT_FAILURE);
+    }
     if (currStudent->allocated[idx].isMCQ) { // MCQ
         sprintf(quesHTML, "<html><body %s>%s%s%s<h1 %s>Question %d/%d</h1><p>Your grade is: %d/%d</p>   \
                         <p>Attempts left: %d</p><p>%s</p><form method=\"post\">                         \
@@ -48,6 +52,10 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
 
 char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML, int index) {
     finishHTML = (char*) realloc(finishHTML, BUFSIZ);
+    if (finishHTML == NULL) {
+        perror("[!] Error: Failed to allocate memory for finishHTML.\n");
+        exit(EXIT_FAILURE);
+    }
     sprintf(finishHTML, "<html><body %s>%s<h1>Test Finished</h1>    \
                         <p>Your grade is: %d/%d</p></body></html>", \
                         blueBG, logoutButton, grade, MAX_QUESTIONS*3);
@@ -58,6 +66,10 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, i
     int idx = currQuestion[index];
     int isCorrect = !strcmp(currStudent->allocated[idx].finalStuAns, correctAns);
     answerHTML = (char*) realloc(answerHTML, BUFSIZ);
+    if (answerHTML == NULL) {
+        perror("[!] Error: Failed to allocate memory for answerHTML.\n");
+        exit(EXIT_FAILURE);
+    }
     sprintf(answerHTML, "<html><body %s>%s%s%s<h1 %s>Question %d/%d</h1><p>Your grade is: %d/%d</p>     \
                         <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p></body></html>",\
                         blueBG, logoutButton, (idx > 0) ? backButton : "", nextButton, isCorrect ? correctColor : wrongColor, \
@@ -68,6 +80,10 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, i
 
 char* getLoginHTML(char *loginHTML, int failed) {
     loginHTML = (char*) realloc(loginHTML, BUFSIZ);
+    if (loginHTML == NULL) {
+        perror("[!] Error: Failed to allocate memory for loginHTML.\n");
+        exit(EXIT_FAILURE);
+    }
     sprintf(loginHTML, "<html><body %s><h1>Login</h1><form method=\"post\">\
                         <label for=\"uname\">Username : </label><input type=\"text\" name=\"uname\" value=\"\" required><br><br>\
                         <label for=\"pword\">Password : </label><input type=\"text\" name=\"pword\" value=\"\" required><br><br>\

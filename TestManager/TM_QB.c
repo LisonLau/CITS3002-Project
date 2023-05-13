@@ -41,6 +41,10 @@ void handleQBgetFile(char *filename) {
     // Receive the file from QB
     char filelines[BUFSIZ];
     FILE *fp = fopen(filename, "wb"); 
+    if (fp == NULL) {
+        fprintf(stderr, "[-] Error: Failed to open file '%s' for writing.\n", filename);
+        exit(EXIT_FAILURE);
+    }
     int bytes = recv(TMclient, filelines, BUFSIZ, 0);
     fwrite(filelines, sizeof(char), bytes, fp); 
     fclose(fp);
@@ -115,6 +119,10 @@ char* handleQBgetAns(char *type, char *ques) {
     
     // Receive QB response
     char *correctAns = malloc(BUFFERSIZE);
+    if (correctAns == NULL) {
+        perror("[!] Error: Failed to allocate memory for response.\n");
+        exit(EXIT_FAILURE);
+    }
     int response_bytes = recv(TMclient, correctAns, BUFFERSIZE, 0);
     if (response_bytes < 0) {
         perror("[-] Failed to receive QB response.\n");
@@ -135,7 +143,7 @@ char* handleQBgetAns(char *type, char *ques) {
 // Socket send message
 void socketSend(int socket, char *message, char *type) {
     if (send(socket, message, strlen(message), 0) < 0) {
-        printf("[-] Message '%s' failed to send.", type);
+        fprintf(stderr, "[-] Message '%s' failed to send.", type);
         exit(EXIT_FAILURE);
     }
     printf("[+] Message '%s' sent successfully.\n", type);

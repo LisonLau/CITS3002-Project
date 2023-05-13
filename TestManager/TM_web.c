@@ -111,7 +111,7 @@ void runTMforWeb() {
                 getpeername(sockfd, (struct sockaddr*)&addr, &addrsize);
                 if ((valread = read(sockfd, buffer, BUFFERSIZE))  == 0) {
                     // This client has disconnected
-                    printf("[-] A client disconnected, ip: %s, port: %d\n",
+                    printf("[.] A client disconnected, ip: %s, port: %d\n",
                             inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
                     client_socket[i] = 0;
                     shutdown(sockfd, SHUT_RDWR);
@@ -134,7 +134,10 @@ void runTMforWeb() {
                         char *loginHTML = {0};
                         loginHTML = getLoginHTML(loginHTML, 0);
                         sendHTMLpage(sockfd, loginHTML);
-                        free(loginHTML);
+                        if (loginHTML != NULL) {
+                            free(loginHTML);
+                            loginHTML = NULL;
+                        }
                         isLoggedIn = -1;
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         students[index].loggedIn = 0;
@@ -155,7 +158,10 @@ void runTMforWeb() {
                             char *finishHTML = {0};
                             finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML, index);
                             sendHTMLpage(sockfd, finishHTML);
-                            free(finishHTML);
+                            if (finishHTML != NULL) {
+                                free(finishHTML);
+                                finishHTML = NULL;
+                            }
                         }
                         // Handle display question page of current question
                         else {
@@ -183,7 +189,10 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
         char *loginHTML = {0};
         loginHTML = getLoginHTML(loginHTML, 0);
         sendHTMLpage(socket, loginHTML);
-        free(loginHTML);
+        if (loginHTML != NULL) {
+            free(loginHTML);
+            loginHTML = NULL;
+        }
     } 
     // Extract the username and password from the form data
     else if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
@@ -203,13 +212,19 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
             char *loginHTML = {0};
             loginHTML = getLoginHTML(loginHTML, 1);
             sendHTMLpage(socket, loginHTML);
-            free(loginHTML);
+            if (loginHTML != NULL) {
+                free(loginHTML);
+                loginHTML = NULL;
+            }
         }
     }
     // Display 404 error page
     else {
         char* errorHTML = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>404 Not Found</title>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n</body>\n</html>";
-        send(socket, errorHTML, strlen(errorHTML), 0);
+        if (send(socket, errorHTML, strlen(errorHTML), 0) < 0) {
+            perror("[-] Error sending HTML page.");
+            exit(EXIT_FAILURE);
+        }
     }
     return 0;
 }
@@ -230,5 +245,8 @@ int checkLoggedIn(char *var, int getIndex) {
 void sendHTMLpage(int socket, char *message) {
     char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
-    send(socket, response, strlen(response), 0);
+    if (send(socket, response, strlen(response), 0) < 0) {
+        perror("[-] Error sending HTML page.");
+        exit(EXIT_FAILURE);
+    }
 }
