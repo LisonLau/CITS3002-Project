@@ -76,8 +76,8 @@ void runTMforWeb() {
         // Adding child sockets to the sets
         for (int i = 0; i < MAX_CLIENTS; i++){
             sockfd = client_socket[i];
-            if (sockfd > 0) {FD_SET(sockfd, &readset);}
-            if (sockfd > max_sd) {max_sd = sockfd;}
+            if (sockfd > 0) FD_SET(sockfd, &readset);
+            if (sockfd > max_sd)    max_sd = sockfd;
         }
 
         // Waiting for one of the sockets to do something, waits indefinitely
