@@ -1,3 +1,7 @@
+// Student 1: Allison Lau   (23123849)
+// Student 2: Alicia Lau    (22955092)
+// Student 3: Li-Anne Long  (23192171)
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
