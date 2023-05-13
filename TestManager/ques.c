@@ -90,10 +90,11 @@ void handleMarkAttempts(int socket, char *HTTPrequest, Students *currStudent, in
     int numAttempts = currStudent->allocated[currQuestion[index]].numAttempts;
     int isCorrect = currStudent->allocated[currQuestion[index]].isCorrect;
 
-    // If question is correct OR 3 attempts made 
+    // If student submits an answer
     if (strstr(HTTPrequest, "mcq") || strstr(HTTPrequest, "pcq")) {
         currStudent->allocated[currQuestion[index]].numAttempts--;
-        if (isCorrect || numAttempts == 1) {
+        // If question is correct OR 3 attempts made 
+        if (isCorrect || numAttempts == 1) {    
             currStudent->allocated[currQuestion[index]].isDone = 1;
             strcpy(currStudent->allocated[currQuestion[index]].finalStuAns, result.studentAns);
             if (isCorrect)
