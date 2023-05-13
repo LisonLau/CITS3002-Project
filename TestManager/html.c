@@ -1,22 +1,9 @@
 #include "TM.h"
-
-// HTML variables
-char *backButton   = "<form method=\'post\'><input type=\'submit\' name=\'back\' value=\'Back\'></form>";
-char *nextButton   = "<form method=\'post\'><input type=\'submit\' name=\'next\' value=\'Next\'></form>";
-char *logoutButton = "<form method=\'post\'><input type=\"submit\" name=\'logout\' value=\"Logout\"></form>";
-char *failMessage  = "<p>Login failed. Try again.</p><br>";
-char *wrongAnswer  = "<p>Your answer is wrong. Try again.</p>";
-char *correctMessage = "<p>Your answer is correct!</p>";
-char *wrongMessage   = "<p>Your answer is wrong!</p>";
-char *blueBG = "style=\"background-color:#BBECF6\"";
-char *correctColor = "style=\"background-color:#C6F099\"";
-char *wrongColor = "style=\"background-color:#F6B0AD\"";
-char *idleColor = "style=\"background-color:#F0F29F\"";
+#include "html.h"
 
 char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
     int idx = currQuestion[index];
-    int isCorrect = currStudent->allocated[idx].isCorrect; //(isCorrect ? correctColor : wrongColor)
-    // int isDone = currStudent->allocated[idx].isDone;
+    int isCorrect = currStudent->allocated[idx].isCorrect;
     quesHTML = (char*) realloc(quesHTML, HTMLSIZE);
     if (quesHTML == NULL) {
         perror("[!] Error: Failed to allocate memory for quesHTML.\n");
