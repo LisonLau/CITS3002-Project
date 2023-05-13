@@ -119,8 +119,14 @@ void handleDisplayAnswer(int socket, Students *currStudent, int index, Result re
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
         answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
         sendHTMLpage(socket, answerHTML);
-        free(answerHTML);
-        free(correctAns);
+        if (answerHTML != NULL) {
+            free(answerHTML);
+            answerHTML = NULL;
+        }
+        if (correctAns != NULL) {
+            free(correctAns);
+            correctAns = NULL;
+        }
     }
 }
 
@@ -137,7 +143,10 @@ void handleDisplayQuestion(int socket, char *HTTPrequest, Students *currStudent,
         char *quesHTML = {0};
         quesHTML = getQuestionHTML(quesHTML, currStudent, index);
         sendHTMLpage(socket, quesHTML);
-        free(quesHTML);
+        if (quesHTML != NULL) {
+            free(quesHTML);
+            quesHTML = NULL;
+        }
     }
 }
 
