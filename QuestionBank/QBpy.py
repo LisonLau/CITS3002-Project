@@ -1,3 +1,7 @@
+# Student 1: Allison Lau   (23123849)
+# Student 2: Alicia Lau    (22955092)
+# Student 3: Li-Anne Long  (23192171)
+
 import csv
 import os
 
@@ -15,6 +19,7 @@ class QuestionBankPython:
     # Get and store Python MCQ in a list 
     def getMCQ(self):
         MCquestions = []
+        # Open the Python MCQ csv file
         with open(self.mcqpyCSV, "r") as csvfile:
             reader = csv.reader(csvfile)
             for line in reader:
@@ -26,6 +31,7 @@ class QuestionBankPython:
     # Get and store C PCQ in a list
     def getPCQ(self):
         PCquestions = []
+        # Open the Python PCQ csv file
         with open(self.pcqpyCSV, "r") as lines:
             for line in lines:
                 type = "pcqpy"
@@ -36,6 +42,7 @@ class QuestionBankPython:
     def gradeMCQ(self, question, student_answer):
         AllMCQ = self.getMCQ()
         for mcq in AllMCQ:
+            # Check if the question and student answer match an MCQ question in the list
             if mcq[1] == question and mcq[6] == student_answer:
                 return True
         return False
@@ -44,6 +51,7 @@ class QuestionBankPython:
     def getMCQanswer(self, question):
         AllMCQ = self.getMCQ()
         for mcq in AllMCQ:
+            # Check if the question matches an MCQ question in the list
             if mcq[1] == question:
                 return mcq[6]
     

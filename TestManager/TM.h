@@ -69,8 +69,8 @@ extern void   sendHTMLpage(int, char *);
 // ques.c
 extern void   handleDisplayTest(int, char *, Students *, int);
 extern Result handleUserAnswers(char *, Students *, int);
-extern void   handleMarkAttempts(int, Result, Students *, int, char *);
-extern void   handleDisplayAnswer(int, Result, Students *, int);
+extern void   handleMarkAttempts(int, char *, Students *, int, Result);
+extern void   handleDisplayAnswer(int, Students *, int, Result);
 extern void   handleDisplayQuestion(int, char *, Students *, int);
 extern void   urlDecode(char *, char *);
 // TM_QB.c
@@ -82,6 +82,6 @@ extern void   socketSend(int, char *, char *);
 extern void   receiveACK(int, char *, char *);
 // html.c
 extern char*  getQuestionHTML(char *, Students *, int);
-extern char*  getFinishHTML(int, char *, int, char *, int);
+extern char*  getFinishHTML(char *, int);
 extern char*  getAnswerHTML(char *, Students *, char *, int);
 extern char*  getLoginHTML(char *, int);

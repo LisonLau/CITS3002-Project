@@ -1,5 +1,11 @@
 #include "TM.h"
 
+/**
+ * @brief Running the main program for TM
+ * @param argc number of command-line arguments provided to the program
+ * @param argv array of strings representing the command-line arguments
+ * @return exit status of the program 
+ */
 int main(int argc, char const *argv[]) {
     // Check if there are two arguments
     if (argc != 3) {
@@ -8,22 +14,21 @@ int main(int argc, char const *argv[]) {
     }
 
     struct in_addr ip1, ip2;
-
-    // Check if the first argument is a valid IPv4 address
+    // Check if the first argument is a valid IP address
     SERVER_HOST = argv[1];
     if (inet_pton(AF_INET, SERVER_HOST, &ip1) != 1) {
         printf("Error: Invalid TM IP address '%s'\n", argv[1]);
         exit(EXIT_FAILURE);
     }
 
-    // Check if the second argument is a valid IPv4 address
+    // Check if the second argument is a valid IP address
     CLIENT_HOST = argv[2];
     if (inet_pton(AF_INET, CLIENT_HOST, &ip2) != 1) {
         printf("Error: Invalid QB IP address '%s'\n", argv[2]);
         exit(EXIT_FAILURE);
     }
     
-    storeUsers();
-    runTMforWeb();
+    storeUsers();   // Store registered users
+    runTMforWeb();  // Run the TM server for web browser clients
     exit(EXIT_SUCCESS);
 }

@@ -1,5 +1,8 @@
 #include "TM.h"
 
+/**
+ * @brief create and run TM server socket for web browser clients
+ */
 void runTMforWeb() {
     int                 opt = 1;
     int                 max_sd, activity, sersockfd, newsockfd, sockfd, valread;
@@ -153,7 +156,7 @@ void runTMforWeb() {
                         // Handle display finish page after test is done
                         if (currStudent.allocated[quesIdx].isDone == 1 && quesIdx >= MAX_QUESTIONS-1) {
                             char *finishHTML = {0};
-                            finishHTML = getFinishHTML(sockfd, buffer, currStudent.grade, finishHTML, index);
+                            finishHTML = getFinishHTML(finishHTML, currStudent.grade);
                             sendHTMLpage(sockfd, finishHTML);
                             free(finishHTML);
                         }
@@ -176,17 +179,24 @@ void runTMforWeb() {
     }
 }
 
-int handleUserLogin(int socket, char *ip, char *buffer) {
-    char *form = strstr(buffer, "uname=");
+/**
+ * @brief handles displaying login page to web browser
+ * @param socket the socket file descriptor
+ * @param ip the IP address
+ * @param HTTPrequest the HTTP request received from client web browser
+ * @return int 1 if student successfully login, 0 if failed
+ */
+int handleUserLogin(int socket, char *ip, char *HTTPrequest) {
+    char *form = strstr(HTTPrequest, "uname=");
     // Display login page
-    if (strstr(buffer, "GET / HTTP/1.1") != NULL) {
+    if (strstr(HTTPrequest, "GET / HTTP/1.1") != NULL) {
         char *loginHTML = {0};
         loginHTML = getLoginHTML(loginHTML, 0);
         sendHTMLpage(socket, loginHTML);
         free(loginHTML);
     } 
     // Extract the username and password from the form data
-    else if (strstr(buffer, "POST / HTTP/1.1") != NULL) {
+    else if (strstr(HTTPrequest, "POST / HTTP/1.1") != NULL) {
         char uname[MAX_USERNAME_LENGTH] = {0};
         char pword[MAX_PASSWORD_LENGTH] = {0};
         sscanf(form, "uname=%[^&]&pword=%s", uname, pword);
@@ -214,6 +224,12 @@ int handleUserLogin(int socket, char *ip, char *buffer) {
     return 0;
 }
 
+/**
+ * @brief checked whether the student is logged in
+ * @param var the TODO LIANNE
+ * @param getIndex 1 if function is getting the student index, 0 otherwise
+ * @return int 
+ */
 int checkLoggedIn(char *var, int getIndex) {
     for (int i = 0; i < MAX_STUDENTS; i++) {
         // Checks if a student is associated with this IP and is logged in
@@ -227,6 +243,11 @@ int checkLoggedIn(char *var, int getIndex) {
     return -1; // not 0 because i need to differentiate between index 0 and false
 }
 
+/**
+ * @brief handles TM socket sending the HTML page to the web browser
+ * @param socket TM socket file descriptor
+ * @param message the HTML message to be send
+ */
 void sendHTMLpage(int socket, char *message) {
     char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);

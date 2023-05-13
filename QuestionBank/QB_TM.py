@@ -1,18 +1,20 @@
+# Student 1: Allison Lau   (23123849)
+# Student 2: Alicia Lau    (22955092)
+# Student 3: Li-Anne Long  (23192171)
+
 import csv
 import random
 import socket
 import time
 from _thread import *
-
 from QBc  import *
 from QBpy import *
-
-BUFFERSIZE = 1024
 
 class QuestionBank:
     def __init__(self, server_host):
         self.SERVER_HOST = server_host
         self.SERVER_PORT = 8888
+        self.BUFFERSIZE  = 1024
         # Create C and Python QB instances
         self.QBcInstance  = QuestionBankC()
         self.QBpyInstance = QuestionBankPython()
@@ -166,7 +168,7 @@ class QuestionBank:
                 print("----- Connected to: " + TMaddress[0] + ':' + str(TMaddress[1]) + " ------------")
                 
                 # Receive a string message
-                message = TMclient.recv(BUFFERSIZE).decode()
+                message = TMclient.recv(self.BUFFERSIZE).decode()
                 
                 # Send acknowledgment for received data
                 if message:
