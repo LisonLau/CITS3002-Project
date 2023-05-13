@@ -1,3 +1,7 @@
+// Student 1: Allison Lau   (23123849)
+// Student 2: Alicia Lau    (22955092)
+// Student 3: Li-Anne Long  (23192171)
+
 // HTML variables
 char *backButton   = "<form method=\'post\'><input type=\'submit\' name=\'back\' value=\'Back\'></form>";
 char *nextButton   = "<form method=\'post\'><input type=\'submit\' name=\'next\' value=\'Next\'></form>";
