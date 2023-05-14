@@ -1,5 +1,5 @@
-print(add_nums(43,50))|93
-print(string_len("Happiness"))|9
-print(sum_even([1,4,5,10]))|20
-print(reverse_string("Sunshine"))|enihsnuS
-print(longest_len(["hello","gosh","me"]))|5
+print(add_nums(43,50))@93
+print(string_len("Happiness"))@9
+print(sum_even([1,4,5,10]))@14
+print(reverse_string("Sunshine"))@enihsnuS
+print(longest_len(["hello","gosh","gorgeous","me"]))@8

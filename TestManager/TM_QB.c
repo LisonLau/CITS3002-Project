@@ -32,7 +32,7 @@ void handleQBgetFile(char *filename) {
 
     // Send the request for file message
     char message[BUFFERSIZE] = "";
-    strcat(message, "get,");
+    strcat(message, "get@");
     strcat(message, filename);
     socketSend(TMclient, message, "get file");
 
@@ -61,9 +61,9 @@ int handleQBcheck(char *type, char *ques, char *ans) {
     // Send the message
     char message[BUFFERSIZE] = "";
     strcat(message, type);
-    strcat(message, ",");
+    strcat(message, "@");
     strcat(message, ques);
-    strcat(message, ",");
+    strcat(message, "@");
     strcat(message, ans);
     socketSend(TMclient, message, "check answer");
 
@@ -97,10 +97,10 @@ char* handleQBgetAns(char *type, char *ques) {
 
     // Send the message
     char message[BUFFERSIZE] = "";
-    strcat(message, "get,");
-    strcat(message, "answer,");
+    strcat(message, "get@");
+    strcat(message, "answer@");
     strcat(message, type);
-    strcat(message, ",");
+    strcat(message, "@");
     strcat(message, ques);
     socketSend(TMclient, message, "get answer");
     

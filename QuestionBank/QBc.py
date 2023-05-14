@@ -51,7 +51,6 @@ class QuestionBankC:
     # Grade C PCQ
     def gradePCQ(self, question, student_answer):
         # Find the corressponding question
-        print("REACHED")
         with open(self.pcqcCSV, "r") as file:
             lines = file.readlines()
             for i in range(len(lines)):
@@ -61,24 +60,25 @@ class QuestionBankC:
                     # Find corresponding test from the pcqc test file
                     with open("./CQuestions/pcqcTests.txt", "r") as testData:
                         testData = testData.readlines()
-                        data = testData[i].split("|")
+                        data = testData[i].split("@")
 
+                    # Write the c file
                     with open("tempTestFile.c", "w") as temp:
                         temp.write("#include <string.h>\n#include <stdio.h>\n#include <stdlib.h>\n")
                         temp.write(student_answer + "\n")
                         temp.write("int main(int argc, char const *argv[]) {\n\t" + f"{data[0]}\n" + "\treturn 0;\n}")
 
-                    # Compile the c file...?
-                    result = subprocess.run(["cc","-std=c11","-Wall","-Werror","-o", "TFF", os.path.abspath("tempTestFile.c")], capture_output=True, text=True)
+                    # Compile the c file
+                    result = subprocess.run(["cc","-std=c11","-Wall","-Werror","-o", "TFF", \
+                                             os.path.abspath("tempTestFile.c")], capture_output=True, text=True)
                     if result.stderr:
-                        # If the c file can't compile...?
-                        print("stderr:\t" + result.stderr)
+                        # If the c file with the student's answer doesn't compile
+                        print("[!] stderr:\t" + result.stderr)
                         return False
+                    
+                    # Execute the code
                     process = subprocess.Popen(["./TFF"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                    # result = subprocess.run([sys.executable, "./TTF"], capture_output=True, text=True)
                     stdout, stderr = process.communicate()
-                    print(stdout)
-                    print(data[1].strip())
 
                     # Delete the file after the code is executed
                     try:
@@ -86,10 +86,13 @@ class QuestionBankC:
                         os.remove(os.path.abspath("TFF"))
                     except OSError:
                         pass
-
+                    
+                    # Check the output of the code
                     if (stdout.strip() == data[1].strip()):
                         return True
-                    break
+                    else:
+                        print("[!] stderr:\t" + stderr.strip())
+                        return False
         return False
     
     # Get PCQ answer from given question
@@ -100,7 +103,7 @@ class QuestionBankC:
                 if question.rstrip() == lines[i].rstrip():
                     with open("./CQuestions/pcqcTests.txt", "r") as testData:
                         testData = testData.readlines()
-                        data = testData[i].split("|")
+                        data = testData[i].split("@")
                         print(data[1].strip())
-                        return data[1].strip()
+                        return f"Input data:{data[0].strip()}, Expected output:{data[1].strip()}"
         return ""

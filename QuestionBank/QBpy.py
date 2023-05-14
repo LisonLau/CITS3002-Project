@@ -55,15 +55,17 @@ class QuestionBankPython:
             lines = file.readlines()
             for i in range(len(lines)):
                 if question.rstrip() == lines[i].rstrip():
-                    # TODO: Issues with csv.... i want to cry
                     # Find corresponding test from the pcqpy test file
                     with open("./PythonQuestions/pcqpyTests.txt", "r") as testData:
                         testData = testData.readlines()
-                        data = testData[i].split("|")
+                        data = testData[i].split("@")
 
+                    # Write the python file to execute
                     with open("tempTestFile.py", "w") as temp:
                         temp.write(student_answer + "\n")
                         temp.write(data[0])
+
+                    # Execute the python file with the student's code
                     result = subprocess.run(["python3", os.path.abspath("tempTestFile.py")], capture_output=True, text=True)
                     print(result.stdout.strip(),data[1].strip())
 
@@ -73,12 +75,12 @@ class QuestionBankPython:
                     except OSError:
                         pass
 
-                    # TODO: store the user's output...because that needs to be shown...?
-                    #       like got: output if it was an error.... and expected: set answer
+                    # Check the output of the program
                     if (result.stdout.strip() == data[1].strip()):
                         return True
-                    # else:
-                    #       return result.stderr.strip()
+                    else:
+                        print(f'[!] stderr: {result.stderr.strip()}')
+                        return False
         return False
     
     # Get PCQ answer from given question
@@ -89,7 +91,7 @@ class QuestionBankPython:
                 if question.rstrip() == lines[i].rstrip():
                     with open("./PythonQuestions/pcqpyTests.txt", "r") as testData:
                         testData = testData.readlines()
-                        data = testData[i].split("|")
+                        data = testData[i].split("@")
                         print(data[1].strip())
-                        return data[1].strip()
+                        return f"Input data:{data[0].strip()}, Expected output:{data[1].strip()}"
         return ""

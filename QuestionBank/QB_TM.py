@@ -60,18 +60,18 @@ class QuestionBank:
         return answer
     
     def categoriseMessage(self, message):
-        if len(message.split(",")) == 2:
+        if len(message.split("@")) == 2:
             return "get_file"
-        elif len(message.split(",")) == 3:
+        elif len(message.split("@")) == 3:
             return "check"
-        elif len(message.split(",")) == 4:
+        elif len(message.split("@")) == 4:
             return "get_ans"
         else:
             return ""
         
     def executeSendFile(self, message, TMsocket):
         # Get filename and create question file
-        filename = message.split(",")[1]
+        filename = message.split("@")[1]
         self.makeQuestionFile(filename)
         
         # Check if the file exists
@@ -88,7 +88,7 @@ class QuestionBank:
     
     def executeCheckAnswer(self, message, TMsocket):
         # Grade question
-        type, question, answer = message.split(",")
+        type, question, answer = message.split("@")
         isCorrect = self.gradeQuestion(type, question, answer)
         # Send response 'correct' or 'wrong'
         if (isCorrect):
@@ -100,8 +100,8 @@ class QuestionBank:
             
     def executeSendAnswer(self, message, TMsocket):
         # Find correct answer for given question
-        type = message.split(",")[2]
-        question = message.split(",")[3]
+        type = message.split("@")[2]
+        question = message.split("@")[3]
         correctAns = self.getAnswer(type, question)
         TMsocket.send(correctAns.encode())
         print(f"[+] Answer '{correctAns}' sent successfully.")
