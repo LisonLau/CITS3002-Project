@@ -105,5 +105,5 @@ class QuestionBankC:
                         testData = testData.readlines()
                         data = testData[i].split("@")
                         print(data[1].strip())
-                        return f"Input data:{data[0].strip()}, Expected output:{data[1].strip()}"
+                        return f"Input data: {data[0].strip()}\tExpected output: {data[1].strip()}"
         return ""
