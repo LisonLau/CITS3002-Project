@@ -19,11 +19,17 @@ git clone https://github.com/LisonLau CITS3002-Project.git
 
 Instructions on how to run the project:
 1. Navigate to the QuestionBank folder
+```bash
+cd QuestionBank
+```
 2. Start the QB program by running the command below:
 ```bash
 python3 QB.py <QB IP address>
 ```
 3. Navigate to the TestManager folder
+```bash
+cd TestManager
+```
 4. Compile the TM program
 ```bash
 make
