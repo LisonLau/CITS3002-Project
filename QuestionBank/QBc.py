@@ -68,8 +68,6 @@ class QuestionBankC:
         with open(self.pcqcCSV, "r") as file:
             lines = file.readlines()
             for i in range(len(lines)):
-                print(question.rstrip())
-                print(lines[i].rstrip())
                 if question.rstrip() == lines[i].rstrip():
                     # Find corresponding test from the pcqc test file
                     with open("./CQuestions/pcqcTests.txt", "r") as testData:
@@ -95,7 +93,7 @@ class QuestionBankC:
                         except OSError:
                             pass
                         
-                        return False
+                        return False, result.stderr.replace("\n", "<br>")
                     
                     # Execute the code
                     process = subprocess.Popen(["./TFF"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -110,11 +108,11 @@ class QuestionBankC:
                     
                     # Check the output of the code
                     if (stdout.strip() == data[1].strip()):
-                        return True
+                        return True, stdout.strip()
                     else:
                         print("[!] stderr:\t" + stderr.strip())
-                        return False
-        return False
+                        return False, stderr.strip().replace("\n", "<br>")
+        return False, "An internal QB error has occured."
     
     # Get PCQ answer from given question
     def getPCQanswer(self, question):
@@ -126,5 +124,5 @@ class QuestionBankC:
                         testData = testData.readlines()
                         data = testData[i].split("@")
                         print(data[1].strip())
-                        return f"Input data: {data[0].strip()}\tExpected output: {data[1].strip()}"
-        return ""
+                        return f"<br>Input data: {data[0].strip()}<br>Expected output: {data[1].strip()}"
+        return "An internal QB error has occured."

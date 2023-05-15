@@ -81,7 +81,7 @@ class QuestionBankPython:
 
                     # Execute the python file with the student's code
                     result = subprocess.run(["python3", os.path.abspath("tempTestFile.py")], capture_output=True, text=True)
-                    print(result.stdout.strip(),data[1].strip())
+                    print(result.stdout.strip(), data[1].strip())
 
                     # Delete the file after the code is executed
                     try:
@@ -91,11 +91,11 @@ class QuestionBankPython:
 
                     # Check the output of the program
                     if (result.stdout.strip() == data[1].strip()):
-                        return True
+                        return True, result.stdout.strip()
                     else:
                         print(f'[!] stderr: {result.stderr.strip()}')
-                        return False
-        return False
+                        return False, result.stderr.strip().replace("\n", "<br>")
+        return False, "An internal QB error has occured."
     
     # Get PCQ answer from given question
     def getPCQanswer(self, question):
@@ -107,5 +107,5 @@ class QuestionBankPython:
                         testData = testData.readlines()
                         data = testData[i].split("@")
                         print(data[1].strip())
-                        return f"Input data:{data[0].strip()}, Expected output:{data[1].strip()}"
-        return ""
+                        return f"<br>Input data:{data[0].strip()}<br>Expected output:{data[1].strip()}"
+        return "An internal QB error has occured."

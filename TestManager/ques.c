@@ -69,10 +69,10 @@ Result handleUserAnswers(char *HTTPrequest, Students *currStudent, int index) {
         sscanf(strstr(HTTPrequest, "pcqpy="), "pcqpy=%s", encoded_ans);
         urlDecode(encoded_ans, result.studentAns); 
         result.isCorrect = handleQBcheck("pcqpy", currStudent->allocated[currQuestion[index]].question, result.studentAns);  // If wrong, minus mark by 1
+        printf("%s\n", result.studentAns);
     } else if (strstr(HTTPrequest, "pcqc=") != NULL) {  // PCQC
         sscanf(strstr(HTTPrequest, "pcqc="), "pcqc=%s", encoded_ans);
         urlDecode(encoded_ans, result.studentAns); 
-        printf("%s\n", result.studentAns);
         result.isCorrect = handleQBcheck("pcqc", currStudent->allocated[currQuestion[index]].question, result.studentAns);   // If wrong, minus mark by 1
         printf("%s\n", result.studentAns);
     }
