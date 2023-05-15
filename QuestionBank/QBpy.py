@@ -109,3 +109,15 @@ class QuestionBankPython:
                         print(data[1].strip())
                         return f"Input data:{data[0].strip()}, Expected output:{data[1].strip()}"
         return ""
+    
+    # Get PCQ image answer from given question
+    def getPCQimage(self, question):
+        with open(self.pcqpyCSV, "r") as file:
+            lines = file.readlines()
+            for i in range(len(lines)):
+                if question.rstrip() == lines[i].rstrip():
+                    imagefile = f"./PythonQuestions/pcqpy{i}.png"
+                    with open(imagefile, 'rb') as file:
+                        bytes = file.read()
+                    return bytes
+        return ""

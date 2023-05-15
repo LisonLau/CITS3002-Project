@@ -4,8 +4,8 @@
 
 import csv
 import os
-import sys
 import subprocess
+
 class QuestionBankC:
     # Initialise path names for C csv files
     def __init__(self):
@@ -127,4 +127,16 @@ class QuestionBankC:
                         data = testData[i].split("@")
                         print(data[1].strip())
                         return f"Input data: {data[0].strip()}\tExpected output: {data[1].strip()}"
+        return ""
+    
+    # Get PCQ image answer from given question
+    def getPCQimage(self, question):
+        with open(self.pcqpyCSV, "r") as file:
+            lines = file.readlines()
+            for i in range(len(lines)):
+                if question.rstrip() == lines[i].rstrip():
+                    imagefile = f"./CQuestions/pcqc{i}.png"
+                    with open(imagefile, 'rb') as file:
+                        bytes = file.read()
+                    return bytes
         return ""

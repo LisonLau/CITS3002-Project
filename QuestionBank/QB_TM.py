@@ -65,16 +65,22 @@ class QuestionBank:
         return isCorrect
 
     # Retrieve the answer to the given question
-    def getAnswer(self, type, ques):
+    def getAnswer(self, type, ques, getImg):
         answer = ""
         if type == "mcqc":      # C multiple choice question
             answer = self.QBcInstance.getMCQanswer(ques)
         elif type == "pcqc":    # C programming challenge question
-            answer = self.QBcInstance.getPCQanswer(ques)
+            if getImg == 1:
+                answer = self.QBcInstance.getPCQimage(ques)
+            else:
+                answer = self.QBcInstance.getPCQanswer(ques)
         elif type == "mcqpy":   # PYTHON multiple choice question
             answer = self.QBpyInstance.getMCQanswer(ques)
         elif type == "pcqpy":   # PYTHON programming challenge question
-            answer = self.QBpyInstance.getPCQanswer(ques)
+            if getImg == 1:
+                answer = self.QBpyInstance.getPCQimage(ques)
+            else:
+                answer = self.QBpyInstance.getPCQanswer(ques)
         else:
             print("Error occurred: invalid question type")
         return answer
@@ -122,10 +128,21 @@ class QuestionBank:
         # Find correct answer for given question
         type = message.split("@")[1]
         question = message.split("@")[2]
-        correctAns = self.getAnswer(type, question)
+        correctAns = self.getAnswer(type, question, 0) # 0 for not getting image
         try:
             TMsocket.send(correctAns.encode())
             print(f"[+] Answer '{correctAns}' sent successfully.")
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
+          
+    # Send the answer of PCQ as an image to TM 
+    def executeSendImage(self, message, TMsocket):
+        type = message.split("@")[1]
+        question = message.split("@")[2]
+        imageAns = self.getAnswer(type, question, 1) # 1 for getting image
+        try:
+            TMsocket.send(imageAns)
+            print(f"[+] Image answer sent successfully.")
         except Exception as e:
             print(f"Error occurred: {str(e)}")
         
@@ -139,6 +156,8 @@ class QuestionBank:
             self.executeCheckAnswer(message, TMclient)
         elif messageType == "get_answer":
             self.executeSendAnswer(message, TMclient)
+        elif messageType == "get_image":
+            self.executeSendImage(message, TMclient)
         else:
             print("[!] Error occurred: invalid message.")
     
@@ -152,6 +171,8 @@ class QuestionBank:
             print("[+] Message 'check answer' from TM received.")
         elif messageType == "get_answer":
             print("[+] Message 'get answer' from TM received.")
+        elif messageType == "get_image":
+            print("[+] Message 'get image' from TM received.")
         else:
             print("[!] Error: message received was not understood.")
             

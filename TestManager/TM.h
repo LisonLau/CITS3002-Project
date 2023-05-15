@@ -88,6 +88,7 @@ extern int    createTMclient();
 extern int    handleQBcheck(char *, char *, char *);
 extern void   handleQBgetFile(char *);
 extern char*  handleQBgetAns(char *, char *);
+extern void   handleQBgetImg(char *, char *);
 extern void   socketSend(int, char *, char *);
 extern void   receiveACK(int, char *, char *);
 // html.c
