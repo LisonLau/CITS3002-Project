@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netdb.h>
+#include <signal.h>
 
 #define SERVER_PORT         8080
 #define CLIENT_PORT         8888
@@ -42,7 +43,9 @@ typedef struct Questions {
 typedef struct Students {
     char username[MAX_USERNAME_LENGTH];
     char password[MAX_PASSWORD_LENGTH];
+    char filename[BUFFERSIZE];
     char ipAddress[255];
+    int  hasQuesFile;
     int  loggedIn;
     int  grade;
     Questions allocated[MAX_QUESTIONS];
@@ -57,9 +60,12 @@ typedef struct Result {
 Students    students[MAX_STUDENTS];
 int         currQuestion[MAX_STUDENTS]; // records current question the student is at
 int         numStudents;
+int         TMserver; // server socket file descriptor
 const char  *SERVER_HOST;
 const char  *CLIENT_HOST;
 
+// main.c
+extern void   clearMemory(int);
 // user.c
 extern void   storeUsers();
 extern int    authenticateUsers(char *, char *);

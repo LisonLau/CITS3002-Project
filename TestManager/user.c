@@ -34,6 +34,10 @@ void storeUsers() {
         for (int i = 0; i < MAX_QUESTIONS; i++) {
             students[count].allocated[i].numAttempts = 3;
         }
+        // Create custom filename
+        strcat(students[count].filename, students[count].username);
+        strcat(students[count].filename, students[count].password);
+        strcat(students[count].filename, ".csv");
         count++;
     }
 
@@ -100,7 +104,6 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
                 if (token[len-1] == '\n') {
                     token[len-1] = '\0';
                 }
-                printf("'%s'\n", token);
                 strcpy(currStudent->allocated[quesIdx].options[j], token);
             }
             quesIdx++;

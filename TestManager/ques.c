@@ -13,17 +13,15 @@
  */
 void handleDisplayTest(int socket, char *HTTPrequest, Students *currStudent, int index) {
     // Create custom filename
-    char filename[BUFFERSIZE] = "";
-    strcat(filename, currStudent->username);
-    strcat(filename, currStudent->password);
-    strcat(filename, ".csv");
+
 
     // If student file does not exists, create one
-    if (access(filename, F_OK) != 0) {
-        handleQBgetFile(filename);
+    if (access(currStudent->filename, F_OK) != 0) {
+        handleQBgetFile(currStudent->filename);
         currStudent->grade = 0;
+        currStudent->hasQuesFile = 1;
         // Store student's allocated questions
-        storeStudentQuestions(filename, currStudent);
+        storeStudentQuestions(currStudent->filename, currStudent);
     }
 
     // Handle the test
@@ -33,12 +31,10 @@ void handleDisplayTest(int socket, char *HTTPrequest, Students *currStudent, int
         result = handleUserAnswers(HTTPrequest, currStudent, index);
 
         // Handle grading and number of attempts
-        printf("%d\n", currStudent->allocated[currQuestion[index]].isCorrect);
         if (!currStudent->allocated[currQuestion[index]].isCorrect) {
             currStudent->allocated[currQuestion[index]].isCorrect = result.isCorrect;
         }
         handleMarkAttempts(socket, HTTPrequest, currStudent, index, result);
-        printf("%d\n", currStudent->allocated[currQuestion[index]].isCorrect);
 
         // Handle display answer page AFTER question is done
         handleDisplayAnswer(socket, currStudent, index);
@@ -113,7 +109,6 @@ void handleMarkAttempts(int socket, char *HTTPrequest, Students *currStudent, in
  * @param socket the socket file descriptor
  * @param currStudent current student information
  * @param index index of student's current question
- * @param result contains the student answer and whether it is correct
  */
 void handleDisplayAnswer(int socket, Students *currStudent, int index) {
     // Display answer page when question is already done
