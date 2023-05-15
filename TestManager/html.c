@@ -1,23 +1,25 @@
+// Student 1: Allison Lau   (23123849)
+// Student 2: Alicia Lau    (22955092)
+// Student 3: Li-Anne Long  (23192171)
+
 #include "TM.h"
+#include "html.h"
 
-// HTML variables
-char *backButton   = "<form method=\'post\'><input type=\'submit\' name=\'back\' value=\'Back\'></form>";
-char *nextButton   = "<form method=\'post\'><input type=\'submit\' name=\'next\' value=\'Next\'></form>";
-char *logoutButton = "<form method=\'post\'><input type=\"submit\" name=\'logout\' value=\"Logout\"></form>";
-char *failMessage  = "<p>Login failed. Try again.</p><br>";
-char *wrongAnswer  = "<p>Your answer is wrong. Try again.</p>";
-char *correctMessage = "<p>Your answer is correct!</p>";
-char *wrongMessage   = "<p>Your answer is wrong!</p>";
-char *blueBG = "style=\"background-color:#BBECF6\"";
-char *correctColor = "style=\"background-color:#C6F099\"";
-char *wrongColor = "style=\"background-color:#F6B0AD\"";
-char *idleColor = "style=\"background-color:#F0F29F\"";
-
+/**
+ * @brief Updates quesHTML string with the question page HTML code
+ * @param quesHTML the string containing the question page HTML code
+ * @param currStudent current student information used to generate the question page HTML code
+ * @param index the index of the student's current question
+ * @return char* returns quesHTML string with the question page HTML code
+ */
 char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
     int idx = currQuestion[index];
-    int isCorrect = currStudent->allocated[idx].isCorrect; //(isCorrect ? correctColor : wrongColor)
-    // int isDone = currStudent->allocated[idx].isDone;
+    int isCorrect = currStudent->allocated[idx].isCorrect;
     quesHTML = (char*) realloc(quesHTML, HTMLSIZE);
+    if (quesHTML == NULL) {
+        perror("[!] Error: Failed to allocate memory for quesHTML.\n");
+        exit(EXIT_FAILURE);
+    }
     if (currStudent->allocated[idx].isMCQ) { // MCQ
         sprintf(quesHTML, "<html><body %s>%s%s%s<h1 %s>Question %d/%d</h1><p>Your grade is: %d/%d</p>   \
                         <p>Attempts left: %d</p><p>%s</p><form method=\"post\">                         \
@@ -47,21 +49,40 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
     return quesHTML;
 }
 
-char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML, int index) {
+/**
+ * @brief Updates finishHTML string with the finish test page HTML code
+ * @param finishHTML the string containing the finish test page HTML code
+ * @param grade the student's final grade
+ * @return char* returns finishHTML string with the finish test page HTML code
+ */
+char* getFinishHTML(char *finishHTML, int grade) {
     finishHTML = (char*) realloc(finishHTML, BUFSIZ);
+    if (finishHTML == NULL) {
+        perror("[!] Error: Failed to allocate memory for finishHTML.\n");
+        exit(EXIT_FAILURE);
+    }
     sprintf(finishHTML, "<html><body %s>%s<h1>Test Finished</h1>    \
                         <p>Your grade is: %d/%d</p></body></html>", \
                         blueBG, logoutButton, grade, MAX_QUESTIONS*3);
     return finishHTML;
 }
 
+/**
+ * @brief Updates answerHTML string with the finish question page HTML code
+ * @param answerHTML the string containing the finish question page HTML code
+ * @param currStudent current student information used to generate the finish question page HTML code
+ * @param correctAns QB's correct answer to be displayed
+ * @param index the index of the student's current question
+ * @return char* returns answerHTML string with the finish question page HTML code
+ */
 char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, int index) {
     int idx = currQuestion[index];
-    printf("Iscorrect: %d, idx: %i\n", currStudent->allocated[idx].isCorrect, idx);
-    // int isCorrect = !strcmp(currStudent->allocated[idx].finalStuAns, correctAns);
     int isCorrect = currStudent->allocated[idx].isCorrect;
-    
     answerHTML = (char*) realloc(answerHTML, BUFSIZ);
+    if (answerHTML == NULL) {
+        perror("[!] Error: Failed to allocate memory for answerHTML.\n");
+        exit(EXIT_FAILURE);
+    }
     sprintf(answerHTML, "<html><body %s>%s%s%s<h1 %s>Question %d/%d</h1><p>Your grade is: %d/%d</p>     \
                         <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p></body></html>",\
                         blueBG, logoutButton, (idx > 0) ? backButton : "", nextButton, isCorrect ? correctColor : wrongColor, \
@@ -70,8 +91,18 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, i
     return answerHTML;
 }
 
+/**
+ * @brief Updates loginHTML string with the login page HTML code
+ * @param loginHTML the string containing the login page HTML code
+ * @param failed 1 is user failed to login, 0 otherwise
+ * @return char* returns loginHTML string with the login page HTML code
+ */
 char* getLoginHTML(char *loginHTML, int failed) {
     loginHTML = (char*) realloc(loginHTML, BUFSIZ);
+    if (loginHTML == NULL) {
+        perror("[!] Error: Failed to allocate memory for loginHTML.\n");
+        exit(EXIT_FAILURE);
+    }
     sprintf(loginHTML, "<html><body %s><h1>Login</h1><form method=\"post\">\
                         <label for=\"uname\">Username : </label><input type=\"text\" name=\"uname\" value=\"\" required><br><br>\
                         <label for=\"pword\">Password : </label><input type=\"text\" name=\"pword\" value=\"\" required><br><br>\

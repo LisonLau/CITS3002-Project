@@ -1,57 +1,66 @@
-# CITS3002-Project
+# CITS3002 Networks Project
 
-project draft:
+Students undertake a test using a standard web-browser. Their web-browser will communicate with a software application termed a Test-Manager (TM). The TM will communicate with software application termed Question-Bank (QB). TM manages the testing of students, while QB generates and assesses questions. 
 
----------------------- code for reading input from radio button (mcq): -----------------------------
+# TM and Web-browser
+```bash
+The web-browser and TM communicate through HTTP requests. Upon accessing the test, the TM sends a HTTP response, containing the HTML for the login page, and question pages to the web-browser. The web-browser interacts back by sending POST requests through submit buttons. TM receives the request containing the student input and passes them to QB for answer checking.
+```
+# TM and QB
+```bash
+TM and QB communicate through requests and acknowledgements. Requests are sent as message strings. Both TM and QB exchange acknowledgements upon receiving requests from each other. 
+TM requests include requesting for a student database file for authentication, student grades, and correct answer output if the student lost all their attempts.
+A simple stop-and-wait protocol is represented in our implementation, where both ends wait up to 5 seconds if acknowledgements are not yet received. If the time limit is exceeded, the request is retransmitted.
+```
 
-// Parse the HTTP request to extract the POST data
-  char* post_data = NULL;   // should be char post_data[1024]
-  char* body_start = strstr(buffer, "\r\n\r\n");    // should be char body_start[1024]
-  if (body_start != NULL) {
-    post_data = body_start + 4;
-  }
+## Implementation
+TestManager accepts multiple connections from students. TM receives IP addresses for accessed students.  
 
-  // Extract the value of the "choice" parameter from the POST data
-  char* choice_value = NULL;    // should be char choice_value[1024]
-  if (post_data != NULL) {
-    char* choice_start = strstr(post_data, "mcq="); // should be char choice_start[1024]
-    if (choice_start != NULL) {
-      choice_start += strlen("mcq=");
-      char* choice_end = strchr(choice_start, '&'); // should be char choice_end[1024]
-      if (choice_end == NULL) {
-        choice_end = post_data + strlen(post_data);
-      }
-      choice_value = strndup(choice_start, choice_end - choice_start);
-    }
-  }
+## Dependencies
+- [Python3](https://www.python.org/downloads/)
 
-  // Generate a response based on the POST data
-  if (choice_value == NULL) {
-    response_body = strdup("No radio button choice found\n");
-  } else {
-    char response_template[] = "Received radio button choice: %s\n";
-    int response_body_size = snprintf(NULL, 0, response_template, choice_value) + 1;
-    response_body = malloc(response_body_size);
-    snprintf(response_body, response_body_size, response_template, choice_value);
-  }
-  
-  // String to send to QB for grading: choice_value
-  
------------------------------------------------ end of code ---------------------------------------------------------------
 
-------------------------- code for reading http post request from textarea input (pcq) ------------------------------------
+## Installation
 
-// Extract POST data from HTTP request
-    char *post_data = strstr(buffer, "\r\n\r\n");
-    if (post_data != NULL) {
-        post_data += 4; // skip past the "\r\n\r\n"
-        printf("POST data: %s\n", post_data);
-        // parse the POST data to retrieve the textarea input
-        // process the data as needed
-    }
-    
-    // Return response to client
-    send(new_socket, response, strlen(response), 0);
-    printf("Response sent\n");
-    
-------------------------------------------------- end of code --------------------------------------------------------
+1. Clone the repository:
+```bash
+git clone https://github.com/LisonLau CITS3002-Project.git
+```
+2. Download and install [Python3](https://www.python.org/downloads/).
+3. Use the appropriate environment to run C applications such as Linux or macOS
+
+## Usage
+
+Instructions on how to run the project:
+1. Navigate to the QuestionBank folder
+```bash
+cd QuestionBank
+```
+2. Start the QB program by running the command below:
+```bash
+python3 QB.py <QB IP address>
+```
+3. Navigate to the TestManager folder
+```bash
+cd TestManager
+```
+4. Compile the TM program
+```bash
+make
+```
+5. Start the TM program by running the command below:
+```bash
+./TM <TM IP address> <QB IP address>
+```
+6. Multiple student clients can access the test browser by a URL 
+```bash
+https://<TM IP address>:8080
+```
+- QB IP address: the IP address of the host device running the QuestionBank application
+- TM IP address: the IP address of the host device running the TestManager application
+
+## References
+[Decoding url] https://stackoverflow.com/questions/2673207/c-c-url-decode-library
+[How to transfer files using TCP socket] https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-python3/
+[How to transfer files using sockets in Python] https://www.thepythoncode.com/article/send-receive-files-using-sockets-python
+[File transferring using sockets in C] https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-c/

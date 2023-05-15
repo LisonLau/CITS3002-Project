@@ -1,16 +1,21 @@
+# Student 1: Allison Lau   (23123849)
+# Student 2: Alicia Lau    (22955092)
+# Student 3: Li-Anne Long  (23192171)
+
 import csv
 import random
 import socket
 import time
 from _thread import *
-
 from QBc  import *
 from QBpy import *
 
-BUFFERSIZE = 1024
-
 class QuestionBank:
-    def __init__(self):
+    def __init__(self, server_host):
+        # Network socket variables
+        self.SERVER_HOST = server_host
+        self.SERVER_PORT = 8888
+        
         # Create C and Python QB instances
         self.QBcInstance  = QuestionBankC()
         self.QBpyInstance = QuestionBankPython()
@@ -20,7 +25,11 @@ class QuestionBank:
         self.pcqc  = self.QBcInstance.getPCQ()
         self.mcqpy = self.QBpyInstance.getMCQ()
         self.pcqpy = self.QBpyInstance.getPCQ()
+        
+        self.BUFFERSIZE  = 1024
+        self.filesList = []
 
+    # Generates a list of random questions from MCQ and PCQ 
     def getRandom(self):
         # Not including the answers for MCQ
         allQuestions = [x[:-1] for x in self.mcqc] + [x[:-1] for x in self.mcqpy] + self.pcqc + self.pcqpy
@@ -28,13 +37,19 @@ class QuestionBank:
         randomQuestions = allQuestions[:10]
         return randomQuestions
 
+    # Create a file containing the questions for a student
     def makeQuestionFile(self, filename):
         # filename format : student_password
         question_list = self.getRandom()
-        with open(filename, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerows(question_list)
+        try:
+            with open(filename, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerows(question_list)
+            self.filesList.append(filename)
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
             
+    # Grade the question and return whether it is correct or not
     def gradeQuestion(self, type, ques, ans):
         isCorrect = False
         if type == "mcqc":      # C multiple choice question
@@ -45,8 +60,11 @@ class QuestionBank:
             isCorrect = self.QBpyInstance.gradeMCQ(ques, ans)
         elif type == "pcqpy":   # PYTHON programming challenge question
             isCorrect = self.QBpyInstance.gradePCQ(ques, ans)
+        else:
+            print("Error occurred: invalid question type")
         return isCorrect
 
+    # Retrieve the answer to the given question
     def getAnswer(self, type, ques):
         answer = ""
         if type == "mcqc":      # C multiple choice question
@@ -56,118 +74,158 @@ class QuestionBank:
         elif type == "mcqpy":   # PYTHON multiple choice question
             answer = self.QBpyInstance.getMCQanswer(ques)
         elif type == "pcqpy":   # PYTHON programming challenge question
-            answer = self.QBpyInstance.getPCQanswer(ques)
-        return answer
-    
-    def categoriseMessage(self, message):
-        if len(message.split("@")) == 2:
-            return "get_file"
-        elif len(message.split("@")) == 3:
-            return "check"
-        elif len(message.split("@")) == 4:
-            return "get_ans"
+            answer = self.QBcInstance.getPCQanswer(ques)
         else:
-            return ""
+            print("Error occurred: invalid question type")
+        return answer
         
+    # Send the question file to TM
     def executeSendFile(self, message, TMsocket):
         # Get filename and create question file
         filename = message.split("@")[1]
         self.makeQuestionFile(filename)
         
-        # Check if the file exists
-        if os.path.isfile(filename):
-            # Open the file and read its contents
-            with open(filename, 'rb') as f:
-                file_contents = f.read()
-
-            # Send the file contents to the client
-            TMsocket.sendall(file_contents)
-            print(f"[+] Question file '{filename}' sent successfully.")
-        else:
-            print("[-] Failed to send question file.")   
+        # Send question file
+        try:
+            # Check if the file exists
+            if os.path.isfile(filename):
+                # Open the file, read its contents and send it to the client
+                file = open(filename, 'r')
+                file_contents = file.read()
+                TMsocket.send(file_contents.encode())
+                print(f"[+] Question file '{filename}' sent successfully.")
+            else:
+                print("[-] Failed to send question file.")   
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
     
+    # Send whether a student's answer is correct or not to TM
     def executeCheckAnswer(self, message, TMsocket):
         # Grade question
-        type, question, answer = message.split("@")
+        type, question, answer = message.split(",")
         isCorrect = self.gradeQuestion(type, question, answer)
         # Send response 'correct' or 'wrong'
-        if (isCorrect):
-            TMsocket.send("correct".encode())
-            print("[+] Response 'correct' sent successfully.")
-        else:
-            TMsocket.send("wrong".encode())
-            print("[+] Response 'wrong' sent successfully.")
-            
+        try:
+            if (isCorrect):
+                TMsocket.send("correct".encode())
+                print("[+] Response 'correct' sent successfully.")
+            else:
+                TMsocket.send("wrong".encode())
+                print("[+] Response 'wrong' sent successfully.")
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
+           
+    # Send the answer of a question to TM 
     def executeSendAnswer(self, message, TMsocket):
         # Find correct answer for given question
-        type = message.split("@")[2]
-        question = message.split("@")[3]
+        type = message.split("@")[1]
+        question = message.split("@")[2]
         correctAns = self.getAnswer(type, question)
-        TMsocket.send(correctAns.encode())
-        print(f"[+] Answer '{correctAns}' sent successfully.")
+        try:
+            TMsocket.send(correctAns.encode())
+            print(f"[+] Answer '{correctAns}' sent successfully.")
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
         
+    # Execute send operation depending on TM's message request
     def sendToTM(self, message, TMclient):
-        # Categorise message received as 'get' or 'check'
-        if self.categoriseMessage(message) == "get_file":
-            print("[+] Message 'get file' from TM received.")
+        # Categorise message depending on TM's request 
+        messageType = message.split("@")[0]
+        if messageType == "get_file":
             self.executeSendFile(message, TMclient)
-        elif self.categoriseMessage(message) == "check":
-            print("[+] Message 'check' from TM received.")
+        elif messageType == "check_answer":
             self.executeCheckAnswer(message, TMclient)
-        elif self.categoriseMessage(message) == "get_ans":
-            print("[+] Message 'get answer' from TM received.")
+        elif messageType == "get_answer":
             self.executeSendAnswer(message, TMclient)
         else:
-            print("[!] Error: message received was not understood.", message)
+            print("[!] Error occurred: invalid message.")
     
-    def runQBserver(self, clientNetworkIp):
-        # hostname = socket.gethostname()
-        # host = socket.gethostbyname(hostname)  
-        host = clientNetworkIp
-        port = 8888
-        thread_count = 0
-        
-        # Create server socket
-        QBserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print('[+] Server socket created.')
-        
-        # Set socket opt
-        QBserver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        print('[+] Set socket options successful.')
-        
-        # Bind socket to host and port
+    # Print messages of what type of request recevied from TM
+    def printReceivedMsg(self, message):
+        # Categorise message depending on TM's request 
+        messageType = message.split("@")[0]
+        if messageType == "get_file":
+            print("[+] Message 'get file' from TM received.")
+        elif messageType == "check_answer":
+            print("[+] Message 'check answer' from TM received.")
+        elif messageType == "get_answer":
+            print("[+] Message 'get answer' from TM received.")
+        else:
+            print("[!] Error: message received was not understood.")
+            
+    # Receive TM acknowledgement for sent request
+    def receiveACK(self, message, TMclient):
+        ack = ""
+        while (ack != "ACK"):
+            ack = TMclient.recv(self.BUFFERSIZE).decode()
+            if ack == "ACK":    # ack received, can close connection
+                print("[+] Acknowledgement from TM received.")
+                break
+            else:               # ack not received, retry sending data
+                print("[-] Acknowledgement from TM not received.")
+                print("[.] Retrying in 5 seconds...")
+                time.sleep(5)
+                self.sendToTM(message, TMclient)
+    
+    # Create and run QB server socket for TM client to connect
+    def runQBserver(self):
         try:
-            QBserver.bind((host, port))
-        except socket.error as e:  
-            print(f'[-] {str(e)}')
-            return 0
-        print('[+] Binding successful.')
+            # Create server socket
+            QBserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            print('[+] Server socket created.')
+            
+            # Set socket opt
+            QBserver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            print('[+] Set socket options successful.')
+            
+            # Bind socket to host and port
+            QBserver.bind((self.SERVER_HOST, self.SERVER_PORT))
+            print('[+] Binding successful.')
 
-        # Listen for connections
-        QBserver.listen(5)
-        print(f"[*] Listening as {host}:{port}")
+            # Listen for connections
+            QBserver.listen(5)
+            print(f"[*] Listening as {self.SERVER_HOST}:{self.SERVER_PORT}")
+        except socket.error as e:
+            print(f'[-] Error in creating QB socket: {str(e)}')
+            QBserver.close()
         
         try:
             while True:
                 # Establish connection 
                 TMclient, TMaddress = QBserver.accept()
-                print('[+] Connected to: ' + TMaddress[0] + ':' + str(TMaddress[1]))
+                print("----- Connected to: " + TMaddress[0] + ':' + str(TMaddress[1]) + " ------------")
                 
                 # Receive a string message
-                message = TMclient.recv(BUFFERSIZE).decode()
+                message = TMclient.recv(self.BUFFERSIZE).decode()
                 
+                # Send acknowledgment for received data
+                if message:
+                    self.printReceivedMsg(message)
+                    TMclient.send("ACK".encode())
+                    print("[+] Message 'ACKNOWLEDGEMENT' sent successfully.")
+                else:
+                    break
+                    
                 # Perform the required send operation
+                time.sleep(0.1) # to prevent simultaneous ACK and message send
                 self.sendToTM(message, TMclient)
 
-                # Receive acknowledgement for sent data
-                # ack = TMclient.recv(BUFFERSIZE).decode()
-                # if ack == "ACK":
-                #     print("[+] Acknowledgement received for sent data.")
-                # else:
-                #     print("[-] Acknowledgement not received.")
+                # Receive TM acknowledgement for sent data
+                self.receiveACK(message, TMclient)
                     
                 TMclient.close()
+                print("----- Connection to " + TMaddress[0] + ':' + str(TMaddress[1]) + " closed -----")
         # If the user presses Ctrl+C, close the connection and the socket
         except KeyboardInterrupt:
-            QBserver.close()    # close QB socket
-            print("[-] Connection closed.")
+            # Remove question files
+            for file in self.filesList:
+                try:
+                    if os.path.isfile(file):
+                        os.remove(file)
+                except OSError as e:
+                    print(f"[!] Failed to delete file '{file}'.\n")
+            print("\n[-] Removed all student's question files.")
+            
+            # Close the QB server socket
+            QBserver.close()
+            print("[-] QB server connection closed.")
