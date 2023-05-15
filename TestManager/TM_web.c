@@ -135,7 +135,7 @@ void runTMforWeb() {
                         isLoggedIn = -1;
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         students[index].loggedIn = 0;
-                        // strcpy(students[index].ipAddress, "");
+                        strcpy(students[index].ipAddress, "");
                         continue;
                     }
 
