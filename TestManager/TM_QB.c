@@ -105,9 +105,6 @@ int handleQBcheck(char *type, char *question, char *answer) {
     char *mark = strtok(response, "@");
     char *output = strtok(NULL, "@");
 
-    printf("mark: %s\n", mark);
-    printf("output: %s\n", output);
-
     // Send acknowledgement for received data
     char ack[BUFFERSIZE] = "ACK";
     socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
@@ -120,9 +117,10 @@ int handleQBcheck(char *type, char *question, char *answer) {
     }
 
     if (strcmp(type, "pcqc") == 0 || strcmp(type, "pcqpy") == 0 ) {
-        strcpy(answer, output);
-        printf("answer: %s", answer);
-    
+        if (output != NULL){
+            strcpy(answer, output);
+            printf("answer: %s", answer);
+        }
     }
 
     close(TMclient);
