@@ -29,6 +29,7 @@ class QuestionBank:
         self.BUFFERSIZE  = 1024
         self.filesList = []
 
+    # Generates a list of random questions from MCQ and PCQ 
     def getRandom(self):
         # Not including the answers for MCQ
         allQuestions = [x[:-1] for x in self.mcqc] + [x[:-1] for x in self.mcqpy] + self.pcqc + self.pcqpy
@@ -36,6 +37,7 @@ class QuestionBank:
         randomQuestions = allQuestions[:10]
         return randomQuestions
 
+    # Create a file containing the questions for a student
     def makeQuestionFile(self, filename):
         # filename format : student_password
         question_list = self.getRandom()
@@ -47,6 +49,7 @@ class QuestionBank:
         except Exception as e:
             print(f"Error occurred: {str(e)}")
             
+    # Grade the question and return whether it is correct or not
     def gradeQuestion(self, type, ques, ans):
         isCorrect = False
         if type == "mcqc":      # C multiple choice question
@@ -61,6 +64,7 @@ class QuestionBank:
             print("Error occurred: invalid question type")
         return isCorrect
 
+    # Retrieve the answer to the given question
     def getAnswer(self, type, ques):
         answer = ""
         if type == "mcqc":      # C multiple choice question
@@ -74,19 +78,8 @@ class QuestionBank:
         else:
             print("Error occurred: invalid question type")
         return answer
-    
-    def categoriseMessage(self, message):
-        messageType = message.split("@")[0]
-        if messageType == "get_file":
-            return "get_file"
-        elif messageType == "check_answer":
-            return "check_answer"
-        elif messageType == "get_answer":
-            return "get_answer"
-        else:
-            print("Error occurred: invalid message")
-            return ""
         
+    # Send the question file to TM
     def executeSendFile(self, message, TMsocket):
         # Get filename and create question file
         filename = message.split("@")[1]
@@ -106,6 +99,7 @@ class QuestionBank:
         except Exception as e:
             print(f"Error occurred: {str(e)}")
     
+    # Send whether a student's answer is correct or not to TM
     def executeCheckAnswer(self, message, TMsocket):
         # Grade question
         type = message.split("@")[1]
@@ -122,7 +116,8 @@ class QuestionBank:
                 print("[+] Response 'wrong' sent successfully.")
         except Exception as e:
             print(f"Error occurred: {str(e)}")
-            
+           
+    # Send the answer of a question to TM 
     def executeSendAnswer(self, message, TMsocket):
         # Find correct answer for given question
         type = message.split("@")[1]
@@ -134,26 +129,33 @@ class QuestionBank:
         except Exception as e:
             print(f"Error occurred: {str(e)}")
         
+    # Execute send operation depending on TM's message request
     def sendToTM(self, message, TMclient):
-        # Categorise message received
-        if self.categoriseMessage(message) == "get_file":
+        # Categorise message depending on TM's request 
+        messageType = message.split("@")[0]
+        if messageType == "get_file":
             self.executeSendFile(message, TMclient)
-        elif self.categoriseMessage(message) == "check_answer":
+        elif messageType == "check_answer":
             self.executeCheckAnswer(message, TMclient)
-        elif self.categoriseMessage(message) == "get_answer":
+        elif messageType == "get_answer":
             self.executeSendAnswer(message, TMclient)
+        else:
+            print("[!] Error occurred: invalid message.")
     
+    # Print messages of what type of request recevied from TM
     def printReceivedMsg(self, message):
-        # Categorise message received
-        if self.categoriseMessage(message) == "get_file":
+        # Categorise message depending on TM's request 
+        messageType = message.split("@")[0]
+        if messageType == "get_file":
             print("[+] Message 'get file' from TM received.")
-        elif self.categoriseMessage(message) == "check_answer":
+        elif messageType == "check_answer":
             print("[+] Message 'check answer' from TM received.")
-        elif self.categoriseMessage(message) == "get_answer":
+        elif messageType == "get_answer":
             print("[+] Message 'get answer' from TM received.")
         else:
             print("[!] Error: message received was not understood.")
             
+    # Receive TM acknowledgement for sent request
     def receiveACK(self, message, TMclient):
         ack = ""
         while (ack != "ACK"):
@@ -167,6 +169,7 @@ class QuestionBank:
                 time.sleep(5)
                 self.sendToTM(message, TMclient)
     
+    # Create and run QB server socket for TM client to connect
     def runQBserver(self):
         try:
             # Create server socket
