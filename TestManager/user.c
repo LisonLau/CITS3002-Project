@@ -80,7 +80,7 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
             continue;
         }
         
-        currStudent->allocated[quesIdx].isCorrect = -1;
+        currStudent->allocated[quesIdx].isCorrect = 0;
         // Check the question type and store the values accordingly
         if (strcmp(type, "pcqpy") == 0 || strcmp(type, "pcqc") == 0) {
             strncpy(currStudent->allocated[quesIdx].type, type, 10);
@@ -96,6 +96,11 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
             // Store options
             for (int j = 0; j < MAX_OPTIONS; j++) {
                 token = strtok(NULL, ",");
+                int len = strlen(token);
+                if (token[len-1] == '\n') {
+                    token[len-1] = '\0';
+                }
+                printf("'%s'\n", token);
                 strcpy(currStudent->allocated[quesIdx].options[j], token);
             }
             quesIdx++;

@@ -76,7 +76,7 @@ char* getFinishHTML(char *finishHTML, int grade) {
  */
 char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, int index) {
     int idx = currQuestion[index];
-    int isCorrect = !strcmp(currStudent->allocated[idx].finalStuAns, correctAns);
+    int isCorrect = currStudent->allocated[idx].isCorrect;
     answerHTML = (char*) realloc(answerHTML, BUFSIZ);
     if (answerHTML == NULL) {
         perror("[!] Error: Failed to allocate memory for answerHTML.\n");

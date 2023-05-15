@@ -257,7 +257,7 @@ int checkLoggedIn(char *var, int getIndex) {
 void sendHTMLpage(int TMsocket, char *message) {
     char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
-    if (send(socket, response, strlen(response), 0) < 0) {
+    if (send(TMsocket, response, strlen(response), 0) < 0) {
         perror("[-] Error sending HTML page.");
         exit(EXIT_FAILURE);
     }
