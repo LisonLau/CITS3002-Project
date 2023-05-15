@@ -135,7 +135,7 @@ void runTMforWeb() {
                         isLoggedIn = -1;
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         students[index].loggedIn = 0;
-                        strcpy(students[index].ipAddress, "");
+                        // strcpy(students[index].ipAddress, "");
                         continue;
                     }
 
@@ -239,10 +239,11 @@ int handleUserLogin(int socket, char *ip, char *HTTPrequest) {
 int checkLoggedIn(char *var, int getIndex) {
     for (int i = 0; i < MAX_STUDENTS; i++) {
         // Checks if a student is associated with this IP and is logged in
-        if (getIndex && (strcmp(students[i].username, var) == 0 || strcmp(students[i].ipAddress, var) == 0)) {
+        if (getIndex == 1 && (strcmp(students[i].username, var) == 0 || strcmp(students[i].ipAddress, var) == 0)) {
             return i; // returns index of the student
         }
-        else if (!getIndex && strcmp(students[i].ipAddress, var) == 0 && students[i].loggedIn == 1) {
+        else if (getIndex == 0 && strcmp(students[i].ipAddress, var) == 0 && students[i].loggedIn == 1) {
+            printf("ip: %s, loggedIn: %d", students[i].ipAddress, students[i].loggedIn);
             return 1; // returns 1 for true user is logged in
         }
     }

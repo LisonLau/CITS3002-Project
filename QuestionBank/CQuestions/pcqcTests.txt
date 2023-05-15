@@ -1,0 +1,5 @@
+printf("%d",add_nums(43,50));@93
+printf("%d",string_len("Happiness"));@9
+int numbers[] = {1,4,5,10};printf("%d",sum_even(numbers)); @14
+char ans[9] = "Sunshine";reverse_string(ans);printf("%s",ans);@enihsnuS
+char *arr[] = {"hello","gosh","gorgeous","me"};printf("%d",longest_len(arr));@8
