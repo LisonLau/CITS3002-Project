@@ -2,10 +2,18 @@
 
 Students undertake a test using a standard web-browser. Their web-browser will communicate with a software application termed a Test-Manager (TM). The TM will communicate with software application termed Question-Bank (QB). TM manages the testing of students, while QB generates and assesses questions. 
 
+# TM and Web-browser
+```bash
 The web-browser and TM communicate through HTTP requests. Upon accessing the test, the TM sends a HTTP response, containing the HTML for the login page, and question pages to the web-browser. The web-browser interacts back by sending POST requests through submit buttons. TM receives the request containing the student input and passes them to QB for answer checking.
+```
+# TM and QB
+```bash
+TM and QB communicate through requests and acknowledgements. Requests are sent as message strings. Both TM and QB exchange acknowledgements upon receiving requests from each other. 
+TM requests include requesting for a student database file for authentication, student grades, and correct answer output if the student lost all their attempts.
+A simple stop-and-wait protocol is represented in our implementation, where both ends wait up to 5 seconds if acknowledgements are not yet received. If the time limit is exceeded, the request is retransmitted.
+```
 
-TM and QB communicate through requests and acknowledgements. Requests are sent as message strings. Both TM and QB exchange acknowledgements upon receiving requests from each other. A simple stop-and-wait protocol is represented in our implementation, where both ends wait up to 5 seconds if acknowledgements are not yet received. If the time limit is exceeded, the request is retransmitted.
-
+## Implementation
 TestManager accepts multiple connections from students. Students enter their IP addresses to access the TM. TM receives IP addresses for accessed students.  
 
 ## Dependencies
