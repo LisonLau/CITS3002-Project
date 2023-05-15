@@ -57,7 +57,7 @@ char* getFinishHTML(int socket, char *buffer, int grade, char *finishHTML, int i
 
 char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, int index) {
     int idx = currQuestion[index];
-    printf("Iscorrect: %d\n", currStudent->allocated[idx].isCorrect);
+    printf("Iscorrect: %d, idx: %i\n", currStudent->allocated[idx].isCorrect, idx);
     // int isCorrect = !strcmp(currStudent->allocated[idx].finalStuAns, correctAns);
     int isCorrect = currStudent->allocated[idx].isCorrect;
     

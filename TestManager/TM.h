@@ -57,7 +57,6 @@ int         currQuestion[MAX_STUDENTS]; // records current question the student 
 int         numStudents;
 char        *HOST;
 const char  *clientIpAddr;
-const char  *clientIpAddr;
 
 // user.c
 extern void   storeUsers();

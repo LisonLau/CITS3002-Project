@@ -74,6 +74,13 @@ class QuestionBankC:
                     if result.stderr:
                         # If the c file with the student's answer doesn't compile
                         print("[!] stderr:\t" + result.stderr)
+
+                        # Delete the uncompiled file
+                        try:
+                            os.remove(os.path.abspath("tempTestFile.c"))
+                        except OSError:
+                            pass
+                        
                         return False
                     
                     # Execute the code
