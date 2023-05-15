@@ -14,7 +14,7 @@ A simple stop-and-wait protocol is represented in our implementation, where both
 ```
 
 ## Implementation
-TestManager accepts multiple connections from students. Students enter their IP addresses to access the TM. TM receives IP addresses for accessed students.  
+TestManager accepts multiple connections from students. TM receives IP addresses for accessed students.  
 
 ## Dependencies
 - [Python3](https://www.python.org/downloads/)
