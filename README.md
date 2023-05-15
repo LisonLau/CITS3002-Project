@@ -53,3 +53,6 @@ https://<TM IP address>:8080
 
 ## References
 [Decoding url] https://stackoverflow.com/questions/2673207/c-c-url-decode-library
+[How to transfer files using TCP socket] https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-python3/
+[How to transfer files using sockets in Python] https://www.thepythoncode.com/article/send-receive-files-using-sockets-python
+[File transferring using sockets in C] https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-c/
