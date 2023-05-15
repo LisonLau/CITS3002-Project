@@ -6,6 +6,8 @@ The web-browser and TM communicate through HTTP requests. Upon accessing the tes
 
 TM and QB communicate through requests and acknowledgements. Requests are sent as message strings. Both TM and QB exchange acknowledgements upon receiving requests from each other. A simple stop-and-wait protocol is represented in our implementation, where both ends wait up to 5 seconds if acknowledgements are not yet received. If the time limit is exceeded, the request is retransmitted.
 
+TestManager accepts multiple connections from students. Students enter their IP addresses to access the TM. TM receives IP addresses for accessed students.  
+
 ## Dependencies
 - [Python3](https://www.python.org/downloads/)
 
@@ -48,3 +50,6 @@ https://<TM IP address>:8080
 ```
 - QB IP address: the IP address of the host device running the QuestionBank application
 - TM IP address: the IP address of the host device running the TestManager application
+
+## References
+[Decoding url] https://stackoverflow.com/questions/2673207/c-c-url-decode-library
