@@ -102,7 +102,9 @@ class QuestionBank:
     # Send whether a student's answer is correct or not to TM
     def executeCheckAnswer(self, message, TMsocket):
         # Grade question
-        type, question, answer = message.split(",")
+        type = message.split("@")[1]
+        question = message.split("@")[2]
+        answer = message.split("@")[3]
         isCorrect = self.gradeQuestion(type, question, answer)
         # Send response 'correct' or 'wrong'
         try:
