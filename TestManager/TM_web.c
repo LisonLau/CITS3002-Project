@@ -9,7 +9,7 @@
  */
 void runTMforWeb() {
     int                 opt = 1;
-    int                 max_sd, activity, sersockfd, newsockfd, sockfd, valread;
+    int                 max_sd, activity, newsockfd, sockfd, valread;
     int                 client_socket[MAX_CLIENTS] = {0};
     struct sockaddr_in  addr;
     socklen_t           addrsize;
@@ -18,14 +18,14 @@ void runTMforWeb() {
     int                 isLoggedIn = 0;
   
     // Create socket file descriptor
-    if ((sersockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((TMserver = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("[-] Error in socket.");
         exit(EXIT_FAILURE);
     } 
     printf("[+] Server socket created.\n");
 
     // Set socket options
-    if (setsockopt(sersockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+    if (setsockopt(TMserver, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
         perror("[-] Error in setting socket options.");
         exit(EXIT_FAILURE);
     }
@@ -37,15 +37,15 @@ void runTMforWeb() {
 
     // Bind socket to port
     addrsize = sizeof(addr);
-    if (bind(sersockfd, (struct sockaddr*)&addr, addrsize) < 0) {
+    if (bind(TMserver, (struct sockaddr*)&addr, addrsize) < 0) {
         perror("[-] Error in binding");
         exit(EXIT_FAILURE);
     }
     printf("[+] Binding successful.\n");
-    printf("[+] Server socket, fd: %d\n", sersockfd);
+    printf("[+] Server socket, fd: %d\n", TMserver);
 
     // Listen for incoming connections
-    if (listen(sersockfd, 10) < 0) {
+    if (listen(TMserver, 10) < 0) {
         perror("[-] Error in listening.");
         exit(EXIT_FAILURE);
     }
@@ -57,8 +57,8 @@ void runTMforWeb() {
         FD_ZERO(&readset);
 
         // Add master socket to set
-        FD_SET(sersockfd, &readset);
-        max_sd = sersockfd;
+        FD_SET(TMserver, &readset);
+        max_sd = TMserver;
 
         // Adding child sockets to the sets
         for (int i = 0; i < MAX_CLIENTS; i++){
@@ -76,8 +76,8 @@ void runTMforWeb() {
         }
 
         // When something a client request comes into the server
-        if (FD_ISSET(sersockfd, &readset)) {
-            if ((newsockfd = accept(sersockfd, (struct sockaddr*)&addr, &addrsize)) < 0) {
+        if (FD_ISSET(TMserver, &readset)) {
+            if ((newsockfd = accept(TMserver, (struct sockaddr*)&addr, &addrsize)) < 0) {
                 perror("[-] Error in accepting.");
                 exit(EXIT_FAILURE);
             }
@@ -257,7 +257,7 @@ int checkLoggedIn(char *var, int getIndex) {
 void sendHTMLpage(int TMsocket, char *message) {
     char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
-    if (send(socket, response, strlen(response), 0) < 0) {
+    if (send(TMsocket, response, strlen(response), 0) < 0) {
         perror("[-] Error sending HTML page.");
         exit(EXIT_FAILURE);
     }

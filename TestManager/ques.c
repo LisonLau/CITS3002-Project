@@ -13,19 +13,16 @@
  */
 void handleDisplayTest(int socket, char *HTTPrequest, Students *currStudent, int index) {
     // Create custom filename
-    char filename[BUFFERSIZE] = "";
-    strcat(filename, currStudent->username);
-    strcat(filename, currStudent->password);
-    strcat(filename, ".csv");
+
 
     // If student file does not exists, create one
-    if (access(filename, F_OK) != 0) {
-        handleQBgetFile(filename);
+    if (access(currStudent->filename, F_OK) != 0) {
+        handleQBgetFile(currStudent->filename);
         currStudent->grade = 0;
-    } 
-
-    // Store student's allocated questions
-    storeStudentQuestions(filename, currStudent);
+        currStudent->hasQuesFile = 1;
+        // Store student's allocated questions
+        storeStudentQuestions(currStudent->filename, currStudent);
+    }
 
     // Handle the test
     Result result;
@@ -34,11 +31,13 @@ void handleDisplayTest(int socket, char *HTTPrequest, Students *currStudent, int
         result = handleUserAnswers(HTTPrequest, currStudent, index);
 
         // Handle grading and number of attempts
-        currStudent->allocated[currQuestion[index]].isCorrect = result.isCorrect;
+        if (!currStudent->allocated[currQuestion[index]].isCorrect) {
+            currStudent->allocated[currQuestion[index]].isCorrect = result.isCorrect;
+        }
         handleMarkAttempts(socket, HTTPrequest, currStudent, index, result);
 
         // Handle display answer page AFTER question is done
-        handleDisplayAnswer(socket, currStudent, index, result);
+        handleDisplayAnswer(socket, currStudent, index);
 
         // Handle display questions WHEN nothing to do
         handleDisplayQuestion(socket, HTTPrequest, currStudent, index);
@@ -88,14 +87,14 @@ Result handleUserAnswers(char *HTTPrequest, Students *currStudent, int index) {
  */
 void handleMarkAttempts(int socket, char *HTTPrequest, Students *currStudent, int index, Result result) {
     int numAttempts = currStudent->allocated[currQuestion[index]].numAttempts;
-    int isCorrect = currStudent->allocated[currQuestion[index]].isCorrect;
+    int isCorrect = result.isCorrect;
 
-    // If student submits an answer
+    // If question is correct OR 3 attempts made 
     if (strstr(HTTPrequest, "mcq") || strstr(HTTPrequest, "pcq")) {
         currStudent->allocated[currQuestion[index]].numAttempts--;
-        // If question is correct OR 3 attempts made 
-        if (isCorrect || numAttempts == 1) {    
+        if (isCorrect || numAttempts == 1) {
             currStudent->allocated[currQuestion[index]].isDone = 1;
+            currStudent->allocated[currQuestion[index]].isCorrect = result.isCorrect;
             strcpy(currStudent->allocated[currQuestion[index]].finalStuAns, result.studentAns);
             if (isCorrect)
                 currStudent->grade += numAttempts;
@@ -110,9 +109,8 @@ void handleMarkAttempts(int socket, char *HTTPrequest, Students *currStudent, in
  * @param socket the socket file descriptor
  * @param currStudent current student information
  * @param index index of student's current question
- * @param result contains the student answer and whether it is correct
  */
-void handleDisplayAnswer(int socket, Students *currStudent, int index, Result result) {
+void handleDisplayAnswer(int socket, Students *currStudent, int index) {
     // Display answer page when question is already done
     if (currStudent->allocated[currQuestion[index]].isDone) {
         char *answerHTML = {0};

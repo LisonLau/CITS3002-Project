@@ -32,7 +32,27 @@ int main(int argc, char const *argv[]) {
         return EXIT_FAILURE;
     }
     
+    signal(SIGINT, clearMemory);  // Signal handler for Ctrl+C
     storeUsers();   // Store registered users
     runTMforWeb();  // Run the TM server for web browser clients
+    exit(EXIT_SUCCESS);
+}
+
+/**
+ * @brief Removes all student's question files and close the server socket
+ */
+void clearMemory(int sig) {
+    // Remove question files
+    for (int i = 0; i < numStudents; i++) {
+        if (students[i].hasQuesFile) {
+            if (remove(students[i].filename) != 0) {
+                fprintf(stderr, "[!] Failed to delete file '%s'.\n", students[i].filename);
+            }
+        }
+    }
+    printf("\n[-] Removed all student's question files.\n");
+    // Close the TM server socket
+    close(TMserver);
+    printf("[-] TM server connection closed.\n");
     exit(EXIT_SUCCESS);
 }
