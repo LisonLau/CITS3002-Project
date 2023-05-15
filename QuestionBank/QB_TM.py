@@ -74,7 +74,7 @@ class QuestionBank:
         elif type == "mcqpy":   # PYTHON multiple choice question
             answer = self.QBpyInstance.getMCQanswer(ques)
         elif type == "pcqpy":   # PYTHON programming challenge question
-            answer = self.QBcInstance.getPCQanswer(ques)
+            answer = self.QBpyInstance.getPCQanswer(ques)
         else:
             print("Error occurred: invalid question type")
         return answer
