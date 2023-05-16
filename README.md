@@ -60,7 +60,13 @@ https://<TM IP address>:8080
 - TM IP address: the IP address of the host device running the TestManager application
 
 ## References
-[Decoding url] https://stackoverflow.com/questions/2673207/c-c-url-decode-library
-[How to transfer files using TCP socket] https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-python3/
+# File transfer
+[How to transfer files using TCP socket]  https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-python3/
 [How to transfer files using sockets in Python] https://www.thepythoncode.com/article/send-receive-files-using-sockets-python
-[File transferring using sockets in C] https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-c/
+[File transferring using sockets in C]  https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-c/
+
+# Encoding and decoding
+[Decoding url]  https://stackoverflow.com/questions/2673207/c-c-url-decode-library
+
+# HTML scripts
+[Enable tab in textarea]  https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
