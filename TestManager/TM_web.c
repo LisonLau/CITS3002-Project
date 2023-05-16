@@ -267,8 +267,8 @@ void sendHTMLpage(int TMsocket, char *message) {
 
 void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
     // Send HTTP response headers
-    char responseHeaders[BUFFERSIZE] = {0};
-    sprintf(responseHeaders, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %d\nConnection: close\n", HTMLSIZE);
+    char responseHeaders[BUFFERSIZE];
+    snprintf(responseHeaders, sizeof(responseHeaders),"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %d\r\nConnection: close\r\n\r\n", HTMLSIZE);
     if (write(TMsocket, responseHeaders, strlen(responseHeaders)) == -1) {
         fprintf(stderr, "[!] Failed to send HTML response headers.");
         exit(EXIT_FAILURE);
@@ -287,14 +287,14 @@ void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
         exit(EXIT_FAILURE);
     }
 
-    // Get the size of the image file
+    // Get size of image file
     fseek(imageFile, 0, SEEK_END);
     long imageSize = ftell(imageFile);
     fseek(imageFile, 0, SEEK_SET);
 
     // Allocate memory to store the image
-    char* imageData = (char*)malloc(imageSize);
-    if (imageData == NULL) {
+    char* imageData  = (char*)malloc(imageSize);
+    if (imageData  == NULL) {
         fprintf(stderr, "[-] Error allocating memory for image buffer.");
         exit(EXIT_FAILURE);
     }
@@ -306,9 +306,9 @@ void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
     }
     fclose(imageFile);
 
-    // Send image
+    // Send the image
     if (write(TMsocket, imageData, imageSize) == -1) {
-        fprintf(stderr, "[!] Failed to send image.");
+        fprintf(stderr, "[!] Failed to send image data.");
         exit(EXIT_FAILURE);
     }
 
