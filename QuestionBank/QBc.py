@@ -68,8 +68,6 @@ class QuestionBankC:
         with open(self.pcqcCSV, "r") as file:
             lines = file.readlines()
             for i in range(len(lines)):
-                print(question.rstrip())
-                print(lines[i].rstrip())
                 if question.rstrip() == lines[i].rstrip():
                     # Find corresponding test from the pcqc test file
                     with open("./CQuestions/pcqcTests.txt", "r") as testData:
@@ -95,11 +93,15 @@ class QuestionBankC:
                         except OSError:
                             pass
                         
-                        return False
+                        return False, result.stderr.replace("\n", "<br>")
                     
                     # Execute the code
-                    process = subprocess.Popen(["./TFF"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                    stdout, stderr = process.communicate()
+                    process = ""
+                    try:
+                        process = subprocess.run(["./TFF"], capture_output=True, text=True, timeout=2)
+                    except subprocess.TimeoutExpired:
+                        print(f"[!] Student's answer timed-out")
+                   
 
                     # Delete the file after the code is executed
                     try:
@@ -109,12 +111,15 @@ class QuestionBankC:
                         pass
                     
                     # Check the output of the code
-                    if (stdout.strip() == data[1].strip()):
-                        return True
-                    else:
-                        print("[!] stderr:\t" + stderr.strip())
-                        return False
-        return False
+                    print(process)
+                    if (process):
+                        if (process.stdout.strip() == data[1].strip()):
+                            return True, process.stdout.strip()
+                        else:
+                            print("[!] stderr:\t" + process.stderr.strip())
+                            return False, process.stderr.strip().replace("\n", "<br>")
+                    return False, "Error: TimeoutExpired"
+        return False, "An internal QB error has occured."
     
     # Get PCQ answer from given question
     def getPCQanswer(self, question):
@@ -126,5 +131,5 @@ class QuestionBankC:
                         testData = testData.readlines()
                         data = testData[i].split("@")
                         print(data[1].strip())
-                        return f"Input data: {data[0].strip()}\tExpected output: {data[1].strip()}"
-        return ""
+                        return f"<br>Input data: {data[0].strip()}<br>Expected output: {data[1].strip()}"
+        return "An internal QB error has occured."
