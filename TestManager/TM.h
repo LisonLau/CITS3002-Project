@@ -76,6 +76,7 @@ extern void   runTMforWeb();
 extern int    checkLoggedIn(char *, int);
 extern int    handleUserLogin(int, char *, char *);
 extern void   sendHTMLpage(int, char *);
+extern void   sendImage(int);
 // ques.c
 extern void   handleDisplayTest(int, char *, Students *, int);
 extern Result handleUserAnswers(char *, Students *, int);

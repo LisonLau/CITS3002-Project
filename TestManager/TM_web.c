@@ -254,12 +254,48 @@ int checkLoggedIn(char *var, int getIndex) {
  * @brief handles TM socket sending the HTML page to the web browser
  * @param TMsocket TM socket file descriptor
  * @param message the HTML message to be send
+ * @param sendImage 1 if socket is sending an image, 0 otherwise
  */
 void sendHTMLpage(int TMsocket, char *message) {
     char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
     if (send(TMsocket, response, strlen(response), 0) < 0) {
-        perror("[-] Error sending HTML page.");
+        fprintf(stderr, "[-] Error sending HTML page.");
         exit(EXIT_FAILURE);
     }
+}
+
+void sendImage(int TMsocket) {
+    // Read the image file
+    FILE* imageFile = fopen("tempImg.png", "rb");
+    if (imageFile == NULL) {
+        fprintf(stderr, "[-] Error opening image file.");
+        exit(EXIT_FAILURE);
+    }
+    fseek(imageFile, 0, SEEK_END);
+    long imageSize = ftell(imageFile);
+    fseek(imageFile, 0, SEEK_SET);
+
+    // Allocate memory to store the image
+    char* imageBuffer = (char*)malloc(imageSize);
+    if (imageBuffer == NULL) {
+        fprintf(stderr, "[-] Error allocating memory for image buffer.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Read image data into the buffer
+    if (fread(imageBuffer, 1, imageSize, imageFile) != imageSize) {
+        fprintf(stderr, "[-] Error reading image file.");
+        exit(EXIT_FAILURE);
+    }
+    fclose(imageFile);
+
+    // Send the image data
+    if (send(TMsocket, imageBuffer, imageSize, 0) < 0) {
+        fprintf(stderr, "[-] Error sending image data.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Free the allocated memory
+    free(imageBuffer);
 }

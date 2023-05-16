@@ -115,10 +115,11 @@ void handleDisplayAnswer(int socket, Students *currStudent, int index) {
         char *answerHTML = {0};
         char *correctAns = {0};
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
+        answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
         if (!currStudent->allocated[currQuestion[index]].isMCQ) {
             handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
+            sendImage(socket);
         }
-        answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
         sendHTMLpage(socket, answerHTML);
         if (answerHTML != NULL) {
             free(answerHTML);
