@@ -50,13 +50,13 @@ void handleQBgetFile(char *filename) {
     receiveACK(TMclient, message, "get file");
 
     // Receive the file from QB
-    char filelines[BUFSIZ];
+    char filelines[FILESIZE];
     FILE *fp = fopen(filename, "wb"); 
     if (fp == NULL) {
         fprintf(stderr, "[-] Error: Failed to open file '%s' for writing.\n", filename);
         exit(EXIT_FAILURE);
     }
-    int bytes = recv(TMclient, filelines, BUFSIZ, 0);
+    int bytes = recv(TMclient, filelines, FILESIZE, 0);
     fwrite(filelines, sizeof(char), bytes, fp); 
     fclose(fp);
     printf("[+] Question file '%s' received successfully.\n", filename);
