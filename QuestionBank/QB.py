@@ -5,7 +5,6 @@
 import sys
 import ipaddress
 from QB_TM import *
-import sys
 
 # Running the main program for QB
 if __name__ == '__main__':
