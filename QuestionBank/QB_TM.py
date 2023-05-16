@@ -71,14 +71,14 @@ class QuestionBank:
             answer = self.QBcInstance.getMCQanswer(ques)
         elif type == "pcqc":    # C programming challenge question
             if getImg == 1:
-                answer = self.QBcInstance.getPCQimage(ques)
+                answer = self.QBcInstance.getPCQimage(ques) # in image form
             else:
                 answer = self.QBcInstance.getPCQanswer(ques)
         elif type == "mcqpy":   # PYTHON multiple choice question
             answer = self.QBpyInstance.getMCQanswer(ques)
         elif type == "pcqpy":   # PYTHON programming challenge question
             if getImg == 1:
-                answer = self.QBpyInstance.getPCQimage(ques)
+                answer = self.QBpyInstance.getPCQimage(ques) # in image form
             else:
                 answer = self.QBpyInstance.getPCQanswer(ques)
         else:
@@ -139,9 +139,9 @@ class QuestionBank:
     def executeSendImage(self, message, TMsocket):
         type = message.split("@")[1]
         question = message.split("@")[2]
-        imageAns = self.getAnswer(type, question, 1) # 1 for getting image
+        imageData = self.getAnswer(type, question, 1) # 1 for getting image
         try:
-            TMsocket.send(imageAns)
+            TMsocket.send(imageData)
             print(f"[+] Image answer sent successfully.")
         except Exception as e:
             print(f"Error occurred: {str(e)}")
@@ -235,21 +235,22 @@ class QuestionBank:
                 
                 # Receive a string message
                 message = TMclient.recv(self.BUFFERSIZE).decode()
+                messageType = message.split("@")[0]
                 
                 # Send acknowledgment for received data
-                if message:
-                    self.printReceivedMsg(message)
-                    TMclient.send("ACK".encode())
-                    print("[+] Message 'ACKNOWLEDGEMENT' sent successfully.")
-                else:
-                    break
+                if message :
+                    if messageType != "get_image" :
+                        self.printReceivedMsg(message)
+                        TMclient.send("ACK".encode())
+                        print("[+] Message 'ACKNOWLEDGEMENT' sent successfully.")
                     
                 # Perform the required send operation
                 time.sleep(0.1) # to prevent simultaneous ACK and message send
                 self.sendToTM(message, TMclient)
 
                 # Receive TM acknowledgement for sent data
-                self.receiveACK(message, TMclient)
+                if messageType != "get_image":
+                    self.receiveACK(message, TMclient)
                     
                 TMclient.close()
                 print("----- Connection to " + TMaddress[0] + ':' + str(TMaddress[1]) + " closed -----")
