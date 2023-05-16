@@ -119,7 +119,6 @@ int handleQBcheck(char *type, char *question, char *answer) {
     if (strcmp(type, "pcqc") == 0 || strcmp(type, "pcqpy") == 0 ) {
         if (output != NULL){
             strcpy(answer, output);
-            printf("answer: %s", answer);
         }
     }
 
