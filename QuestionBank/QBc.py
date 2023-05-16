@@ -96,8 +96,12 @@ class QuestionBankC:
                         return False, result.stderr.replace("\n", "<br>")
                     
                     # Execute the code
-                    process = subprocess.Popen(["./TFF"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                    stdout, stderr = process.communicate()
+                    process = ""
+                    try:
+                        process = subprocess.run(["./TFF"], capture_output=True, text=True, timeout=2)
+                    except subprocess.TimeoutExpired:
+                        print(f"[!] Student's answer timed-out")
+                   
 
                     # Delete the file after the code is executed
                     try:
@@ -107,11 +111,14 @@ class QuestionBankC:
                         pass
                     
                     # Check the output of the code
-                    if (stdout.strip() == data[1].strip()):
-                        return True, stdout.strip()
-                    else:
-                        print("[!] stderr:\t" + stderr.strip())
-                        return False, stderr.strip().replace("\n", "<br>")
+                    print(process)
+                    if (process):
+                        if (process.stdout.strip() == data[1].strip()):
+                            return True, process.stdout.strip()
+                        else:
+                            print("[!] stderr:\t" + process.stderr.strip())
+                            return False, process.stderr.strip().replace("\n", "<br>")
+                    return False, "Error: TimeoutExpired"
         return False, "An internal QB error has occured."
     
     # Get PCQ answer from given question

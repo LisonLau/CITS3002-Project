@@ -80,8 +80,12 @@ class QuestionBankPython:
                         temp.write(data[0])
 
                     # Execute the python file with the student's code
-                    result = subprocess.run(["python3", os.path.abspath("tempTestFile.py")], capture_output=True, text=True)
-                    print(result.stdout.strip(), data[1].strip())
+                    result = ""
+                    try:
+                        result = subprocess.run(["python3", os.path.abspath("tempTestFile.py")], capture_output=True, text=True, timeout=2)
+                        print(result.stdout.strip(),data[1].strip())
+                    except subprocess.TimeoutExpired:
+                        print(f"[!] Student's answer timed-out")
 
                     # Delete the file after the code is executed
                     try:
@@ -90,11 +94,14 @@ class QuestionBankPython:
                         pass
 
                     # Check the output of the program
-                    if (result.stdout.strip() == data[1].strip()):
-                        return True, result.stdout.strip()
-                    else:
-                        print(f'[!] stderr: {result.stderr.strip()}')
-                        return False, result.stderr.strip().replace("\n", "<br>")
+                    if (result):
+                        if (result.stdout.strip() == data[1].strip()):
+                            return True, result.stdout.strip()    
+                        else:
+                            print(f'[!] stderr: {result.stderr.strip()}')
+                            return False, result.stderr.strip().replace("\n", "<br>")
+                    return False, "Error: TimeoutExpired"
+                    
         return False, "An internal QB error has occured."
     
     # Get PCQ answer from given question
