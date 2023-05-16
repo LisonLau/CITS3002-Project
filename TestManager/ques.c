@@ -12,9 +12,6 @@
  * @param index index of student's current question
  */
 void handleDisplayTest(int socket, char *HTTPrequest, Students *currStudent, int index) {
-    // Create custom filename
-
-
     // If student file does not exists, create one
     if (access(currStudent->filename, F_OK) != 0) {
         handleQBgetFile(currStudent->filename);
@@ -52,7 +49,7 @@ void handleDisplayTest(int socket, char *HTTPrequest, Students *currStudent, int
  * @return Result contains the student answer and whether it is correct
  */
 Result handleUserAnswers(char *HTTPrequest, Students *currStudent, int index) {
-    // Get the answer inputted by user on SUBMIT button press
+    // Get the answer input by user on SUBMIT button press
     Result result;
     result.isCorrect = 0;
     char encoded_ans[BUFFERSIZE];
@@ -91,17 +88,17 @@ void handleMarkAttempts(int socket, char *HTTPrequest, Students *currStudent, in
     int numAttempts = currStudent->allocated[currQuestion[index]].numAttempts;
     int isCorrect = result.isCorrect;
 
-    // If question is correct OR 3 attempts made 
+    // If student attempts a question
     if (strstr(HTTPrequest, "mcq") || strstr(HTTPrequest, "pcq")) {
         currStudent->allocated[currQuestion[index]].numAttempts--;
+        // if the student gets the question correct or loses all attempts
         if (isCorrect || numAttempts == 1) {
             currStudent->allocated[currQuestion[index]].isDone = 1;
             currStudent->allocated[currQuestion[index]].isCorrect = result.isCorrect;
             strcpy(currStudent->allocated[currQuestion[index]].finalStuAns, result.studentAns);
-            if (isCorrect)
-                currStudent->grade += numAttempts;
-            else if (numAttempts == 1)
-                currStudent->grade += numAttempts-1;
+            
+            if (isCorrect)  currStudent->grade += numAttempts;
+            else if (numAttempts == 1)  currStudent->grade += numAttempts-1;
         }
     }
 }
