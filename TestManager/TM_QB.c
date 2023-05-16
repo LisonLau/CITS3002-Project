@@ -50,13 +50,13 @@ void handleQBgetFile(char *filename) {
     receiveACK(TMclient, message, "get file");
 
     // Receive the file from QB
-    char filelines[BUFSIZ];
+    char filelines[FILESIZE];
     FILE *fp = fopen(filename, "wb"); 
     if (fp == NULL) {
         fprintf(stderr, "[-] Error: Failed to open file '%s' for writing.\n", filename);
         exit(EXIT_FAILURE);
     }
-    int bytes = recv(TMclient, filelines, BUFSIZ, 0);
+    int bytes = recv(TMclient, filelines, FILESIZE, 0);
     fwrite(filelines, sizeof(char), bytes, fp); 
     fclose(fp);
     printf("[+] Question file '%s' received successfully.\n", filename);
@@ -177,14 +177,14 @@ void handleQBgetImg(char *type, char *question) {
     // receiveACK(TMclient, message, "get image");
     
     // Receive image from QB
-    char imageData[BUFFERSIZE];
+    char imageData[HTMLSIZE];
     int  imageBytes;
     FILE *imageFile = fopen("tempImg.png", "wb"); 
     if (imageFile == NULL) {
         fprintf(stderr, "[-] Error: Failed to open image for writing.\n");
         exit(EXIT_FAILURE);
     }
-    while ((imageBytes = recv(TMclient, imageData, BUFFERSIZE, 0)) > 0) {
+    while ((imageBytes = recv(TMclient, imageData, HTMLSIZE, 0)) > 0) {
         fwrite(imageData, sizeof(char), imageBytes, imageFile);
     }
     fclose(imageFile);

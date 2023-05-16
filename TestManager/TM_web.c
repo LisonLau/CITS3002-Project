@@ -135,7 +135,7 @@ void runTMforWeb() {
                         isLoggedIn = -1;
                         int index = checkLoggedIn(inet_ntoa(addr.sin_addr), 1);
                         students[index].loggedIn = 0;
-                        // strcpy(students[index].ipAddress, "");
+                        strcpy(students[index].ipAddress, "");
                         continue;
                     }
 
@@ -268,17 +268,17 @@ void sendHTMLpage(int TMsocket, char *message) {
 void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
     // Send HTTP response headers
     char responseHeaders[BUFFERSIZE];
-    snprintf(responseHeaders, sizeof(responseHeaders),"HTTP/1.1 200 OK\r\nContent-Type: image/png\r\nContent-Length: %d\r\nConnection: close\r\n\r\n", HTMLSIZE);
+    snprintf(responseHeaders, sizeof(responseHeaders),"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %d\r\nConnection: close\r\n\r\n", HTMLSIZE);
     if (write(TMsocket, responseHeaders, strlen(responseHeaders)) == -1) {
         fprintf(stderr, "[!] Failed to send HTML response headers.");
         exit(EXIT_FAILURE);
     }
 
     // Send HTML code
-    // if (write(TMsocket, HTMLcode, strlen(HTMLcode)) == -1) {
-    //     fprintf(stderr, "[!] Failed to send HTML code.");
-    //     exit(EXIT_FAILURE);
-    // }
+    if (write(TMsocket, HTMLcode, strlen(HTMLcode)) == -1) {
+        fprintf(stderr, "[!] Failed to send HTML code.");
+        exit(EXIT_FAILURE);
+    }
 
     // Read the image file
     FILE* imageFile = fopen("tempImg.png", "rb");
@@ -291,6 +291,8 @@ void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
     fseek(imageFile, 0, SEEK_END);
     long imageSize = ftell(imageFile);
     fseek(imageFile, 0, SEEK_SET);
+
+    printf("%ld\n", imageSize);
 
     // Allocate memory to store the image
     char* imageData  = (char*)malloc(imageSize);

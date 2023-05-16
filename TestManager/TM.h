@@ -27,6 +27,7 @@
 #define MAX_OPTION_LENGTH   100
 #define MAX_CLIENTS         30
 #define BUFFERSIZE          1024
+#define FILESIZE            8129
 #define HTMLSIZE            16384   
 
 typedef struct Questions {
