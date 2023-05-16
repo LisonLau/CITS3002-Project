@@ -90,7 +90,7 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, i
                             currStudent->allocated[idx].finalStuAns, isCorrect ? correctMessage : wrongMessage, correctAns);
     } else { // PCQ
         sprintf(answerHTML, "<html><body %s>%s%s%s<h1 %s>Question %d/%d</h1><p>Your grade is: %d/%d</p>     \
-                            <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p><img src='trial.png'></body></html>",\
+                            <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p><img src='tempImg.png'></body></html>",\
                             blueBG, logoutButton, (idx > 0) ? backButton : "", nextButton, isCorrect ? correctColor : wrongColor, \
                             idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated[idx].question,      \
                             currStudent->allocated[idx].finalStuAns, isCorrect ? correctMessage : wrongMessage, correctAns);

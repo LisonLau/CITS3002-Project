@@ -76,11 +76,11 @@ extern void   runTMforWeb();
 extern int    checkLoggedIn(char *, int);
 extern int    handleUserLogin(int, char *, char *);
 extern void   sendHTMLpage(int, char *);
-extern void   sendImage(int);
+extern void   sendImageHTMLpage(int, char *);
 // ques.c
 extern void   handleDisplayTest(int, char *, Students *, int);
 extern Result handleUserAnswers(char *, Students *, int);
-extern void   handleMarkAttempts(int, char *, Students *, int, Result);
+extern void   handleMarkAttempts(char *, Students *, int, Result);
 extern void   handleDisplayAnswer(int, Students *, int);
 extern void   handleDisplayQuestion(int, char *, Students *, int);
 extern void   urlDecode(char *, char *);

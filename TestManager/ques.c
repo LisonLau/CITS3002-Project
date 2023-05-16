@@ -6,12 +6,12 @@
 
 /**
  * @brief Handles displaying the test on a web browser
- * @param socket the socket file descriptor
+ * @param TMsocket the TM server socket file descriptor
  * @param HTTPrequest the HTTP request received from client web browser
  * @param currStudent current student information
  * @param index index of student's current question
  */
-void handleDisplayTest(int socket, char *HTTPrequest, Students *currStudent, int index) {
+void handleDisplayTest(int TMsocket, char *HTTPrequest, Students *currStudent, int index) {
     // If student file does not exists, create one
     if (access(currStudent->filename, F_OK) != 0) {
         handleQBgetFile(currStudent->filename);
@@ -31,13 +31,13 @@ void handleDisplayTest(int socket, char *HTTPrequest, Students *currStudent, int
         if (!currStudent->allocated[currQuestion[index]].isCorrect) {
             currStudent->allocated[currQuestion[index]].isCorrect = result.isCorrect;
         }
-        handleMarkAttempts(socket, HTTPrequest, currStudent, index, result);
+        handleMarkAttempts(HTTPrequest, currStudent, index, result);
 
         // Handle display answer page AFTER question is done
-        handleDisplayAnswer(socket, currStudent, index);
+        handleDisplayAnswer(TMsocket, currStudent, index);
 
         // Handle display questions WHEN nothing to do
-        handleDisplayQuestion(socket, HTTPrequest, currStudent, index);
+        handleDisplayQuestion(TMsocket, HTTPrequest, currStudent, index);
     }
 }
 
@@ -69,22 +69,19 @@ Result handleUserAnswers(char *HTTPrequest, Students *currStudent, int index) {
     } else if (strstr(HTTPrequest, "pcqc=") != NULL) {  // PCQC
         sscanf(strstr(HTTPrequest, "pcqc="), "pcqc=%s", encoded_ans);
         urlDecode(encoded_ans, result.studentAns); 
-        printf("%s\n", result.studentAns);
         result.isCorrect = handleQBcheck("pcqc", currStudent->allocated[currQuestion[index]].question, result.studentAns);   // If wrong, minus mark by 1
-        printf("%s\n", result.studentAns);
     }
     return result;
 }
 
 /**
  * @brief Handles keeping track of number of attempts and student's marks
- * @param socket the socket file descriptor
  * @param HTTPrequest the HTTP request received from client web browser
  * @param currStudent current student information
  * @param index index of student's current question
  * @param result contains the student answer and whether it is correct
  */
-void handleMarkAttempts(int socket, char *HTTPrequest, Students *currStudent, int index, Result result) {
+void handleMarkAttempts(char *HTTPrequest, Students *currStudent, int index, Result result) {
     int numAttempts = currStudent->allocated[currQuestion[index]].numAttempts;
     int isCorrect = result.isCorrect;
 
@@ -105,22 +102,24 @@ void handleMarkAttempts(int socket, char *HTTPrequest, Students *currStudent, in
 
 /**
  * @brief Handles displaying the answer page on the web browser
- * @param socket the socket file descriptor
+ * @param TMsocket the TM server socket file descriptor
  * @param currStudent current student information
  * @param index index of student's current question
  */
-void handleDisplayAnswer(int socket, Students *currStudent, int index) {
+void handleDisplayAnswer(int TMsocket, Students *currStudent, int index) {
     // Display answer page when question is already done
     if (currStudent->allocated[currQuestion[index]].isDone) {
         char *answerHTML = {0};
         char *correctAns = {0};
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
         answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
-        if (!currStudent->allocated[currQuestion[index]].isMCQ) {
+        sendHTMLpage(TMsocket, answerHTML);
+        if (currStudent->allocated[currQuestion[index]].isMCQ) {
+            sendHTMLpage(TMsocket, answerHTML);
+        } else {
             handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
-            sendImage(socket);
+            sendImageHTMLpage(TMsocket, answerHTML);
         }
-        sendHTMLpage(socket, answerHTML);
         if (answerHTML != NULL) {
             free(answerHTML);
             answerHTML = NULL;
@@ -134,17 +133,17 @@ void handleDisplayAnswer(int socket, Students *currStudent, int index) {
 
 /**
  * @brief Handles displayed the question page on the web browser
- * @param socket the socket file descriptor
+ * @param TMsocket the TM server socket file descriptor
  * @param HTTPrequest the HTTP request received from client web browser
  * @param currStudent current student information
  * @param index index of student's current question
  */
-void handleDisplayQuestion(int socket, char *HTTPrequest, Students *currStudent, int index) {
+void handleDisplayQuestion(int TMsocket, char *HTTPrequest, Students *currStudent, int index) {
     // Display the question if student is not done with the question
     if (currStudent->allocated[currQuestion[index]].isDone == 0) {
         char *quesHTML = {0};
         quesHTML = getQuestionHTML(quesHTML, currStudent, index);
-        sendHTMLpage(socket, quesHTML);
+        sendHTMLpage(TMsocket, quesHTML);
         if (quesHTML != NULL) {
             free(quesHTML);
             quesHTML = NULL;

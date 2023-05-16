@@ -265,37 +265,53 @@ void sendHTMLpage(int TMsocket, char *message) {
     }
 }
 
-void sendImage(int TMsocket) {
+void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
+    // Send HTTP response headers
+    char responseHeaders[BUFFERSIZE] = {0};
+    sprintf(responseHeaders, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %d\nConnection: close\n", HTMLSIZE);
+    if (write(TMsocket, responseHeaders, strlen(responseHeaders)) == -1) {
+        fprintf(stderr, "[!] Failed to send HTML response headers.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Send HTML code
+    if (write(TMsocket, HTMLcode, strlen(HTMLcode)) == -1) {
+        fprintf(stderr, "[!] Failed to send HTML code.");
+        exit(EXIT_FAILURE);
+    }
+
     // Read the image file
     FILE* imageFile = fopen("tempImg.png", "rb");
     if (imageFile == NULL) {
         fprintf(stderr, "[-] Error opening image file.");
         exit(EXIT_FAILURE);
     }
+
+    // Get the size of the image file
     fseek(imageFile, 0, SEEK_END);
     long imageSize = ftell(imageFile);
     fseek(imageFile, 0, SEEK_SET);
 
     // Allocate memory to store the image
-    char* imageBuffer = (char*)malloc(imageSize);
-    if (imageBuffer == NULL) {
+    char* imageData = (char*)malloc(imageSize);
+    if (imageData == NULL) {
         fprintf(stderr, "[-] Error allocating memory for image buffer.");
         exit(EXIT_FAILURE);
     }
 
     // Read image data into the buffer
-    if (fread(imageBuffer, 1, imageSize, imageFile) != imageSize) {
+    if (fread(imageData, 1, imageSize, imageFile) != imageSize) {
         fprintf(stderr, "[-] Error reading image file.");
         exit(EXIT_FAILURE);
     }
     fclose(imageFile);
 
-    // Send the image data
-    if (send(TMsocket, imageBuffer, imageSize, 0) < 0) {
-        fprintf(stderr, "[-] Error sending image data.");
+    // Send image
+    if (write(TMsocket, imageData, imageSize) == -1) {
+        fprintf(stderr, "[!] Failed to send image.");
         exit(EXIT_FAILURE);
     }
 
     // Free the allocated memory
-    free(imageBuffer);
+    free(imageData);
 }
