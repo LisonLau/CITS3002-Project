@@ -39,7 +39,7 @@ int main(int argc, char const *argv[]) {
 }
 
 /**
- * @brief Removes all student's question files and close the server socket
+ * @brief Removes all student's question files and close the server socket on termination
  */
 void clearMemory(int sig) {
     // Remove question files

@@ -189,6 +189,21 @@ class QuestionBank:
                 print("[.] Retrying in 5 seconds...")
                 time.sleep(5)
                 self.sendToTM(message, TMclient)
+                
+    # Delete question files and close sockets on termination
+    def clearMemory(self, socket):
+        # Remove question files
+        for file in self.filesList:
+            try:
+                if os.path.isfile(file):
+                    os.remove(file)
+            except OSError as e:
+                print(f"[!] Failed to delete file '{file}'.\n")
+        print("\n[-] Removed all student's question files.")
+        
+        # Close the QB server socket
+        socket.close()
+        print("[-] QB server connection closed.")
     
     # Create and run QB server socket for TM client to connect
     def runQBserver(self):
@@ -240,15 +255,4 @@ class QuestionBank:
                 print("----- Connection to " + TMaddress[0] + ':' + str(TMaddress[1]) + " closed -----")
         # If the user presses Ctrl+C, close the connection and the socket
         except KeyboardInterrupt:
-            # Remove question files
-            for file in self.filesList:
-                try:
-                    if os.path.isfile(file):
-                        os.remove(file)
-                except OSError as e:
-                    print(f"[!] Failed to delete file '{file}'.\n")
-            print("\n[-] Removed all student's question files.")
-            
-            # Close the QB server socket
-            QBserver.close()
-            print("[-] QB server connection closed.")
+            self.clearMemory(QBserver)
