@@ -38,7 +38,7 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
     } else { // PCQ
         sprintf(quesHTML, "<html><body %s>%s%s%s<form method='post'>\
                         <h1>Question %d/%d</h1><p>Your grade is: %d/%d</p><p>Attempts left: %d</p>                                          \
-                        <label for='%s'>%s</label><form method='post'><br><textarea name='%s' rows='20' cols='60' %s></textarea>            \
+                        <label for='%s'>%s</label><form method='post'><br><textarea name=\"%s\" rows=\"20\" cols=\"60\" %s></textarea>            \
                         <br><br><button type='submit'>Submit</button>%s</form></body></html>",                                              \
                         blueBG, logoutButton, (idx > 0) ? backButton : "", (idx < MAX_QUESTIONS-1) ? nextButton : "",                       \
                         idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated[idx].numAttempts,                 \
