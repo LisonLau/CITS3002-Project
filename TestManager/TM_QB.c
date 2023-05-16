@@ -170,6 +170,42 @@ char* handleQBgetAns(char *type, char *question) {
     return correctAns;
 }
 
+void handleQBgetImg(char *type, char *question) {
+    int TMclient = createTMclient();
+
+    // Send the message
+    char message[BUFFERSIZE] = "";
+    strcat(message, "get_image@");
+    strcat(message, type);
+    strcat(message, "@");
+    strcat(message, question);
+    socketSend(TMclient, message, "get image");
+
+    // Receive QB acknowledgement for sent request
+    // receiveACK(TMclient, message, "get image");
+    
+    // Receive image from QB
+    char imageData[HTMLSIZE];
+    int  imageBytes;
+    FILE *imageFile = fopen("tempImg.png", "wb"); 
+    if (imageFile == NULL) {
+        fprintf(stderr, "[-] Error: Failed to open image for writing.\n");
+        exit(EXIT_FAILURE);
+    }
+    while ((imageBytes = recv(TMclient, imageData, HTMLSIZE, 0)) > 0) {
+        fwrite(imageData, sizeof(char), imageBytes, imageFile);
+    }
+    fclose(imageFile);
+    printf("[+] Image received successfully.\n");
+
+    // Send acknowledgement for received data
+    // char ack[BUFFERSIZE] = "ACK";
+    // socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
+
+    close(TMclient);
+    printf("--------- Connection to QB closed ---------\n");
+}
+
 /**
  * @brief handles sending socket message
  * @param TMclient TM client socket file descriptor

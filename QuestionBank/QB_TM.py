@@ -66,16 +66,22 @@ class QuestionBank:
         return isCorrect, output
 
     # Retrieve the answer to the given question
-    def getAnswer(self, type, ques):
+    def getAnswer(self, type, ques, getImg):
         answer = ""
         if type == "mcqc":      # C multiple choice question
             answer = self.QBcInstance.getMCQanswer(ques)
         elif type == "pcqc":    # C programming challenge question
-            answer = self.QBcInstance.getPCQanswer(ques)
+            if getImg == 1:
+                answer = self.QBcInstance.getPCQimage(ques) # in image form
+            else:
+                answer = self.QBcInstance.getPCQanswer(ques)
         elif type == "mcqpy":   # PYTHON multiple choice question
             answer = self.QBpyInstance.getMCQanswer(ques)
         elif type == "pcqpy":   # PYTHON programming challenge question
-            answer = self.QBpyInstance.getPCQanswer(ques)
+            if getImg == 1:
+                answer = self.QBpyInstance.getPCQimage(ques) # in image form
+            else:
+                answer = self.QBpyInstance.getPCQanswer(ques)
         else:
             print("Error occurred: invalid question type")
         return answer
@@ -123,10 +129,21 @@ class QuestionBank:
         # Find correct answer for given question
         type = message.split("@")[1]
         question = message.split("@")[2]
-        correctAns = self.getAnswer(type, question)
+        correctAns = self.getAnswer(type, question, 0) # 0 for not getting image
         try:
             TMsocket.send(correctAns.encode())
             print(f"[+] Answer '{correctAns}' sent successfully.")
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
+          
+    # Send the answer of PCQ as an image to TM 
+    def executeSendImage(self, message, TMsocket):
+        type = message.split("@")[1]
+        question = message.split("@")[2]
+        imageData = self.getAnswer(type, question, 1) # 1 for getting image
+        try:
+            TMsocket.send(imageData)
+            print(f"[+] Image answer sent successfully.")
         except Exception as e:
             print(f"Error occurred: {str(e)}")
         
@@ -140,6 +157,8 @@ class QuestionBank:
             self.executeCheckAnswer(message, TMclient)
         elif messageType == "get_answer":
             self.executeSendAnswer(message, TMclient)
+        elif messageType == "get_image":
+            self.executeSendImage(message, TMclient)
         else:
             print("[!] Error occurred: invalid message.")
     
@@ -153,6 +172,8 @@ class QuestionBank:
             print("[+] Message 'check answer' from TM received.")
         elif messageType == "get_answer":
             print("[+] Message 'get answer' from TM received.")
+        elif messageType == "get_image":
+            print("[+] Message 'get image' from TM received.")
         else:
             print("[!] Error: message received was not understood.")
             
@@ -169,6 +190,21 @@ class QuestionBank:
                 print("[.] Retrying in 5 seconds...")
                 time.sleep(5)
                 self.sendToTM(message, TMclient)
+                
+    # Delete question files and close sockets on termination
+    def clearMemory(self, socket):
+        # Remove question files
+        for file in self.filesList:
+            try:
+                if os.path.isfile(file):
+                    os.remove(file)
+            except OSError as e:
+                print(f"[!] Failed to delete file '{file}'.\n")
+        print("\n[-] Removed all student's question files.")
+        
+        # Close the QB server socket
+        socket.close()
+        print("[-] QB server connection closed.")
     
     # Create and run QB server socket for TM client to connect
     def runQBserver(self):
@@ -200,35 +236,25 @@ class QuestionBank:
                 
                 # Receive a string message
                 message = TMclient.recv(self.BUFFERSIZE).decode()
+                messageType = message.split("@")[0]
                 
                 # Send acknowledgment for received data
-                if message:
-                    self.printReceivedMsg(message)
-                    TMclient.send("ACK".encode())
-                    print("[+] Message 'ACKNOWLEDGEMENT' sent successfully.")
-                else:
-                    break
+                if message :
+                    if messageType != "get_image" :
+                        self.printReceivedMsg(message)
+                        TMclient.send("ACK".encode())
+                        print("[+] Message 'ACKNOWLEDGEMENT' sent successfully.")
                     
                 # Perform the required send operation
                 time.sleep(0.1) # to prevent simultaneous ACK and message send
                 self.sendToTM(message, TMclient)
 
                 # Receive TM acknowledgement for sent data
-                self.receiveACK(message, TMclient)
+                if messageType != "get_image":
+                    self.receiveACK(message, TMclient)
                     
                 TMclient.close()
                 print("----- Connection to " + TMaddress[0] + ':' + str(TMaddress[1]) + " closed -----")
         # If the user presses Ctrl+C, close the connection and the socket
         except KeyboardInterrupt:
-            # Remove question files
-            for file in self.filesList:
-                try:
-                    if os.path.isfile(file):
-                        os.remove(file)
-                except OSError as e:
-                    print(f"[!] Failed to delete file '{file}'.\n")
-            print("\n[-] Removed all student's question files.")
-            
-            # Close the QB server socket
-            QBserver.close()
-            print("[-] QB server connection closed.")
+            self.clearMemory(QBserver)
