@@ -102,16 +102,24 @@ int handleQBcheck(char *type, char *question, char *answer) {
     }
     response[response_bytes] = '\0';
     printf("[+] QB response '%s' received successfully.\n", response);
+    char *mark = strtok(response, "@");
+    char *output = strtok(NULL, "@");
 
     // Send acknowledgement for received data
     char ack[BUFFERSIZE] = "ACK";
     socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
     
     // If answer graded by QB is correct
-    if (strcmp(response, "correct") == 0) {
+    if (strcmp(mark, "correct") == 0) {
         isCorrect = 1;
-    } else if (strcmp(response, "wrong") == 0) {
+    } else if (strcmp(mark, "wrong") == 0) {
         isCorrect = 0;
+    }
+
+    if (strcmp(type, "pcqc") == 0 || strcmp(type, "pcqpy") == 0 ) {
+        if (output != NULL){
+            strcpy(answer, output);
+        }
     }
 
     close(TMclient);

@@ -44,6 +44,13 @@ int main(int argc, char const *argv[]) {
     return 0;
 }
 
+void reverse_string(char *str1)  {  
+    int count = 1;
+    while (count > 0){
+        count ++;
+    }
+}  
+
 
 // Write a C function reverse_string that takes a string as input and reverses that string.
 void reverse_string(char *str1)  {  

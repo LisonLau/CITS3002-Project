@@ -160,13 +160,10 @@ void runTMforWeb() {
                         // Handle display question page of current question
                         else {
                             // Increment quesIdx on NEXT button press
-                            if (strstr(HTTPrequest, "next=Next") != NULL) {
-                                currQuestion[index]++;
-                            } 
+                            if (strstr(HTTPrequest, "next=Next") != NULL)   currQuestion[index]++;
                             // Decrement quesIdx on BACK button press
-                            if (strstr(HTTPrequest, "back=Back") != NULL) {
-                                currQuestion[index]--;
-                            }
+                            if (strstr(HTTPrequest, "back=Back") != NULL)   currQuestion[index]--;
+                            
                             handleDisplayTest(sockfd, HTTPrequest, &students[index], index);
                         }
                     }

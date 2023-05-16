@@ -52,17 +52,18 @@ class QuestionBank:
     # Grade the question and return whether it is correct or not
     def gradeQuestion(self, type, ques, ans):
         isCorrect = False
+        output = " "
         if type == "mcqc":      # C multiple choice question
             isCorrect = self.QBcInstance.gradeMCQ(ques, ans)
         elif type == "pcqc":    # C programming challenge question
-            isCorrect = self.QBcInstance.gradePCQ(ques, ans)
+            isCorrect, output = self.QBcInstance.gradePCQ(ques, ans)
         elif type == "mcqpy":   # PYTHON multiple choice question
             isCorrect = self.QBpyInstance.gradeMCQ(ques, ans)
         elif type == "pcqpy":   # PYTHON programming challenge question
-            isCorrect = self.QBpyInstance.gradePCQ(ques, ans)
+            isCorrect, output = self.QBpyInstance.gradePCQ(ques, ans)
         else:
             print("Error occurred: invalid question type")
-        return isCorrect
+        return isCorrect, output
 
     # Retrieve the answer to the given question
     def getAnswer(self, type, ques, getImg):
@@ -111,14 +112,14 @@ class QuestionBank:
         type = message.split("@")[1]
         question = message.split("@")[2]
         answer = message.split("@")[3]
-        isCorrect = self.gradeQuestion(type, question, answer)
+        isCorrect, output = self.gradeQuestion(type, question, answer)
         # Send response 'correct' or 'wrong'
         try:
             if (isCorrect):
-                TMsocket.send("correct".encode())
+                TMsocket.send(f"correct@{output}".encode())
                 print("[+] Response 'correct' sent successfully.")
             else:
-                TMsocket.send("wrong".encode())
+                TMsocket.send(f"wrong@{output}".encode())
                 print("[+] Response 'wrong' sent successfully.")
         except Exception as e:
             print(f"Error occurred: {str(e)}")
