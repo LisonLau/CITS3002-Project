@@ -108,12 +108,9 @@ int handleQBcheck(char *type, char *question, char *answer) {
     socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
     
     // If answer graded by QB is correct
-    if (strcmp(response, "correct") == 0) {
-        isCorrect = 1;
-    } else if (strcmp(response, "wrong") == 0) {
-        isCorrect = 0;
-    }
-
+    if (strcmp(response, "correct") == 0)   isCorrect = 1;
+    else if (strcmp(response, "wrong") == 0)    isCorrect = 0;
+    
     close(TMclient);
     printf("--------- Connection to QB closed ---------\n");
     return isCorrect;
