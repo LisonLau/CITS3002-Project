@@ -16,6 +16,9 @@ void runTMforWeb() {
     fd_set              readset;
     char                HTTPrequest[BUFFERSIZE];
     int                 isLoggedIn = 0;
+    struct timeval      timeout;
+    timeout.tv_sec = 10; // wait up to 10 seconds 
+    timeout.tv_usec = 0;
   
     // Create socket file descriptor
     if ((TMserver = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -69,7 +72,7 @@ void runTMforWeb() {
 
         // Waiting for one of the sockets to do something, waits indefinitely
         printf("[+] Waiting...\n");
-        activity = select(max_sd + 1, &readset, NULL, NULL, NULL);
+        activity = select(max_sd + 1, &readset, NULL, NULL, &timeout);
         if (activity < 0 && errno != EINTR){
             perror("[-] Socket connection error.\n");
             exit(EXIT_FAILURE);
