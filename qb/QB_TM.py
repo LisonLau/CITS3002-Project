@@ -30,6 +30,7 @@ class QuestionBank:
         self.pcqpy = self.QBpyInstance.getPCQ()
         
         self.BUFFERSIZE  = 1024
+        self.TEMP_IMG = "tempImg.png"
         self.filesList = []
 
     # Generates a list of random questions from MCQ and PCQ 
@@ -208,8 +209,8 @@ class QuestionBank:
         
         # Delete temp image
         try:
-            if os.path.isfile("tempImg.png"):
-                os.remove("tempImg.png")
+            if os.path.isfile(self.TEMP_IMG):
+                os.remove(self.TEMP_IMG)
         except OSError as e:
             print(f"[!] Failed to delete image.\n")
         print("\n[-] Removed temp image.")

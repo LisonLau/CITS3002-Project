@@ -53,7 +53,7 @@ void clearMemory(int sig) {
     printf("\n[-] Removed all student's question files.\n");
     
     // Remove temp image
-    if (remove("tempImg.png") != 0) {
+    if (remove(TEMP_IMG) != 0) {
         fprintf(stderr, "[!] Failed to delete image");
     }
     printf("\n[-] Removed temp image.\n");
