@@ -202,6 +202,14 @@ class QuestionBank:
                 print(f"[!] Failed to delete file '{file}'.\n")
         print("\n[-] Removed all student's question files.")
         
+        # Delete temp image
+        try:
+            if os.path.isfile("tempImg.png"):
+                os.remove("tempImg.png")
+        except OSError as e:
+            print(f"[!] Failed to delete image.\n")
+        print("\n[-] Removed temp image.")
+
         # Close the QB server socket
         socket.close()
         print("[-] QB server connection closed.")

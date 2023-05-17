@@ -263,16 +263,6 @@ void sendHTMLpage(int TMsocket, char *message) {
 }
 
 void sendImagePage(int TMsocket) {
-    // Send HTTP response headers
-    char responseHeaders[BUFFERSIZE];
-    snprintf(responseHeaders, sizeof(responseHeaders),\
-    "HTTP/1.1 200 OK\r\nContent-Type: image/png\r\nContent-Length: %d\r\n\
-    Connection: close\r\n\r\n", HTMLSIZE);
-    if (send(TMsocket, responseHeaders, strlen(responseHeaders), 0) < 0) {
-        fprintf(stderr, "[!] Failed to send HTML response headers.");
-        exit(EXIT_FAILURE);
-    }
-
     // Read the image file
     FILE* imageFile = fopen("tempImg.png", "rb");
     if (imageFile == NULL) {
@@ -300,6 +290,15 @@ void sendImagePage(int TMsocket) {
         exit(EXIT_FAILURE);
     }
     fclose(imageFile);
+
+    // Send HTTP response headers
+    char responseHeaders[BUFFERSIZE];
+    snprintf(responseHeaders, sizeof(responseHeaders),\
+    "HTTP/1.1 200 OK\nContent-Type: image/png\nContent-Length: %ld\n\n", imageSize);
+    if (send(TMsocket, responseHeaders, strlen(responseHeaders), 0) < 0) {
+        fprintf(stderr, "[!] Failed to send HTML response headers.");
+        exit(EXIT_FAILURE);
+    }
 
     // Send the image
     if (send(TMsocket, imageData, imageSize, 0) < 0) {
