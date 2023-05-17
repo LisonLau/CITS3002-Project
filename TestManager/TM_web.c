@@ -309,10 +309,10 @@ void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
     fclose(imageFile);
 
     // Send the image
-    if (send(TMsocket, imageData, imageSize, 0) == -1) {
-        fprintf(stderr, "[!] Failed to send image data.");
-        exit(EXIT_FAILURE);
-    }
+    // if (send(TMsocket, imageData, imageSize, 0) == -1) {
+    //     fprintf(stderr, "[!] Failed to send image data.");
+    //     exit(EXIT_FAILURE);
+    // }
 
     // Free the allocated memory
     free(imageData);

@@ -90,11 +90,11 @@ extern int    createTMclient();
 extern int    handleQBcheck(char *, char *, char *);
 extern void   handleQBgetFile(char *);
 extern char*  handleQBgetAns(char *, char *);
-extern void   handleQBgetImg(char *, char *);
+extern char*  handleQBgetImg(char *, char *, char*);
 extern void   socketSend(int, char *, char *);
 extern void   receiveACK(int, char *, char *);
 // html.c
 extern char*  getQuestionHTML(char *, Students *, int);
 extern char*  getFinishHTML(char *, int);
-extern char*  getAnswerHTML(char *, Students *, char *, int);
+extern char*  getAnswerHTML(char *, Students *, char *, int, char*);
 extern char*  getLoginHTML(char *, int);

@@ -111,12 +111,14 @@ void handleDisplayAnswer(int TMsocket, Students *currStudent, int index) {
     if (currStudent->allocated[currQuestion[index]].isDone) {
         char *answerHTML = {0};
         char *correctAns = {0};
+        char *imageData =  {0};
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
-        answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
         if (currStudent->allocated[currQuestion[index]].isMCQ) {
+            answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index, "");
             sendHTMLpage(TMsocket, answerHTML);
         } else {
-            handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
+            imageData = handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question, imageData);
+            answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index, imageData);
             sendImageHTMLpage(TMsocket, answerHTML);
         }
 

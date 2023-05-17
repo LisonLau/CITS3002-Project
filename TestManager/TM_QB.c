@@ -170,7 +170,9 @@ char* handleQBgetAns(char *type, char *question) {
     return correctAns;
 }
 
-void handleQBgetImg(char *type, char *question) {
+char* handleQBgetImg(char *type, char *question, char* imageData) {
+
+
     int TMclient = createTMclient();
 
     // Send the message
@@ -185,7 +187,11 @@ void handleQBgetImg(char *type, char *question) {
     // receiveACK(TMclient, message, "get image");
     
     // Receive image from QB
-    char imageData[HTMLSIZE];
+    imageData = (char*) realloc(imageData, HTMLSIZE);
+    if (imageData == NULL) {
+        perror("[!] Error: Failed to allocate memory for quesHTML.\n");
+        exit(EXIT_FAILURE);
+    }
     int  imageBytes;
     FILE *imageFile = fopen("tempImg.png", "wb"); 
     if (imageFile == NULL) {
@@ -204,6 +210,7 @@ void handleQBgetImg(char *type, char *question) {
 
     close(TMclient);
     printf("--------- Connection to QB closed ---------\n");
+    return imageData;
 }
 
 /**

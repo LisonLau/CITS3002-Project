@@ -1,0 +1,10 @@
+mcqc,What is the correct syntax to declare an array in C programming language?,array arr[10];,int arr = [10];,int arr[10];,None of the above
+mcqpy,Which of the operators is used for concatenation in Python?,+,*,%,/
+pcqc,Write a C function reverse_string() that takes a string as input and reverses that string.
+pcqc,Write a C function string_len() that takes a string as input and returns the length of the string.
+pcqpy,Write a Python function add_nums() that takes two numbers as input and returns their sum.
+mcqpy,What is the symbol used in Python for single line comments?,//,#,!,/
+mcqc,What is the extension of a C source code file?,.cpp,.h,.c,.exe
+pcqpy,Write a Python function sum_even() that takes a list of numbers as input and returns the sum of all the even numbers in the list.
+mcqpy,What is the keyword used in Python to define a function?,module,function,class,def
+pcqpy,Write a Python function string_len() that takes a string as input and returns the length of the string.

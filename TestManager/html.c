@@ -74,7 +74,7 @@ char* getFinishHTML(char *finishHTML, int grade) {
  * @param index the index of the student's current question
  * @return char* returns answerHTML string with the finish question page HTML code
  */
-char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, int index) {
+char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, int index, char* imageData) {
     int idx = currQuestion[index];
     int isCorrect = currStudent->allocated[idx].isCorrect;
     answerHTML = (char*) realloc(answerHTML, BUFSIZ);
@@ -90,10 +90,11 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, i
                             currStudent->allocated[idx].finalStuAns, isCorrect ? correctMessage : wrongMessage, correctAns);
     } else { // PCQ
         sprintf(answerHTML, "<html><body %s>%s%s%s<h1 %s>Question %d/%d</h1><p>Your grade is: %d/%d</p>     \
-                            <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p><img src='tempImg.png'></body></html>",\
+                            <p>%s</p><p>Your answer is: %s</p>%s<p>Correct answer is: %s</p><img src='data:image/png;base64,%s'></body></html>",\
                             blueBG, logoutButton, (idx > 0) ? backButton : "", nextButton, isCorrect ? correctColor : wrongColor, \
                             idx+1, MAX_QUESTIONS, currStudent->grade, MAX_QUESTIONS*3, currStudent->allocated[idx].question,      \
-                            currStudent->allocated[idx].finalStuAns, isCorrect ? correctMessage : wrongMessage, correctAns);
+                            currStudent->allocated[idx].finalStuAns, isCorrect ? correctMessage : wrongMessage, correctAns,\
+                            imageData);
     }
     return answerHTML;
 }
