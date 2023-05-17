@@ -88,6 +88,7 @@ int handleQBcheck(char *type, char *question, char *answer) {
     strcat(message, question);
     strcat(message, "@");
     strcat(message, answer);
+    printf("%s\n", answer);
     socketSend(TMclient, message, "check answer");
 
     // Receive QB acknowledgement for sent request
@@ -170,8 +171,7 @@ char* handleQBgetAns(char *type, char *question) {
     return correctAns;
 }
 
-char* handleQBgetImg(char *type, char *question, char* imageData) {
-
+void handleQBgetImg(char *type, char *question) {
 
     int TMclient = createTMclient();
 
@@ -187,17 +187,15 @@ char* handleQBgetImg(char *type, char *question, char* imageData) {
     // receiveACK(TMclient, message, "get image");
     
     // Receive image from QB
-    imageData = (char*) realloc(imageData, HTMLSIZE);
-    if (imageData == NULL) {
-        perror("[!] Error: Failed to allocate memory for quesHTML.\n");
-        exit(EXIT_FAILURE);
-    }
+     char imageData[HTMLSIZE];
     int  imageBytes;
     FILE *imageFile = fopen("tempImg.png", "wb"); 
     if (imageFile == NULL) {
         fprintf(stderr, "[-] Error: Failed to open image for writing.\n");
         exit(EXIT_FAILURE);
     }
+    // imageBytes = recv(TMclient, imageData, FILESIZE, 0);
+    // fwrite(imageData, sizeof(char), imageBytes, imageFile); 
     while ((imageBytes = recv(TMclient, imageData, HTMLSIZE, 0)) > 0) {
         fwrite(imageData, sizeof(char), imageBytes, imageFile);
     }
@@ -210,7 +208,6 @@ char* handleQBgetImg(char *type, char *question, char* imageData) {
 
     close(TMclient);
     printf("--------- Connection to QB closed ---------\n");
-    return imageData;
 }
 
 /**

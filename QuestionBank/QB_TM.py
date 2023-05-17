@@ -60,6 +60,7 @@ class QuestionBank:
         elif type == "mcqpy":   # PYTHON multiple choice question
             isCorrect = self.QBpyInstance.gradeMCQ(ques, ans)
         elif type == "pcqpy":   # PYTHON programming challenge question
+            print(ans)
             isCorrect, output = self.QBpyInstance.gradePCQ(ques, ans)
         else:
             print("Error occurred: invalid question type")

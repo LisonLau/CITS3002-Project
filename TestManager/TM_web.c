@@ -149,7 +149,11 @@ void runTMforWeb() {
                         Students currStudent = students[index];
                         int quesIdx = currQuestion[index];
                         printf("[.] Student is: %s, index:%i quesIdx:%i\n", currStudent.username, index, quesIdx);
-            
+
+                        if (strstr(HTTPrequest, "GET /tempImg.png HTTP/1.1")){
+                            sendImagePage(sockfd);
+                        }
+
                         // Handle display finish page after test is done
                         if (currStudent.allocated[quesIdx].isDone == 1 && quesIdx >= MAX_QUESTIONS-1) {
                             char *finishHTML = {0};
@@ -265,21 +269,7 @@ void sendHTMLpage(int TMsocket, char *message) {
     }
 }
 
-void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
-    // Send HTTP response headers
-    char responseHeaders[BUFFERSIZE];
-    snprintf(responseHeaders, sizeof(responseHeaders),"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %d\r\nConnection: close\r\n\r\n", HTMLSIZE);
-    if (write(TMsocket, responseHeaders, strlen(responseHeaders)) == -1) {
-        fprintf(stderr, "[!] Failed to send HTML response headers.");
-        exit(EXIT_FAILURE);
-    }
-
-    // Send HTML code
-    if (write(TMsocket, HTMLcode, strlen(HTMLcode)) == -1) {
-        fprintf(stderr, "[!] Failed to send HTML code.");
-        exit(EXIT_FAILURE);
-    }
-
+void sendImagePage(int TMsocket) {
     // Read the image file
     FILE* imageFile = fopen("tempImg.png", "rb");
     if (imageFile == NULL) {
@@ -308,11 +298,20 @@ void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
     }
     fclose(imageFile);
 
+    // Send HTTP response headers
+    char responseHeaders[BUFFERSIZE];
+    snprintf(responseHeaders, sizeof(responseHeaders),\
+    "HTTP/1.1 200 OK\nContent-Type: image/png\nContent-Length: %ld\n\n", imageSize);
+    if (send(TMsocket, responseHeaders, strlen(responseHeaders), 0) < 0) {
+        fprintf(stderr, "[!] Failed to send HTML response headers.");
+        exit(EXIT_FAILURE);
+    }
+
     // Send the image
-    // if (send(TMsocket, imageData, imageSize, 0) == -1) {
-    //     fprintf(stderr, "[!] Failed to send image data.");
-    //     exit(EXIT_FAILURE);
-    // }
+    if (send(TMsocket, imageData, imageSize, 0) < 0) {
+        fprintf(stderr, "[!] Failed to send image data.");
+        exit(EXIT_FAILURE);
+    }
 
     // Free the allocated memory
     free(imageData);

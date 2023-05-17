@@ -77,7 +77,7 @@ extern void   runTMforWeb();
 extern int    checkLoggedIn(char *, int);
 extern int    handleUserLogin(int, char *, char *);
 extern void   sendHTMLpage(int, char *);
-extern void   sendImageHTMLpage(int, char *);
+extern void   sendImagePage(int);
 // ques.c
 extern void   handleDisplayTest(int, char *, Students *, int);
 extern Result handleUserAnswers(char *, Students *, int);
@@ -90,11 +90,11 @@ extern int    createTMclient();
 extern int    handleQBcheck(char *, char *, char *);
 extern void   handleQBgetFile(char *);
 extern char*  handleQBgetAns(char *, char *);
-extern char*  handleQBgetImg(char *, char *, char*);
+extern void  handleQBgetImg(char *, char *);
 extern void   socketSend(int, char *, char *);
 extern void   receiveACK(int, char *, char *);
 // html.c
 extern char*  getQuestionHTML(char *, Students *, int);
 extern char*  getFinishHTML(char *, int);
-extern char*  getAnswerHTML(char *, Students *, char *, int, char*);
+extern char*  getAnswerHTML(char *, Students *, char *, int);
 extern char*  getLoginHTML(char *, int);

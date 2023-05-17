@@ -69,6 +69,7 @@ Result handleUserAnswers(char *HTTPrequest, Students *currStudent, int index) {
     } else if (strstr(HTTPrequest, "pcqc=") != NULL) {  // PCQC
         sscanf(strstr(HTTPrequest, "pcqc="), "pcqc=%s", encoded_ans);
         urlDecode(encoded_ans, result.studentAns); 
+        printf("%s\n",result.studentAns);
         result.isCorrect = handleQBcheck("pcqc", currStudent->allocated[currQuestion[index]].question, result.studentAns);   // If wrong, minus mark by 1
     }
     return result;
@@ -111,16 +112,14 @@ void handleDisplayAnswer(int TMsocket, Students *currStudent, int index) {
     if (currStudent->allocated[currQuestion[index]].isDone) {
         char *answerHTML = {0};
         char *correctAns = {0};
-        char *imageData =  {0};
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
-        if (currStudent->allocated[currQuestion[index]].isMCQ) {
-            answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index, "");
-            sendHTMLpage(TMsocket, answerHTML);
-        } else {
-            imageData = handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question, imageData);
-            answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index, imageData);
-            sendImageHTMLpage(TMsocket, answerHTML);
-        }
+        answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
+        sendHTMLpage(TMsocket, answerHTML);
+
+        // Get the example Answer for PCQ questions
+        if (!currStudent->allocated[currQuestion[index]].isMCQ) {
+            handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
+        } 
 
         if (answerHTML != NULL) {
             free(answerHTML);
