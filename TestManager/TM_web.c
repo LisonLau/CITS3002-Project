@@ -265,14 +265,16 @@ void sendHTMLpage(int TMsocket, char *message) {
 void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
     // Send HTTP response headers
     char responseHeaders[BUFFERSIZE];
-    snprintf(responseHeaders, sizeof(responseHeaders),"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %d\r\nConnection: close\r\n\r\n", HTMLSIZE);
-    if (write(TMsocket, responseHeaders, strlen(responseHeaders)) == -1) {
+    snprintf(responseHeaders, sizeof(responseHeaders),\
+    "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %d\r\n\
+    Connection: close\r\n\r\n", HTMLSIZE);
+    if (send(TMsocket, responseHeaders, strlen(responseHeaders), 0) < 0) {
         fprintf(stderr, "[!] Failed to send HTML response headers.");
         exit(EXIT_FAILURE);
     }
 
     // Send HTML code
-    if (write(TMsocket, HTMLcode, strlen(HTMLcode)) == -1) {
+    if (send(TMsocket, HTMLcode, strlen(HTMLcode), 0) < 0) {
         fprintf(stderr, "[!] Failed to send HTML code.");
         exit(EXIT_FAILURE);
     }
@@ -306,7 +308,7 @@ void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
     fclose(imageFile);
 
     // Send the image
-    if (send(TMsocket, imageData, imageSize, 0) == -1) {
+    if (send(TMsocket, imageData, imageSize, 0) < 0) {
         fprintf(stderr, "[!] Failed to send image data.");
         exit(EXIT_FAILURE);
     }
