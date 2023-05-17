@@ -133,11 +133,11 @@ class QuestionBankPython:
                 lines = file.readlines()
                 for i in range(len(lines)):
                     if question.rstrip() == lines[i].rstrip():
-                        imagefile = f"./PythonQuestions/pcqpy{i}.png"
-                        image = open(imagefile, 'rb')
+                        imageFile = f"./PythonQuestions/pcqpy{i}.png"
+                        image = open(imageFile, 'rb')
                         imageData = image.read()
                         image.close()
-                        return imageData
+                        return imageData, imageFile
         except Exception as e:
             print(f"Error occured: {str(e)}")
         return ""

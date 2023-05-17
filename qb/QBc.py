@@ -151,11 +151,11 @@ class QuestionBankC:
                 lines = file.readlines()
                 for i in range(len(lines)):
                     if question.rstrip() == lines[i].rstrip():
-                        imagefile = f"./CQuestions/pcqc{i}.png"
-                        image = open(imagefile, 'rb')
+                        imageFile = f"./CQuestions/pcqc{i}.png"
+                        image = open(imageFile, 'rb')
                         imageData = bytes(image.read())
                         image.close()
-                        return imageData
+                        return imageData, imageFile
         except Exception as e:
             print(f"Error occured: {str(e)}")      
         return ""

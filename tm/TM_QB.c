@@ -44,7 +44,7 @@ void handleQBgetFile(char *filename) {
     int TMclient = createTMclient();
 
     // Send the request for file message
-    char message[BUFFERSIZE] = "";
+    char message[BUFFERSIZE];
     snprintf(message, sizeof(message), "get_file@%s", filename);
     socketSend(TMclient, message, "get file");
 
@@ -59,6 +59,10 @@ void handleQBgetFile(char *filename) {
         exit(EXIT_FAILURE);
     }
     int bytes = recv(TMclient, filelines, FILESIZE, 0);
+    if (bytes < 0) {
+        perror("[-] Failed to receive question file.\n");
+        exit(EXIT_FAILURE);
+    }
     fwrite(filelines, sizeof(char), bytes, fp); 
     fclose(fp);
     printf("[+] Question file '%s' received successfully.\n", filename);
@@ -83,7 +87,7 @@ int handleQBcheck(char *type, char *question, char *answer) {
     int TMclient = createTMclient();
 
     // Send the message
-    char message[BUFFERSIZE] = "";
+    char message[BUFFERSIZE];
     snprintf(message, sizeof(message), "check_answer@%s@%s@%s", type, question, answer);
     printf("%s\n", answer);
     socketSend(TMclient, message, "check answer");
@@ -136,7 +140,7 @@ char* handleQBgetAns(char *type, char *question) {
     int TMclient = createTMclient();
 
     // Send the message
-    char message[BUFFERSIZE] = "";
+    char message[BUFFERSIZE];
     snprintf(message, sizeof(message), "get_answer@%s@%s", type, question);
     socketSend(TMclient, message, "get answer");
 
@@ -176,21 +180,45 @@ void handleQBgetImg(char *type, char *question, char *imageName) {
     int TMclient = createTMclient();
 
     // Send the message
-    char message[BUFFERSIZE] = "";
+    char message[BUFFERSIZE];
     snprintf(message, sizeof(message), "get_image@%s@%s", type, question);
     socketSend(TMclient, message, "get image");
+
+    //
     
+    // Receive image size from QB
+    char *tempSize = malloc(BUFFERSIZE);
+    int sizeBytes = recv(TMclient, tempSize, sizeof(tempSize), 0);
+    if (sizeBytes < 0) {
+        perror("[-] Failed to receive image size.\n");
+        exit(EXIT_FAILURE);
+    }
+    tempSize[sizeBytes] = '\0';
+    int dataSize = (int)atoi(tempSize);
+    size_t imageSize = (size_t)atoll(tempSize);
+
     // Receive image from QB
-    char imageData[HTMLSIZE];
+    char imageData[dataSize];
     int  imageBytes;
+    if (imageData == NULL) {
+        perror("[!] Buffer allocation failed");
+        exit(EXIT_FAILURE);
+    }
     FILE *imageFile = fopen(imageName, "wb"); 
     if (imageFile == NULL) {
         fprintf(stderr, "[-] Error: Failed to open image for writing.\n");
         exit(EXIT_FAILURE);
     }
-    // imageBytes = recv(TMclient, imageData, FILESIZE, 0);
-    // fwrite(imageData, sizeof(char), imageBytes, imageFile); 
-    while ((imageBytes = recv(TMclient, imageData, HTMLSIZE, 0)) > 0) {
+    // imageBytes = recv(TMclient, imageData, imageSize, 0);
+    // if (imageBytes < 0) {
+    //     perror("[-] Failed to receive image.\n");
+    //     exit(EXIT_FAILURE);
+    // }
+    // fwrite(imageData, sizeof(char), imageSize, imageFile); 
+    // printf("bytes %d\n", imageBytes);
+    // printf("size %zu\n", imageSize);
+    // printf("data %s\n", imageData);
+    while ((imageBytes = recv(TMclient, imageData, imageSize, 0)) > 0) {
         fwrite(imageData, sizeof(char), imageBytes, imageFile);
     }
     fclose(imageFile);

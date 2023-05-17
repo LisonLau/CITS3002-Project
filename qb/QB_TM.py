@@ -73,23 +73,24 @@ class QuestionBank:
     # Retrieve the answer to the given question
     def getAnswer(self, type, ques, getImg):
         answer = ""
+        imgfile = ""
         if type == "mcqc":      # C multiple choice question
             answer = self.QBcInstance.getMCQanswer(ques)
         elif type == "pcqc":    # C programming challenge question
             if getImg == 1:
-                answer = self.QBcInstance.getPCQimage(ques) # in image form
+                answer, imgfile = self.QBcInstance.getPCQimage(ques) # in image form
             else:
                 answer = self.QBcInstance.getPCQanswer(ques)
         elif type == "mcqpy":   # PYTHON multiple choice question
             answer = self.QBpyInstance.getMCQanswer(ques)
         elif type == "pcqpy":   # PYTHON programming challenge question
             if getImg == 1:
-                answer = self.QBpyInstance.getPCQimage(ques) # in image form
+                answer, imgfile = self.QBpyInstance.getPCQimage(ques) # in image form
             else:
                 answer = self.QBpyInstance.getPCQanswer(ques)
         else:
             print("Error occurred: invalid question type")
-        return answer
+        return answer, imgfile
         
     # Send the question file to TM
     def executeSendFile(self, message, TMsocket):
@@ -104,7 +105,7 @@ class QuestionBank:
                 # Open the file, read its contents and send it to the client
                 file = open(filename, 'r')
                 file_contents = file.read()
-                TMsocket.send(file_contents.encode())
+                TMsocket.sendall(file_contents.encode())
                 print(f"[+] Question file '{filename}' sent successfully.")
             else:
                 print("[-] Failed to send question file.")   
@@ -121,10 +122,10 @@ class QuestionBank:
         # Send response 'correct' or 'wrong'
         try:
             if (isCorrect):
-                TMsocket.send(f"correct@{output}".encode())
+                TMsocket.sendall(f"correct@{output}".encode())
                 print("[+] Response 'correct' sent successfully.")
             else:
-                TMsocket.send(f"wrong@{output}".encode())
+                TMsocket.sendall(f"wrong@{output}".encode())
                 print("[+] Response 'wrong' sent successfully.")
         except Exception as e:
             print(f"Error occurred: {str(e)}")
@@ -134,9 +135,9 @@ class QuestionBank:
         # Find correct answer for given question
         type = message.split("@")[1]
         question = message.split("@")[2]
-        correctAns = self.getAnswer(type, question, 0) # 0 for not getting image
+        correctAns = self.getAnswer(type, question, 0)[0] # 0 for not getting image
         try:
-            TMsocket.send(correctAns.encode())
+            TMsocket.sendall(correctAns.encode())
             print(f"[+] Answer '{correctAns}' sent successfully.")
         except Exception as e:
             print(f"Error occurred: {str(e)}")
@@ -145,9 +146,11 @@ class QuestionBank:
     def executeSendImage(self, message, TMsocket):
         type = message.split("@")[1]
         question = message.split("@")[2]
-        imageData = self.getAnswer(type, question, 1) # 1 for getting image
+        imageData, imageFile = self.getAnswer(type, question, 1) # 1 for getting image
+        imageSize = os.path.getsize(imageFile)
         try:
-            TMsocket.send(imageData)
+            TMsocket.sendall(str(imageSize).encode())
+            TMsocket.sendall(imageData)
             print(f"[+] Image answer sent successfully.")
         except Exception as e:
             print(f"Error occurred: {str(e)}")
@@ -213,7 +216,7 @@ class QuestionBank:
                 os.remove(self.TEMP_IMG)
         except OSError as e:
             print(f"[!] Failed to delete image.\n")
-        print("\n[-] Removed temp image.")
+        print("[-] Removed temp image.")
 
         # Close the QB server socket
         socket.close()
@@ -253,9 +256,9 @@ class QuestionBank:
                 
                 # Send acknowledgment for received data
                 if message :
+                    self.printReceivedMsg(message)
                     if messageType != "get_image" :
-                        self.printReceivedMsg(message)
-                        TMclient.send("ACK".encode())
+                        TMclient.sendall("ACK".encode())
                         print("[+] Message 'ACKNOWLEDGEMENT' sent successfully.")
                     
                 # Perform the required send operation
