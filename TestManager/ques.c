@@ -24,6 +24,12 @@ void handleDisplayTest(int TMsocket, char *HTTPrequest, Students *currStudent, i
     // Handle the test
     Result result;
     if (strstr(HTTPrequest, "POST / HTTP/1.1") != NULL) {
+        // User click SEE button for PCQ image
+        if (strstr(HTTPrequest, "see=") != NULL) {
+            handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
+            sendImagePage(TMsocket);
+        }
+
         // Handle user answers WHEN submit
         result = handleUserAnswers(HTTPrequest, currStudent, index);
 
@@ -113,13 +119,7 @@ void handleDisplayAnswer(int TMsocket, Students *currStudent, int index) {
         char *correctAns = {0};
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
         answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
-        if (currStudent->allocated[currQuestion[index]].isMCQ) {
-            sendHTMLpage(TMsocket, answerHTML);
-        } else {
-            handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
-            sendImageHTMLpage(TMsocket, answerHTML);
-        }
-
+        sendHTMLpage(TMsocket, answerHTML);
         if (answerHTML != NULL) {
             free(answerHTML);
             answerHTML = NULL;

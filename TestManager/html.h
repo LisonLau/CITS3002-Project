@@ -6,6 +6,7 @@
 char *backButton   = "<form method='post'><input type='submit' name='back' value='Back'></form>";
 char *nextButton   = "<form method='post'><input type='submit' name='next' value='Next'></form>";
 char *logoutButton = "<form method='post'><input type='submit' name='logout' value='Logout'></form>";
+char *seeButton = "<form method='post' target='_blank'><input type='submit' name='see' value='See'></form>";
 char *failMessage  = "<p>Login failed. Try again.</p><br>";
 char *wrongAnswer  = "<p>Your answer is wrong. Try again.</p>";
 char *correctMessage = "<p>Your answer is correct!</p>"; 
