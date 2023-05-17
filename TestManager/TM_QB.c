@@ -192,6 +192,8 @@ void handleQBgetImg(char *type, char *question) {
         fprintf(stderr, "[-] Error: Failed to open image for writing.\n");
         exit(EXIT_FAILURE);
     }
+    // imageBytes = recv(TMclient, imageData, FILESIZE, 0);
+    // fwrite(imageData, sizeof(char), imageBytes, imageFile); 
     while ((imageBytes = recv(TMclient, imageData, HTMLSIZE, 0)) > 0) {
         fwrite(imageData, sizeof(char), imageBytes, imageFile);
     }

@@ -55,7 +55,7 @@ char* getQuestionHTML(char *quesHTML, Students *currStudent, int index) {
  * @return char* returns finishHTML string with the finish test page HTML code
  */
 char* getFinishHTML(char *finishHTML, int grade) {
-    finishHTML = (char*) realloc(finishHTML, BUFSIZ);
+    finishHTML = (char*) realloc(finishHTML, FILESIZE);
     if (finishHTML == NULL) {
         perror("[!] Error: Failed to allocate memory for finishHTML.\n");
         exit(EXIT_FAILURE);
@@ -77,7 +77,7 @@ char* getFinishHTML(char *finishHTML, int grade) {
 char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, int index) {
     int idx = currQuestion[index];
     int isCorrect = currStudent->allocated[idx].isCorrect;
-    answerHTML = (char*) realloc(answerHTML, BUFSIZ);
+    answerHTML = (char*) realloc(answerHTML, FILESIZE);
     if (answerHTML == NULL) {
         perror("[!] Error: Failed to allocate memory for answerHTML.\n");
         exit(EXIT_FAILURE);
@@ -105,7 +105,7 @@ char* getAnswerHTML(char *answerHTML, Students *currStudent, char *correctAns, i
  * @return char* returns loginHTML string with the login page HTML code
  */
 char* getLoginHTML(char *loginHTML, int failed) {
-    loginHTML = (char*) realloc(loginHTML, BUFSIZ);
+    loginHTML = (char*) realloc(loginHTML, FILESIZE);
     if (loginHTML == NULL) {
         perror("[!] Error: Failed to allocate memory for loginHTML.\n");
         exit(EXIT_FAILURE);

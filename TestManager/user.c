@@ -92,7 +92,6 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
             currStudent->allocated[quesIdx].isMCQ = 0;
             quesIdx++;
 
-
         } else if (strcmp(type, "mcqpy") == 0 || strcmp(type, "mcqc") == 0) {
             strncpy(currStudent->allocated[quesIdx].type, type, 10);
             strncpy(currStudent->allocated[quesIdx].question, ques, MAX_QUESTION_LENGTH);
