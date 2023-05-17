@@ -160,13 +160,10 @@ void runTMforWeb() {
                         // Handle display question page of current question
                         else {
                             // Increment quesIdx on NEXT button press
-                            if (strstr(HTTPrequest, "next=Next") != NULL) {
-                                currQuestion[index]++;
-                            } 
+                            if (strstr(HTTPrequest, "next=Next") != NULL)   currQuestion[index]++;
                             // Decrement quesIdx on BACK button press
-                            if (strstr(HTTPrequest, "back=Back") != NULL) {
-                                currQuestion[index]--;
-                            }
+                            if (strstr(HTTPrequest, "back=Back") != NULL)   currQuestion[index]--;
+                            
                             handleDisplayTest(sockfd, HTTPrequest, &students[index], index);
                         }
                     }
@@ -239,10 +236,11 @@ int handleUserLogin(int socket, char *ip, char *HTTPrequest) {
 int checkLoggedIn(char *var, int getIndex) {
     for (int i = 0; i < MAX_STUDENTS; i++) {
         // Checks if a student is associated with this IP and is logged in
-        if (getIndex && (strcmp(students[i].username, var) == 0 || strcmp(students[i].ipAddress, var) == 0)) {
+        if (getIndex == 1 && (strcmp(students[i].username, var) == 0 || strcmp(students[i].ipAddress, var) == 0)) {
             return i; // returns index of the student
         }
-        else if (!getIndex && strcmp(students[i].ipAddress, var) == 0 && students[i].loggedIn == 1) {
+        else if (getIndex == 0 && strcmp(students[i].ipAddress, var) == 0 && students[i].loggedIn == 1) {
+            printf("ip: %s, loggedIn: %d", students[i].ipAddress, students[i].loggedIn);
             return 1; // returns 1 for true user is logged in
         }
     }
@@ -253,12 +251,66 @@ int checkLoggedIn(char *var, int getIndex) {
  * @brief handles TM socket sending the HTML page to the web browser
  * @param TMsocket TM socket file descriptor
  * @param message the HTML message to be send
+ * @param sendImage 1 if socket is sending an image, 0 otherwise
  */
 void sendHTMLpage(int TMsocket, char *message) {
     char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
     if (send(TMsocket, response, strlen(response), 0) < 0) {
-        perror("[-] Error sending HTML page.");
+        fprintf(stderr, "[-] Error sending HTML page.");
         exit(EXIT_FAILURE);
     }
+}
+
+void sendImageHTMLpage(int TMsocket, char *HTMLcode) {
+    // Send HTTP response headers
+    char responseHeaders[BUFFERSIZE];
+    snprintf(responseHeaders, sizeof(responseHeaders),"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %d\r\nConnection: close\r\n\r\n", HTMLSIZE);
+    if (write(TMsocket, responseHeaders, strlen(responseHeaders)) == -1) {
+        fprintf(stderr, "[!] Failed to send HTML response headers.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Send HTML code
+    if (write(TMsocket, HTMLcode, strlen(HTMLcode)) == -1) {
+        fprintf(stderr, "[!] Failed to send HTML code.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Read the image file
+    FILE* imageFile = fopen("tempImg.png", "rb");
+    if (imageFile == NULL) {
+        fprintf(stderr, "[-] Error opening image file.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Get size of image file
+    fseek(imageFile, 0, SEEK_END);
+    long imageSize = ftell(imageFile);
+    fseek(imageFile, 0, SEEK_SET);
+
+    printf("%ld\n", imageSize);
+
+    // Allocate memory to store the image
+    char* imageData  = (char*)malloc(imageSize);
+    if (imageData  == NULL) {
+        fprintf(stderr, "[-] Error allocating memory for image buffer.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Read image data into the buffer
+    if (fread(imageData, 1, imageSize, imageFile) != imageSize) {
+        fprintf(stderr, "[-] Error reading image file.");
+        exit(EXIT_FAILURE);
+    }
+    fclose(imageFile);
+
+    // Send the image
+    if (send(TMsocket, imageData, imageSize, 0) == -1) {
+        fprintf(stderr, "[!] Failed to send image data.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Free the allocated memory
+    free(imageData);
 }

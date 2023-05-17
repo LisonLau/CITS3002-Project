@@ -50,13 +50,13 @@ void handleQBgetFile(char *filename) {
     receiveACK(TMclient, message, "get file");
 
     // Receive the file from QB
-    char filelines[BUFSIZ];
+    char filelines[FILESIZE];
     FILE *fp = fopen(filename, "wb"); 
     if (fp == NULL) {
         fprintf(stderr, "[-] Error: Failed to open file '%s' for writing.\n", filename);
         exit(EXIT_FAILURE);
     }
-    int bytes = recv(TMclient, filelines, BUFSIZ, 0);
+    int bytes = recv(TMclient, filelines, FILESIZE, 0);
     fwrite(filelines, sizeof(char), bytes, fp); 
     fclose(fp);
     printf("[+] Question file '%s' received successfully.\n", filename);
@@ -102,16 +102,24 @@ int handleQBcheck(char *type, char *question, char *answer) {
     }
     response[response_bytes] = '\0';
     printf("[+] QB response '%s' received successfully.\n", response);
+    char *mark = strtok(response, "@");
+    char *output = strtok(NULL, "@");
 
     // Send acknowledgement for received data
     char ack[BUFFERSIZE] = "ACK";
     socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
     
     // If answer graded by QB is correct
-    if (strcmp(response, "correct") == 0) {
+    if (strcmp(mark, "correct") == 0) {
         isCorrect = 1;
-    } else if (strcmp(response, "wrong") == 0) {
+    } else if (strcmp(mark, "wrong") == 0) {
         isCorrect = 0;
+    }
+
+    if (strcmp(type, "pcqc") == 0 || strcmp(type, "pcqpy") == 0 ) {
+        if (output != NULL){
+            strcpy(answer, output);
+        }
     }
 
     close(TMclient);
@@ -160,6 +168,42 @@ char* handleQBgetAns(char *type, char *question) {
     close(TMclient);
     printf("--------- Connection to QB closed ---------\n");
     return correctAns;
+}
+
+void handleQBgetImg(char *type, char *question) {
+    int TMclient = createTMclient();
+
+    // Send the message
+    char message[BUFFERSIZE] = "";
+    strcat(message, "get_image@");
+    strcat(message, type);
+    strcat(message, "@");
+    strcat(message, question);
+    socketSend(TMclient, message, "get image");
+
+    // Receive QB acknowledgement for sent request
+    // receiveACK(TMclient, message, "get image");
+    
+    // Receive image from QB
+    char imageData[HTMLSIZE];
+    int  imageBytes;
+    FILE *imageFile = fopen("tempImg.png", "wb"); 
+    if (imageFile == NULL) {
+        fprintf(stderr, "[-] Error: Failed to open image for writing.\n");
+        exit(EXIT_FAILURE);
+    }
+    while ((imageBytes = recv(TMclient, imageData, HTMLSIZE, 0)) > 0) {
+        fwrite(imageData, sizeof(char), imageBytes, imageFile);
+    }
+    fclose(imageFile);
+    printf("[+] Image received successfully.\n");
+
+    // Send acknowledgement for received data
+    // char ack[BUFFERSIZE] = "ACK";
+    // socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
+
+    close(TMclient);
+    printf("--------- Connection to QB closed ---------\n");
 }
 
 /**

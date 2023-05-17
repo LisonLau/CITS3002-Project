@@ -27,6 +27,7 @@
 #define MAX_OPTION_LENGTH   100
 #define MAX_CLIENTS         30
 #define BUFFERSIZE          1024
+#define FILESIZE            8129
 #define HTMLSIZE            16384   
 
 typedef struct Questions {
@@ -54,6 +55,7 @@ typedef struct Students {
 typedef struct Result {
     int  isCorrect;
     char studentAns[BUFFERSIZE];
+    char studentOutput[BUFFERSIZE];
 } Result;
 
 // Global variables
@@ -75,10 +77,11 @@ extern void   runTMforWeb();
 extern int    checkLoggedIn(char *, int);
 extern int    handleUserLogin(int, char *, char *);
 extern void   sendHTMLpage(int, char *);
+extern void   sendImageHTMLpage(int, char *);
 // ques.c
 extern void   handleDisplayTest(int, char *, Students *, int);
 extern Result handleUserAnswers(char *, Students *, int);
-extern void   handleMarkAttempts(int, char *, Students *, int, Result);
+extern void   handleMarkAttempts(char *, Students *, int, Result);
 extern void   handleDisplayAnswer(int, Students *, int);
 extern void   handleDisplayQuestion(int, char *, Students *, int);
 extern void   urlDecode(char *, char *);
@@ -87,6 +90,7 @@ extern int    createTMclient();
 extern int    handleQBcheck(char *, char *, char *);
 extern void   handleQBgetFile(char *);
 extern char*  handleQBgetAns(char *, char *);
+extern void   handleQBgetImg(char *, char *);
 extern void   socketSend(int, char *, char *);
 extern void   receiveACK(int, char *, char *);
 // html.c
