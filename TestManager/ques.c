@@ -26,8 +26,8 @@ void handleDisplayTest(int TMsocket, char *HTTPrequest, Students *currStudent, i
     if (strstr(HTTPrequest, "POST / HTTP/1.1") != NULL) {
         // User click SEE button for PCQ image
         if (strstr(HTTPrequest, "see=") != NULL) {
-            handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
-            sendImagePage(TMsocket);
+            handleQBgetImg(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question, TEMP_IMG);
+            sendImage(TMsocket, TEMP_IMG);
         }
 
         // Handle user answers WHEN submit
