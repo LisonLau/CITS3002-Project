@@ -253,8 +253,8 @@ class QuestionBank:
                 
                 # Send acknowledgment for received data
                 if message :
+                    self.printReceivedMsg(message)
                     if messageType != "get_image" :
-                        self.printReceivedMsg(message)
                         TMclient.send("ACK".encode())
                         print("[+] Message 'ACKNOWLEDGEMENT' sent successfully.")
                     

@@ -99,7 +99,7 @@ class QuestionBankPython:
                             if (result.stdout.strip() == data[1].strip()):
                                 return True, result.stdout.strip()    
                             else:
-                                print(f'[!] stderr: {result.stderr.strip()}')
+                                print(f"[!] Student's code had a stderr.")
                                 return False, result.stderr.strip().replace("\n", "<br>")
                         return False, "Error: TimeoutExpired"
                       

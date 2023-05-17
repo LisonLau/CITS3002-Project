@@ -85,7 +85,6 @@ int handleQBcheck(char *type, char *question, char *answer) {
     // Send the message
     char message[BUFFERSIZE] = "";
     snprintf(message, sizeof(message), "check_answer@%s@%s@%s", type, question, answer);
-    printf("%s\n", answer);
     socketSend(TMclient, message, "check answer");
 
     // Receive QB acknowledgement for sent request
@@ -188,8 +187,7 @@ void handleQBgetImg(char *type, char *question, char *imageName) {
         fprintf(stderr, "[-] Error: Failed to open image for writing.\n");
         exit(EXIT_FAILURE);
     }
-    // imageBytes = recv(TMclient, imageData, FILESIZE, 0);
-    // fwrite(imageData, sizeof(char), imageBytes, imageFile); 
+
     while ((imageBytes = recv(TMclient, imageData, HTMLSIZE, 0)) > 0) {
         fwrite(imageData, sizeof(char), imageBytes, imageFile);
     }

@@ -119,7 +119,7 @@ class QuestionBankC:
                             if (process.stdout.strip() == data[1].strip()):
                                 return True, process.stdout.strip()
                             else:
-                                print("[!] stderr:\t" + process.stderr.strip())
+                                print("[!] Student's code had a stderr.")
                                 return False, process.stderr.strip().replace("\n", "<br>")
                         return False, "Error: TimeoutExpired"
             return False, "An internal QB error has occured."
