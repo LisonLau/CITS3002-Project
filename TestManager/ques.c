@@ -43,7 +43,7 @@ void handleDisplayTest(int TMsocket, char *HTTPrequest, Students *currStudent, i
         handleDisplayAnswer(TMsocket, currStudent, index);
 
         // Handle display questions WHEN nothing to do
-        handleDisplayQuestion(TMsocket, HTTPrequest, currStudent, index);
+        handleDisplayQuestion(TMsocket, currStudent, index);
     }
 }
 
@@ -75,6 +75,7 @@ Result handleUserAnswers(char *HTTPrequest, Students *currStudent, int index) {
     } else if (strstr(HTTPrequest, "pcqc=") != NULL) {  // PCQC
         sscanf(strstr(HTTPrequest, "pcqc="), "pcqc=%s", encoded_ans);
         urlDecode(encoded_ans, result.studentAns); 
+        printf("%s\n",result.studentAns);
         result.isCorrect = handleQBcheck("pcqc", currStudent->allocated[currQuestion[index]].question, result.studentAns);   // If wrong, minus mark by 1
     }
     return result;
@@ -119,7 +120,7 @@ void handleDisplayAnswer(int TMsocket, Students *currStudent, int index) {
         char *correctAns = {0};
         correctAns = handleQBgetAns(currStudent->allocated[currQuestion[index]].type, currStudent->allocated[currQuestion[index]].question);
         answerHTML = getAnswerHTML(answerHTML, currStudent, correctAns, index);
-        sendHTMLpage(TMsocket, answerHTML);
+        sendHTML(TMsocket, answerHTML);
         if (answerHTML != NULL) {
             free(answerHTML);
             answerHTML = NULL;
@@ -132,18 +133,17 @@ void handleDisplayAnswer(int TMsocket, Students *currStudent, int index) {
 }
 
 /**
- * @brief Handles displayed the question page on the web browser
+ * @brief Handles display the question page on the web browser
  * @param TMsocket the TM server socket file descriptor
- * @param HTTPrequest the HTTP request received from client web browser
  * @param currStudent current student information
  * @param index index of student's current question
  */
-void handleDisplayQuestion(int TMsocket, char *HTTPrequest, Students *currStudent, int index) {
+void handleDisplayQuestion(int TMsocket, Students *currStudent, int index) {
     // Display the question if student is not done with the question
     if (currStudent->allocated[currQuestion[index]].isDone == 0) {
         char *quesHTML = {0};
         quesHTML = getQuestionHTML(quesHTML, currStudent, index);
-        sendHTMLpage(TMsocket, quesHTML);
+        sendHTML(TMsocket, quesHTML);
         if (quesHTML != NULL) {
             free(quesHTML);
             quesHTML = NULL;
@@ -152,7 +152,23 @@ void handleDisplayQuestion(int TMsocket, char *HTTPrequest, Students *currStuden
 }
 
 /**
+ * @brief Handles display finish test page on the web browser
+ * @param TMsocket the TM server socket file descriptor
+ * @param currStudent current student information
+ */
+void handleFinishTest(int TMsocket, Students *currStudent) {
+    char *finishHTML = {0};
+    finishHTML = getFinishHTML(finishHTML, currStudent->grade);
+    sendHTML(TMsocket, finishHTML);
+    if (finishHTML != NULL) {
+        free(finishHTML);
+        finishHTML = NULL;
+    }                        
+}
+
+/**
  * @brief URL decoding function 
+ * Reference - https://stackoverflow.com/questions/2673207/c-c-url-decode-library
  * @param str string to be decoded
  * @param out the decoded string
  */

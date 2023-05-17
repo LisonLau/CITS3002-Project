@@ -5,7 +5,7 @@
 #include "TM.h"
 
 /**
- * @brief create and run TM server socket for web browser clients
+ * @brief Create and run TM server socket for web browser clients
  */
 void runTMforWeb() {
     int                 opt = 1;
@@ -115,7 +115,7 @@ void runTMforWeb() {
                     close(sockfd);
                 } 
                 else {
-                    printf("%s\n\n", HTTPrequest);
+                    printf("%s\n", HTTPrequest);
 
                     // Handle user login if user has not logged in
                     isLoggedIn = checkLoggedIn(inet_ntoa(addr.sin_addr), 0);
@@ -130,7 +130,7 @@ void runTMforWeb() {
                     if (strstr(HTTPrequest, "POST / HTTP/1.1") != NULL && strstr(HTTPrequest, "logout=Logout") != NULL) {
                         char *loginHTML = {0};
                         loginHTML = getLoginHTML(loginHTML, 0);
-                        sendHTMLpage(sockfd, loginHTML);
+                        sendHTML(sockfd, loginHTML);
                         if (loginHTML != NULL) {
                             free(loginHTML);
                             loginHTML = NULL;
@@ -149,16 +149,17 @@ void runTMforWeb() {
                         Students currStudent = students[index];
                         int quesIdx = currQuestion[index];
                         printf("[.] Student is: %s, index:%i quesIdx:%i\n", currStudent.username, index, quesIdx);
-            
+
+                        // Get PCQ answer as an image
+                        if (strstr(HTTPrequest, "GET /tempImg.png HTTP/1.1")){
+                            // Get the example Answer for PCQ questions
+                            handleQBgetImg(currStudent.allocated[quesIdx].type, currStudent.allocated[quesIdx].question, TEMP_IMG);
+                            sendImage(sockfd, TEMP_IMG);
+                        }
+
                         // Handle display finish page after test is done
                         if (currStudent.allocated[quesIdx].isDone == 1 && quesIdx >= MAX_QUESTIONS-1) {
-                            char *finishHTML = {0};
-                            finishHTML = getFinishHTML(finishHTML, currStudent.grade);
-                            sendHTMLpage(sockfd, finishHTML);
-                            if (finishHTML != NULL) {
-                                free(finishHTML);
-                                finishHTML = NULL;
-                            }
+                            handleFinishTest(sockfd, &students[index]);
                         }
                         // Handle display question page of current question
                         else {
@@ -185,20 +186,17 @@ void runTMforWeb() {
  */
 int handleUserLogin(int socket, char *ip, char *HTTPrequest) {
     char *form = strstr(HTTPrequest, "uname=");
+    char *loginHTML = {0};
+
     // Display login page
     if (strstr(HTTPrequest, "GET / HTTP/1.1") != NULL) {
-        char *loginHTML = {0};
         loginHTML = getLoginHTML(loginHTML, 0);
-        sendHTMLpage(socket, loginHTML);
-        if (loginHTML != NULL) {
-            free(loginHTML);
-            loginHTML = NULL;
-        }
+        sendHTML(socket, loginHTML);
     } 
     // Extract the username and password from the form data
     else if (strstr(HTTPrequest, "POST / HTTP/1.1") != NULL) {
-        char uname[MAX_USERNAME_LENGTH] = {0};
-        char pword[MAX_PASSWORD_LENGTH] = {0};
+        char uname[MAX_USERNAME_LENGTH];
+        char pword[MAX_PASSWORD_LENGTH];
         sscanf(form, "uname=%[^&]&pword=%s", uname, pword);
         // User successfully logged in, display question page
         if (authenticateUsers(uname, pword)) {
@@ -210,13 +208,14 @@ int handleUserLogin(int socket, char *ip, char *HTTPrequest) {
         } 
         // User failed to logged in, ask for login attempt
         else {
-            char *loginHTML = {0};
             loginHTML = getLoginHTML(loginHTML, 1);
-            sendHTMLpage(socket, loginHTML);
-            if (loginHTML != NULL) {
-                free(loginHTML);
-                loginHTML = NULL;
-            }
+            sendHTML(socket, loginHTML);
+        }
+
+        // Free loginHTML
+        if (loginHTML != NULL) {
+            free(loginHTML);
+            loginHTML = NULL;
         }
     }
     // Display 404 error page
@@ -254,9 +253,8 @@ int checkLoggedIn(char *var, int getIndex) {
  * @brief handles TM socket sending the HTML page to the web browser
  * @param TMsocket TM socket file descriptor
  * @param message the HTML message to be send
- * @param sendImage 1 if socket is sending an image, 0 otherwise
  */
-void sendHTMLpage(int TMsocket, char *message) {
+void sendHTML(int TMsocket, char *message) {
     char response[HTMLSIZE] = {0};
     sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: %ld\n\n%s", strlen(message), message);
     if (send(TMsocket, response, strlen(response), 0) < 0) {
@@ -265,9 +263,13 @@ void sendHTMLpage(int TMsocket, char *message) {
     }
 }
 
-void sendImagePage(int TMsocket) {
+/**
+ * @brief handles TM socket sending an image
+ * @param TMsocket TM socket file descriptor
+ */
+void sendImage(int TMsocket, char *imageName) {
     // Read the image file
-    FILE* imageFile = fopen("tempImg.png", "rb");
+    FILE* imageFile = fopen(imageName, "rb");
     if (imageFile == NULL) {
         fprintf(stderr, "[-] Error opening image file.");
         exit(EXIT_FAILURE);
@@ -278,11 +280,9 @@ void sendImagePage(int TMsocket) {
     long imageSize = ftell(imageFile);
     fseek(imageFile, 0, SEEK_SET);
 
-    printf("%ld\n", imageSize);
-
     // Allocate memory to store the image
-    char* imageData  = (char*)malloc(imageSize);
-    if (imageData  == NULL) {
+    char* imageData = (char*)malloc(imageSize);
+    if (imageData == NULL) {
         fprintf(stderr, "[-] Error allocating memory for image buffer.");
         exit(EXIT_FAILURE);
     }
@@ -303,7 +303,17 @@ void sendImagePage(int TMsocket) {
         exit(EXIT_FAILURE);
     }
 
+    // Send HTTP response headers
+    char responseHeaders[BUFFERSIZE];
+    snprintf(responseHeaders, sizeof(responseHeaders),\
+    "HTTP/1.1 200 OK\nContent-Type: image/png\nContent-Length: %ld\n\n", imageSize);
+    if (send(TMsocket, responseHeaders, strlen(responseHeaders), 0) < 0) {
+        fprintf(stderr, "[!] Failed to send HTML response headers.");
+        exit(EXIT_FAILURE);
+    }
+
     // Send the image
+    if (send(TMsocket, imageData, imageSize, 0) < 0) {
     if (send(TMsocket, imageData, imageSize, 0) < 0) {
         fprintf(stderr, "[!] Failed to send image data.");
         exit(EXIT_FAILURE);
