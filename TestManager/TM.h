@@ -16,8 +16,6 @@
 #include <netdb.h>
 #include <signal.h>
 
-#define SERVER_PORT         8080
-#define CLIENT_PORT         8888
 #define MAX_USERNAME_LENGTH 100
 #define MAX_PASSWORD_LENGTH 100
 #define MAX_QUESTION_LENGTH 500
@@ -26,9 +24,14 @@
 #define MAX_OPTIONS         4
 #define MAX_OPTION_LENGTH   100
 #define MAX_CLIENTS         30
+
 #define BUFFERSIZE          1024
+#define HTTPSIZE            4096
 #define FILESIZE            8129
 #define HTMLSIZE            16384   
+
+#define SERVER_PORT         8080
+#define CLIENT_PORT         8888
 #define TEMP_IMG            "tempImg.png"
 
 typedef struct Questions {

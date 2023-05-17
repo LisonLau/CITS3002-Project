@@ -181,7 +181,7 @@ void handleQBgetImg(char *type, char *question, char *imageName) {
     socketSend(TMclient, message, "get image");
     
     // Receive image from QB
-     char imageData[HTMLSIZE];
+    char imageData[HTMLSIZE];
     int  imageBytes;
     FILE *imageFile = fopen(imageName, "wb"); 
     if (imageFile == NULL) {

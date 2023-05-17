@@ -14,7 +14,7 @@ void runTMforWeb() {
     struct sockaddr_in  addr;
     socklen_t           addrsize;
     fd_set              readset;
-    char                HTTPrequest[BUFFERSIZE];
+    char                HTTPrequest[HTTPSIZE];
     int                 isLoggedIn = 0;
     struct timeval      timeout;
     timeout.tv_sec = 10; // wait up to 10 seconds 
@@ -104,9 +104,9 @@ void runTMforWeb() {
             if (FD_ISSET(sockfd, &readset)) {
 
                 // Read HTTP request
-                memset(HTTPrequest, 0, BUFFERSIZE);
+                memset(HTTPrequest, 0, HTTPSIZE);
                 getpeername(sockfd, (struct sockaddr*)&addr, &addrsize);
-                if ((valread = read(sockfd, HTTPrequest, BUFFERSIZE))  == 0) {
+                if ((valread = read(sockfd, HTTPrequest, HTTPSIZE))  == 0) {
                     // This client has disconnected
                     printf("[.] A client disconnected, ip: %s, port: %d\n",
                             inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
