@@ -6,6 +6,7 @@ import csv
 import os
 import subprocess
 
+# Question Bank Instance for Python programming questions
 class QuestionBankPython:
     # Initialise path names for Python csv files
     def __init__(self):
@@ -103,9 +104,10 @@ class QuestionBankPython:
                         return False, "Error: TimeoutExpired"
                       
             return False, "An internal QB error has occured."
+        
         except Exception as e:
             print(f"Error occured: {str(e)}")      
-        return False
+        return False, ""
     
     # Get PCQ answer from given question
     def getPCQanswer(self, question):

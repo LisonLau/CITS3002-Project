@@ -6,6 +6,7 @@ import csv
 import os
 import subprocess
 
+# Question Bank Instance for C programming questions
 class QuestionBankC:
     # Initialise path names for C csv files
     def __init__(self):
@@ -158,4 +159,3 @@ class QuestionBankC:
         except Exception as e:
             print(f"Error occured: {str(e)}")      
         return ""
-

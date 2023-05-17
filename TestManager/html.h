@@ -14,4 +14,6 @@ char *blueBG = "style='background-color:#BBECF6'";
 char *correctColor = "style='background-color:#C6F099'";
 char *wrongColor = "style='background-color:#F6B0AD'";
 char *idleColor = "style='background-color:#F0F29F'";
+// Allow tabbing got HTML textarea
+// Reference - https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
 char *onKeyDown = "onkeydown=\"if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}\"";

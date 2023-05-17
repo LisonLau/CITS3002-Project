@@ -2,6 +2,9 @@
 # Student 2: Alicia Lau    (22955092)
 # Student 3: Li-Anne Long  (23192171)
 
+# Transfer files and send messages using TCP socket in Python
+# Reference - https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-python3/
+
 import csv
 import random
 import socket
@@ -256,6 +259,7 @@ class QuestionBank:
                     
                 TMclient.close()
                 print("----- Connection to " + TMaddress[0] + ':' + str(TMaddress[1]) + " closed -----")
+        
         # If the user presses Ctrl+C, close the connection and the socket
         except KeyboardInterrupt:
             self.clearMemory(QBserver)

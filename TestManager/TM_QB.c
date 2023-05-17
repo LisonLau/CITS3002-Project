@@ -2,6 +2,9 @@
 // Student 2: Alicia Lau    (22955092)
 // Student 3: Li-Anne Long  (23192171)
 
+// Transfer files and send messages using TCP socket in C
+// Reference - https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-c/
+
 #include "TM.h"
 
 /**
@@ -42,8 +45,7 @@ void handleQBgetFile(char *filename) {
 
     // Send the request for file message
     char message[BUFFERSIZE] = "";
-    strcat(message, "get_file@");
-    strcat(message, filename);
+    snprintf(message, sizeof(message), "get_file@%s", filename);
     socketSend(TMclient, message, "get file");
 
     // Receive QB acknowledgement for sent request
@@ -82,12 +84,7 @@ int handleQBcheck(char *type, char *question, char *answer) {
 
     // Send the message
     char message[BUFFERSIZE] = "";
-    strcat(message, "check_answer@");
-    strcat(message, type);
-    strcat(message, "@");
-    strcat(message, question);
-    strcat(message, "@");
-    strcat(message, answer);
+    snprintf(message, sizeof(message), "check_answer@%s@%s@%s", type, question, answer);
     printf("%s\n", answer);
     socketSend(TMclient, message, "check answer");
 
@@ -110,13 +107,14 @@ int handleQBcheck(char *type, char *question, char *answer) {
     char ack[BUFFERSIZE] = "ACK";
     socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
     
-    // If answer graded by QB is correct
+    // MCQ - Check if answer is correct or wrong
     if (strcmp(mark, "correct") == 0) {
         isCorrect = 1;
     } else if (strcmp(mark, "wrong") == 0) {
         isCorrect = 0;
     }
 
+    // PCQ - Store answer
     if (strcmp(type, "pcqc") == 0 || strcmp(type, "pcqpy") == 0 ) {
         if (output != NULL){
             strcpy(answer, output);
@@ -129,7 +127,7 @@ int handleQBcheck(char *type, char *question, char *answer) {
 }
 
 /**
- * @brief create TM client to send request from QB to get answer
+ * @brief create TM client to request QB to get answer
  * @param type type of question
  * @param question the question 
  * @return char* the correct answer to the given question
@@ -139,10 +137,7 @@ char* handleQBgetAns(char *type, char *question) {
 
     // Send the message
     char message[BUFFERSIZE] = "";
-    strcat(message, "get_answer@");
-    strcat(message, type);
-    strcat(message, "@");
-    strcat(message, question);
+    snprintf(message, sizeof(message), "get_answer@%s@%s", type, question);
     socketSend(TMclient, message, "get answer");
 
     // Receive QB acknowledgement for sent request
@@ -171,40 +166,33 @@ char* handleQBgetAns(char *type, char *question) {
     return correctAns;
 }
 
-void handleQBgetImg(char *type, char *question) {
-
+/**
+ * @brief create TM client to request QB to get image
+ * @param type type of question
+ * @param question the question
+ * @param imageName name of image file
+ */
+void handleQBgetImg(char *type, char *question, char *imageName) {
     int TMclient = createTMclient();
 
     // Send the message
     char message[BUFFERSIZE] = "";
-    strcat(message, "get_image@");
-    strcat(message, type);
-    strcat(message, "@");
-    strcat(message, question);
+    snprintf(message, sizeof(message), "get_image@%s@%s", type, question);
     socketSend(TMclient, message, "get image");
-
-    // Receive QB acknowledgement for sent request
-    // receiveACK(TMclient, message, "get image");
     
     // Receive image from QB
      char imageData[HTMLSIZE];
     int  imageBytes;
-    FILE *imageFile = fopen("tempImg.png", "wb"); 
+    FILE *imageFile = fopen(imageName, "wb"); 
     if (imageFile == NULL) {
         fprintf(stderr, "[-] Error: Failed to open image for writing.\n");
         exit(EXIT_FAILURE);
     }
-    // imageBytes = recv(TMclient, imageData, FILESIZE, 0);
-    // fwrite(imageData, sizeof(char), imageBytes, imageFile); 
     while ((imageBytes = recv(TMclient, imageData, HTMLSIZE, 0)) > 0) {
         fwrite(imageData, sizeof(char), imageBytes, imageFile);
     }
     fclose(imageFile);
     printf("[+] Image received successfully.\n");
-
-    // Send acknowledgement for received data
-    // char ack[BUFFERSIZE] = "ACK";
-    // socketSend(TMclient, ack, "ACKNOWLEDGEMENT");
 
     close(TMclient);
     printf("--------- Connection to QB closed ---------\n");
