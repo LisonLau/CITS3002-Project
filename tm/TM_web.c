@@ -2,6 +2,9 @@
 // Student 2: Alicia Lau    (22955092)
 // Student 3: Li-Anne Long  (23192171)
 
+// HTTP post message to web browser in C
+// Reference - https://stackoverflow.com/questions/22077802/simple-c-example-of-doing-an-http-post-and-consuming-the-response
+
 #include "TM.h"
 
 /**

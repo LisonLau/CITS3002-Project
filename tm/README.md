@@ -23,5 +23,6 @@ https://<TM IPv4 address>:8080
 ## References / Citations
 - [C Select Manual](https://man7.org/linux/man-pages/man2/select.2.html)
 - [File Transfer using TCP Socket in C](https://idiotdeveloper.com/file-transfer-using-tcp-socket-in-c/)
+- [HTTP post message to web browser in C](https://stackoverflow.com/questions/22077802/simple-c-example-of-doing-an-http-post-and-consuming-the-response)
 - [Decoding URL](https://stackoverflow.com/questions/2673207/c-c-url-decode-library)
 - [JavaScript TAB to indent in textarea](https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea)

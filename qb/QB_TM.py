@@ -32,7 +32,7 @@ class QuestionBank:
         self.BUFFERSIZE  = 1024
         self.TEMP_IMG = "tempImg.png"
         self.filesList = []
-
+    
     # Generates a list of random questions from MCQ and PCQ 
     def getRandom(self):
         # Not including the answers for MCQ
