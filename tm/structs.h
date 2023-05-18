@@ -9,11 +9,12 @@
 #define MAX_QUESTIONS       10
 #define MAX_OPTIONS         4
 #define MAX_OPTION_LENGTH   100
+#define MAX_TYPE_LENGTH     6
 
 #define BUFFERSIZE          1024
 
 typedef struct Questions {
-    char type[10];  
+    char type[MAX_TYPE_LENGTH];  
     char question[MAX_QUESTION_LENGTH];
     int  isMCQ;  // 1 means MCQ, 0 means PCQ
     char options[MAX_OPTIONS][MAX_OPTION_LENGTH];

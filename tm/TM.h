@@ -30,16 +30,19 @@
 
 // main.c
 extern void   clearMemory(int);
+
 // user.c
 extern void   storeUsers();
 extern int    authenticateUsers(char *, char *);
 extern void   storeStudentQuestions(char *, Students *);
+
 // TM_web.c
 extern void   runTMforWeb();
 extern int    checkLoggedIn(char *, int);
 extern int    handleUserLogin(int, char *, char *);
 extern void   sendHTML(int, char *);
 extern void   sendImage(int, char *);
+
 // ques.c
 extern void   handleDisplayTest(int, char *, Students *, int);
 extern Result handleUserAnswers(char *, Students *, int);
@@ -48,6 +51,7 @@ extern void   handleDisplayAnswer(int, Students *, int);
 extern void   handleDisplayQuestion(int, Students *, int);
 extern void   handleFinishTest(int, Students *);
 extern void   urlDecode(char *, char *);
+
 // TM_QB.c
 extern int    createTMclient();
 extern int    handleQBcheck(char *, char *, char *);
@@ -56,6 +60,7 @@ extern char*  handleQBgetAns(char *, char *);
 extern void   handleQBgetImg(char *, char *, char *);
 extern void   socketSend(int, char *, char *);
 extern void   receiveACK(int, char *, char *);
+
 // html.c
 extern char*  getQuestionHTML(char *, Students *, int);
 extern char*  getFinishHTML(char *, int);
