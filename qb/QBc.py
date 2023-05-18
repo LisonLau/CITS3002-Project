@@ -137,7 +137,6 @@ class QuestionBankC:
                         with open("./CQuestions/pcqcTests.txt", "r") as testData:
                             testData = testData.readlines()
                             data = testData[i].split("@")
-                            print(data[1].strip())
                             return f"<br>Input data: {data[0].strip()}<br>Expected output: {data[1].strip()}"
             return "An internal QB error has occured."
         except Exception as e:
