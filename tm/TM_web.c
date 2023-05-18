@@ -297,7 +297,6 @@ void sendImage(int TMsocket, char *imageName) {
     }
     fclose(imageFile);
 
-
     // Send HTTP response headers
     char responseHeaders[BUFFERSIZE];
     snprintf(responseHeaders, sizeof(responseHeaders),\

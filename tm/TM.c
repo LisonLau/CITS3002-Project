@@ -56,7 +56,7 @@ void clearMemory(int sig) {
     if (remove(TEMP_IMG) != 0) {
         fprintf(stderr, "[!] Failed to delete image");
     }
-    printf("\n[-] Removed temp image.\n");
+    printf("[-] Removed temp image.\n");
     
     // Close the TM server socket
     close(TMserver);

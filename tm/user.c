@@ -87,13 +87,13 @@ void storeStudentQuestions(char *filename, Students *currStudent) {
         currStudent->allocated[quesIdx].isCorrect = 0;
         // Check the question type and store the values accordingly
         if (strcmp(type, "pcqpy") == 0 || strcmp(type, "pcqc") == 0) {
-            strncpy(currStudent->allocated[quesIdx].type, type, 10);
+            strncpy(currStudent->allocated[quesIdx].type, type, MAX_TYPE_LENGTH);
             strncpy(currStudent->allocated[quesIdx].question, ques, MAX_QUESTION_LENGTH);
             currStudent->allocated[quesIdx].isMCQ = 0;
             quesIdx++;
 
         } else if (strcmp(type, "mcqpy") == 0 || strcmp(type, "mcqc") == 0) {
-            strncpy(currStudent->allocated[quesIdx].type, type, 10);
+            strncpy(currStudent->allocated[quesIdx].type, type, MAX_TYPE_LENGTH);
             strncpy(currStudent->allocated[quesIdx].question, ques, MAX_QUESTION_LENGTH);
             currStudent->allocated[quesIdx].isMCQ = 1;
             // Store options

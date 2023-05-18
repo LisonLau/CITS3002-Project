@@ -64,7 +64,6 @@ class QuestionBank:
         elif type == "mcqpy":   # PYTHON multiple choice question
             isCorrect = self.QBpyInstance.gradeMCQ(ques, ans)
         elif type == "pcqpy":   # PYTHON programming challenge question
-            print(ans)
             isCorrect, output = self.QBpyInstance.gradePCQ(ques, ans)
         else:
             print("Error occurred: invalid question type")
@@ -213,7 +212,7 @@ class QuestionBank:
                 os.remove(self.TEMP_IMG)
         except OSError as e:
             print(f"[!] Failed to delete image.\n")
-        print("\n[-] Removed temp image.")
+        print("[-] Removed temp image.")
 
         # Close the QB server socket
         socket.close()
